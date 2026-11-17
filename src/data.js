@@ -14,26 +14,46 @@ export const team = [
     roles: ["Chief Executive Officer (CEO)"],
     image: "/images/avatars/m1.jpg",
     bio: "",
-    highlight: { label: "Leadership & Achievements", text: "Spearheaded initiatives to connect business strategy with modern technology solutions, emphasizing long-term client relationships, innovation, and sustainable growth." },
-    expertise: { label: "Professional Expertise", text: "Business strategy, technology consulting, enterprise software delivery, and organizational leadership." },
-    quote: "Technology creates opportunities, but it's the people behind it who turn those opportunities into something meaningful.",
+    highlight: {
+      label: "Leadership & Achievements",
+      text: "Spearheaded initiatives to connect business strategy with modern technology solutions, emphasizing long-term client relationships, innovation, and sustainable growth.",
+    },
+    expertise: {
+      label: "Professional Expertise",
+      text: "Business strategy, technology consulting, enterprise software delivery, and organizational leadership.",
+    },
+    quote:
+      "Technology creates opportunities, but it's the people behind it who turn those opportunities into something meaningful.",
   },
   {
     name: "Olivia Brennan",
     roles: ["Chief Technology Officer (CTO)"],
     image: "/images/avatars/f2.jpg",
     bio: "",
-    highlight: { label: "Leadership & Achievements", text: "Led the development of scalable technology architectures and established engineering practices designed to improve application performance, security, and maintainability." },
-    expertise: { label: "Technical Expertise", text: "Cloud-native architecture, distributed systems, AWS, microservices, API engineering, and software scalability." },
-    quote: "Great engineering isn't about using the newest technology. It's about choosing the right technology to solve the right problem.",
+    highlight: {
+      label: "Leadership & Achievements",
+      text: "Led the development of scalable technology architectures and established engineering practices designed to improve application performance, security, and maintainability.",
+    },
+    expertise: {
+      label: "Technical Expertise",
+      text: "Cloud-native architecture, distributed systems, AWS, microservices, API engineering, and software scalability.",
+    },
+    quote:
+      "Great engineering isn't about using the newest technology. It's about choosing the right technology to solve the right problem.",
   },
   {
     name: "Daniel Harper",
     roles: ["Chief Operating Officer (COO)"],
     image: "/images/avatars/m3.jpg",
     bio: "",
-    highlight: { label: "Leadership & Achievements", text: "Championed operational improvements that strengthened collaboration between engineering, product, and client-facing teams while creating more predictable delivery processes." },
-    expertise: { label: "Professional Expertise", text: "Operational strategy, Agile delivery, resource planning, process optimization, and organizational development." },
+    highlight: {
+      label: "Leadership & Achievements",
+      text: "Championed operational improvements that strengthened collaboration between engineering, product, and client-facing teams while creating more predictable delivery processes.",
+    },
+    expertise: {
+      label: "Professional Expertise",
+      text: "Operational strategy, Agile delivery, resource planning, process optimization, and organizational development.",
+    },
     quote: "Consistency builds trust, and trust is what turns a successful project into a lasting partnership.",
   },
   {
@@ -41,17 +61,30 @@ export const team = [
     roles: ["Director of Engineering"],
     image: "/images/avatars/f5.jpg",
     bio: "",
-    highlight: { label: "Leadership & Achievements", text: "Introduced engineering standards, collaborative code reviews, and automated development workflows to support reliable software delivery and stronger technical collaboration." },
-    expertise: { label: "Technical Expertise", text: "Software architecture, CI/CD, TypeScript, system design, engineering leadership, and performance optimization." },
-    quote: "A great engineering team doesn't just deliver code. It creates solutions that other engineers are proud to build upon.",
+    highlight: {
+      label: "Leadership & Achievements",
+      text: "Introduced engineering standards, collaborative code reviews, and automated development workflows to support reliable software delivery and stronger technical collaboration.",
+    },
+    expertise: {
+      label: "Technical Expertise",
+      text: "Software architecture, CI/CD, TypeScript, system design, engineering leadership, and performance optimization.",
+    },
+    quote:
+      "A great engineering team doesn't just deliver code. It creates solutions that other engineers are proud to build upon.",
   },
   {
     name: "Emily Carter",
     roles: ["Senior Software Architect"],
     image: "/images/avatars/f6.jpg",
     bio: "",
-    highlight: { label: "Technical Achievements", text: "Designed modular software architectures that simplify complex system integrations and support evolving business requirements without compromising maintainability." },
-    expertise: { label: "Technical Expertise", text: "Distributed systems, domain-driven design, PostgreSQL, REST APIs, microservices, and enterprise application architecture." },
+    highlight: {
+      label: "Technical Achievements",
+      text: "Designed modular software architectures that simplify complex system integrations and support evolving business requirements without compromising maintainability.",
+    },
+    expertise: {
+      label: "Technical Expertise",
+      text: "Distributed systems, domain-driven design, PostgreSQL, REST APIs, microservices, and enterprise application architecture.",
+    },
     quote: "The most elegant architecture is the one that makes tomorrow's challenges easier to solve.",
   },
   {
@@ -59,8 +92,14 @@ export const team = [
     roles: ["Lead Full-Stack Engineer"],
     image: "/images/avatars/m4.jpg",
     bio: "",
-    highlight: { label: "Technical Achievements", text: "Led end-to-end development initiatives connecting intuitive web interfaces with scalable backend services, establishing reusable patterns for faster product development." },
-    expertise: { label: "Technical Expertise", text: "React, Next.js, Node.js, TypeScript, PostgreSQL, and full-stack application architecture." },
+    highlight: {
+      label: "Technical Achievements",
+      text: "Led end-to-end development initiatives connecting intuitive web interfaces with scalable backend services, establishing reusable patterns for faster product development.",
+    },
+    expertise: {
+      label: "Technical Expertise",
+      text: "React, Next.js, Node.js, TypeScript, PostgreSQL, and full-stack application architecture.",
+    },
     quote: "The best software feels simple to the user, even when the engineering behind it is anything but.",
   },
   {
@@ -68,8 +107,14 @@ export const team = [
     roles: ["Senior Frontend Developer"],
     image: "/images/avatars/f2.jpg",
     bio: "",
-    highlight: { label: "Technical Achievements", text: "Helped establish reusable component libraries and responsive interface standards to improve consistency, accessibility, and performance across web applications." },
-    expertise: { label: "Technical Expertise", text: "React, Next.js, TypeScript, JavaScript, Tailwind CSS, web accessibility, and frontend performance." },
+    highlight: {
+      label: "Technical Achievements",
+      text: "Helped establish reusable component libraries and responsive interface standards to improve consistency, accessibility, and performance across web applications.",
+    },
+    expertise: {
+      label: "Technical Expertise",
+      text: "React, Next.js, TypeScript, JavaScript, Tailwind CSS, web accessibility, and frontend performance.",
+    },
     quote: "Every detail matters because even the smallest interaction shapes how someone experiences a product.",
   },
   {
@@ -77,8 +122,14 @@ export const team = [
     roles: ["Senior Backend Developer"],
     image: "/images/avatars/m1.jpg",
     bio: "",
-    highlight: { label: "Technical Achievements", text: "Developed secure APIs, optimized database operations, and improved application architecture to support dependable performance under increasingly complex workloads." },
-    expertise: { label: "Technical Expertise", text: "Node.js, Python, PostgreSQL, Redis, API security, database optimization, and backend architecture." },
+    highlight: {
+      label: "Technical Achievements",
+      text: "Developed secure APIs, optimized database operations, and improved application architecture to support dependable performance under increasingly complex workloads.",
+    },
+    expertise: {
+      label: "Technical Expertise",
+      text: "Node.js, Python, PostgreSQL, Redis, API security, database optimization, and backend architecture.",
+    },
     quote: "The strongest systems are often the ones users never have to think about.",
   },
   {
@@ -86,8 +137,14 @@ export const team = [
     roles: ["Full-Stack Developer"],
     image: "/images/avatars/m3.jpg",
     bio: "",
-    highlight: { label: "Technical Achievements", text: "Contributed to the development of modern web platforms, connecting frontend experiences with backend functionality and refining applications through continuous iteration." },
-    expertise: { label: "Technical Expertise", text: "React, TypeScript, Node.js, Express, SQL databases, Git, and RESTful APIs." },
+    highlight: {
+      label: "Technical Achievements",
+      text: "Contributed to the development of modern web platforms, connecting frontend experiences with backend functionality and refining applications through continuous iteration.",
+    },
+    expertise: {
+      label: "Technical Expertise",
+      text: "React, TypeScript, Node.js, Express, SQL databases, Git, and RESTful APIs.",
+    },
     quote: "I love the moment when a complicated idea becomes something people can actually use.",
   },
   {
@@ -95,8 +152,14 @@ export const team = [
     roles: ["DevOps & Cloud Engineer"],
     image: "/images/avatars/f5.jpg",
     bio: "",
-    highlight: { label: "Technical Achievements", text: "Developed infrastructure automation and streamlined deployment workflows to reduce manual configuration, improve consistency, and support reliable application releases." },
-    expertise: { label: "Technical Expertise", text: "AWS, Docker, Kubernetes, Terraform, Linux, GitHub Actions, and CI/CD automation." },
+    highlight: {
+      label: "Technical Achievements",
+      text: "Developed infrastructure automation and streamlined deployment workflows to reduce manual configuration, improve consistency, and support reliable application releases.",
+    },
+    expertise: {
+      label: "Technical Expertise",
+      text: "AWS, Docker, Kubernetes, Terraform, Linux, GitHub Actions, and CI/CD automation.",
+    },
     quote: "Reliable infrastructure should make innovation easier, not stand in its way.",
   },
   {
@@ -104,8 +167,14 @@ export const team = [
     roles: ["AI/ML Engineer"],
     image: "/images/avatars/m4.jpg",
     bio: "",
-    highlight: { label: "Technical Achievements", text: "Explored intelligent search, document processing, and AI-assisted automation to help transform complex data into practical, user-focused applications." },
-    expertise: { label: "Technical Expertise", text: "Python, PyTorch, machine learning, large language models, vector databases, RAG architectures, and AI integration." },
+    highlight: {
+      label: "Technical Achievements",
+      text: "Explored intelligent search, document processing, and AI-assisted automation to help transform complex data into practical, user-focused applications.",
+    },
+    expertise: {
+      label: "Technical Expertise",
+      text: "Python, PyTorch, machine learning, large language models, vector databases, RAG architectures, and AI integration.",
+    },
     quote: "The real value of AI isn't what it can generate. It's what it can help people accomplish.",
   },
   {
@@ -113,8 +182,14 @@ export const team = [
     roles: ["QA Automation Engineer"],
     image: "/images/avatars/f6.jpg",
     bio: "",
-    highlight: { label: "Technical Achievements", text: "Established automated regression testing and quality assurance workflows designed to identify critical issues earlier and support more dependable releases." },
-    expertise: { label: "Technical Expertise", text: "Playwright, Cypress, Selenium, API testing, automated test frameworks, and quality engineering." },
+    highlight: {
+      label: "Technical Achievements",
+      text: "Established automated regression testing and quality assurance workflows designed to identify critical issues earlier and support more dependable releases.",
+    },
+    expertise: {
+      label: "Technical Expertise",
+      text: "Playwright, Cypress, Selenium, API testing, automated test frameworks, and quality engineering.",
+    },
     quote: "Quality isn't something you check at the finish line. It's something you build into every step.",
   },
   {
@@ -122,8 +197,14 @@ export const team = [
     roles: ["Product Manager"],
     image: "/images/avatars/f2.jpg",
     bio: "",
-    highlight: { label: "Leadership & Achievements", text: "Guided product discovery and roadmap planning initiatives, transforming customer feedback and business requirements into clear, actionable development priorities." },
-    expertise: { label: "Professional Expertise", text: "Product strategy, Agile methodologies, user research, product analytics, roadmap development, and stakeholder management." },
+    highlight: {
+      label: "Leadership & Achievements",
+      text: "Guided product discovery and roadmap planning initiatives, transforming customer feedback and business requirements into clear, actionable development priorities.",
+    },
+    expertise: {
+      label: "Professional Expertise",
+      text: "Product strategy, Agile methodologies, user research, product analytics, roadmap development, and stakeholder management.",
+    },
     quote: "A successful product starts by understanding the problem better than anyone else.",
   },
   {
@@ -131,8 +212,14 @@ export const team = [
     roles: ["Senior UI/UX Designer"],
     image: "/images/avatars/m1.jpg",
     bio: "",
-    highlight: { label: "Creative Achievements", text: "Led interface design and usability improvement initiatives for complex digital workflows, bringing clarity to challenging experiences through thoughtful research and visual design." },
-    expertise: { label: "Technical Expertise", text: "Figma, design systems, interaction design, usability testing, information architecture, and responsive UI design." },
+    highlight: {
+      label: "Creative Achievements",
+      text: "Led interface design and usability improvement initiatives for complex digital workflows, bringing clarity to challenging experiences through thoughtful research and visual design.",
+    },
+    expertise: {
+      label: "Technical Expertise",
+      text: "Figma, design systems, interaction design, usability testing, information architecture, and responsive UI design.",
+    },
     quote: "Good design gets attention. Great design makes everything feel effortless.",
   },
   {
@@ -140,8 +227,14 @@ export const team = [
     roles: ["Technical Project Manager"],
     image: "/images/avatars/f6.jpg",
     bio: "",
-    highlight: { label: "Leadership & Achievements", text: "Coordinated cross-functional development initiatives, improving project visibility, risk management, milestone planning, and communication between technical teams and stakeholders." },
-    expertise: { label: "Professional Expertise", text: "Agile and Scrum, technical project delivery, sprint planning, Jira, risk management, and software development lifecycles." },
+    highlight: {
+      label: "Leadership & Achievements",
+      text: "Coordinated cross-functional development initiatives, improving project visibility, risk management, milestone planning, and communication between technical teams and stakeholders.",
+    },
+    expertise: {
+      label: "Professional Expertise",
+      text: "Agile and Scrum, technical project delivery, sprint planning, Jira, risk management, and software development lifecycles.",
+    },
     quote: "A successful project isn't just delivered on time. It's delivered with clarity, trust, and shared purpose.",
   },
   {
@@ -149,8 +242,14 @@ export const team = [
     roles: ["Director of Business Development"],
     image: "/images/avatars/m3.jpg",
     bio: "",
-    highlight: { label: "Business Achievements", text: "Led strategic outreach and solution-focused client engagement initiatives, connecting business challenges with tailored technology services and partnership opportunities." },
-    expertise: { label: "Professional Expertise", text: "Technology consulting, strategic partnerships, enterprise sales, solution development, and client relationship management." },
+    highlight: {
+      label: "Business Achievements",
+      text: "Led strategic outreach and solution-focused client engagement initiatives, connecting business challenges with tailored technology services and partnership opportunities.",
+    },
+    expertise: {
+      label: "Professional Expertise",
+      text: "Technology consulting, strategic partnerships, enterprise sales, solution development, and client relationship management.",
+    },
     quote: "The strongest business relationships begin with listening, not selling.",
   },
   {
@@ -158,18 +257,32 @@ export const team = [
     roles: ["Marketing & Growth Manager"],
     image: "/images/avatars/m4.jpg",
     bio: "",
-    highlight: { label: "Professional Achievements", text: "Developed integrated marketing initiatives connecting brand storytelling, organic discovery, and measurable campaign performance to support business growth." },
-    expertise: { label: "Professional Expertise", text: "Digital marketing, SEO, Google Analytics, content strategy, campaign optimization, and brand positioning." },
-    quote: "Great marketing doesn't just attract attention. It gives people a reason to believe in what you're building.",
+    highlight: {
+      label: "Professional Achievements",
+      text: "Developed integrated marketing initiatives connecting brand storytelling, organic discovery, and measurable campaign performance to support business growth.",
+    },
+    expertise: {
+      label: "Professional Expertise",
+      text: "Digital marketing, SEO, Google Analytics, content strategy, campaign optimization, and brand positioning.",
+    },
+    quote:
+      "Great marketing doesn't just attract attention. It gives people a reason to believe in what you're building.",
   },
   {
     name: "Allison Reed",
     roles: ["Customer Success & Onboarding Engineer"],
     image: "/images/avatars/f5.jpg",
     bio: "",
-    highlight: { label: "Professional Achievements", text: "Developed structured customer onboarding experiences, technical integration guidance, and troubleshooting processes to make adopting new software simpler and more approachable." },
-    expertise: { label: "Technical Expertise", text: "API integration, SQL, technical documentation, product onboarding, troubleshooting, and customer success engineering." },
-    quote: "The best part of my job is seeing someone go from feeling overwhelmed to feeling completely confident with the technology they're using.",
+    highlight: {
+      label: "Professional Achievements",
+      text: "Developed structured customer onboarding experiences, technical integration guidance, and troubleshooting processes to make adopting new software simpler and more approachable.",
+    },
+    expertise: {
+      label: "Technical Expertise",
+      text: "API integration, SQL, technical documentation, product onboarding, troubleshooting, and customer success engineering.",
+    },
+    quote:
+      "The best part of my job is seeing someone go from feeling overwhelmed to feeling completely confident with the technology they're using.",
   },
 ];
 
@@ -264,29 +377,6 @@ export const stack = [
   ["docker", "Docker"],
   ["terraform", "Terraform"],
   ["lc", "LangChain"],
-];
-
-export const works = [
-  {
-    category: "Computer Vision",
-    title: "Precision Inspection",
-    image: "/images/photos/inspection.jpg",
-  },
-  {
-    category: "Applied AI",
-    title: "Retail Perception",
-    image: "/images/photos/retail.jpg",
-  },
-  {
-    category: "Robotics",
-    title: "Autonomous Navigation",
-    image: "/images/photos/robot.jpg",
-  },
-  {
-    category: "Healthcare",
-    title: "Clinical Imaging",
-    image: "/images/photos/clinical.jpg",
-  },
 ];
 
 export const stats = [
@@ -527,9 +617,7 @@ export const terms = [
   {
     id: "contact-us",
     title: "Contact us",
-    paragraphs: [
-      "If you have questions about these Terms, contact us at hello@solvimere.com.",
-    ],
+    paragraphs: ["If you have questions about these Terms, contact us at hello@solvimere.com."],
   },
 ];
 
@@ -548,14 +636,38 @@ export const reviews = {
   ],
   badges: [
     { name: "Clutch 100 Fastest Growth 2023", image: "/images/badges/clutch-100-fastest-growth-2023.png", url: "" },
-    { name: "GoodFirms Top Web Development Company", image: "/images/badges/goodfirms-top-web-development.png", url: "" },
-    { name: "DesignRush Best B2B Digital Marketing Agencies", image: "/images/badges/designrush-best-b2b-digital-marketing.png", url: "" },
-    { name: "AppFutura Top Web Development Company", image: "/images/badges/appfutura-top-web-development.png", url: "" },
-    { name: "Clutch Top Software Developers 2019", image: "/images/badges/clutch-top-software-developers-2019.png", url: "" },
+    {
+      name: "GoodFirms Top Web Development Company",
+      image: "/images/badges/goodfirms-top-web-development.png",
+      url: "",
+    },
+    {
+      name: "DesignRush Best B2B Digital Marketing Agencies",
+      image: "/images/badges/designrush-best-b2b-digital-marketing.png",
+      url: "",
+    },
+    {
+      name: "AppFutura Top Web Development Company",
+      image: "/images/badges/appfutura-top-web-development.png",
+      url: "",
+    },
+    {
+      name: "Clutch Top Software Developers 2019",
+      image: "/images/badges/clutch-top-software-developers-2019.png",
+      url: "",
+    },
     { name: "GoodFirms Top IT Services Company", image: "/images/badges/goodfirms-top-it-services.png", url: "" },
-    { name: "Top Developers Top E-Commerce Application Developer 2020", image: "/images/badges/topdevelopers-ecommerce-2020.png", url: "" },
+    {
+      name: "Top Developers Top E-Commerce Application Developer 2020",
+      image: "/images/badges/topdevelopers-ecommerce-2020.png",
+      url: "",
+    },
     { name: "Verified by 10SEOs", image: "/images/badges/10seos-verified.png", url: "" },
     { name: "BusinessFirms Verified", image: "/images/badges/businessfirms-verified.png", url: "" },
-    { name: "SoftwareWorld Top Rated Software Development Companies", image: "/images/badges/softwareworld-top-rated.png", url: "" },
+    {
+      name: "SoftwareWorld Top Rated Software Development Companies",
+      image: "/images/badges/softwareworld-top-rated.png",
+      url: "",
+    },
   ],
 };

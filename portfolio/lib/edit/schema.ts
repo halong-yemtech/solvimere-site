@@ -3,7 +3,10 @@ import type { Field, Payload } from "payload";
 import type { EditableCollection, EditableGlobal, FieldSchema } from "./types";
 
 const titleCase = (s: string) =>
-  s.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/[_-]+/g, " ").replace(/^./, (c) => c.toUpperCase());
+  s
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/[_-]+/g, " ")
+    .replace(/^./, (c) => c.toUpperCase());
 
 function text(value: unknown): string | undefined {
   if (typeof value === "string") return value;
@@ -25,7 +28,11 @@ export interface SchemaContext {
   platforms?: string[];
 }
 
-export async function serializeFields(payload: Payload, fields: Field[], ctx: SchemaContext = {}): Promise<FieldSchema[]> {
+export async function serializeFields(
+  payload: Payload,
+  fields: Field[],
+  ctx: SchemaContext = {},
+): Promise<FieldSchema[]> {
   const out: FieldSchema[] = [];
   for (const field of fields) {
     const s = await serializeField(payload, field, ctx);
@@ -66,9 +73,10 @@ async function serializeField(payload: Payload, field: Field, ctx: SchemaContext
     required: Boolean((field as { required?: boolean }).required),
     description: text(admin.description),
     width: typeof admin.width === "string" ? admin.width : undefined,
-    defaultValue: typeof (field as { defaultValue?: unknown }).defaultValue === "function"
-      ? undefined
-      : (field as { defaultValue?: unknown }).defaultValue,
+    defaultValue:
+      typeof (field as { defaultValue?: unknown }).defaultValue === "function"
+        ? undefined
+        : (field as { defaultValue?: unknown }).defaultValue,
   };
 
   switch (field.type) {
@@ -80,7 +88,11 @@ async function serializeField(payload: Payload, field: Field, ctx: SchemaContext
     case "email":
       return { ...base, type: "email" };
     case "textarea":
-      return { ...base, type: /markdown/i.test(base.description ?? "") ? "markdown" : "textarea", maxLength: field.maxLength };
+      return {
+        ...base,
+        type: /markdown/i.test(base.description ?? "") ? "markdown" : "textarea",
+        maxLength: field.maxLength,
+      };
     case "number":
       return { ...base, type: "number", min: field.min, max: field.max };
     case "checkbox":
@@ -92,7 +104,7 @@ async function serializeField(payload: Payload, field: Field, ctx: SchemaContext
     case "select":
     case "radio": {
       let options = field.options.map((o) =>
-        typeof o === "string" ? { label: o, value: o } : { label: text(o.label) ?? o.value, value: o.value }
+        typeof o === "string" ? { label: o, value: o } : { label: text(o.label) ?? o.value, value: o.value },
       );
       // "Which account?" pickers: only the accounts this profile has (+ custom / none).
       if ((admin.custom as { accountRef?: boolean } | undefined)?.accountRef && ctx.platforms) {

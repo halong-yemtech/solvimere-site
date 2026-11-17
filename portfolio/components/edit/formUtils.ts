@@ -3,12 +3,12 @@ import type { FieldSchema, MediaItem } from "@/lib/edit/types";
 type Values = Record<string, unknown>;
 
 const idOf = (v: unknown): number | string | null =>
-  v && typeof v === "object" && "id" in v ? (v as { id: number | string }).id : (v as number | string | null) ?? null;
+  v && typeof v === "object" && "id" in v ? (v as { id: number | string }).id : ((v as number | string | null) ?? null);
 
 /** Fields that live directly on `values` (rows and unnamed tabs are flattened). */
 export function flatFields(schema: FieldSchema[]): FieldSchema[] {
   return schema.flatMap((f) =>
-    f.type === "row" ? flatFields(f.fields) : f.type === "tabs" ? f.tabs.flatMap((t) => flatFields(t.fields)) : [f]
+    f.type === "row" ? flatFields(f.fields) : f.type === "tabs" ? f.tabs.flatMap((t) => flatFields(t.fields)) : [f],
   );
 }
 
@@ -21,9 +21,7 @@ export function normalize(schema: FieldSchema[], values: Values): Values {
     switch (f.type) {
       case "upload":
       case "relationship":
-        out[f.name] = f.hasMany
-          ? (Array.isArray(v) ? v : []).map(idOf).filter((x) => x !== null)
-          : idOf(v);
+        out[f.name] = f.hasMany ? (Array.isArray(v) ? v : []).map(idOf).filter((x) => x !== null) : idOf(v);
         break;
       case "number":
         out[f.name] = v === "" || v === null || v === undefined ? null : Number(v);
@@ -60,13 +58,16 @@ export function missingRequired(schema: FieldSchema[], values: Values, prefix = 
     }
     if (f.type === "array") {
       (Array.isArray(v) ? v : []).forEach((row: Values, i: number) =>
-        missing.push(...missingRequired(f.fields, row, `${label} #${i + 1} › `))
+        missing.push(...missingRequired(f.fields, row, `${label} #${i + 1} › `)),
       );
       continue;
     }
     if (!f.required || f.type === "checkbox") continue;
     const empty =
-      v === null || v === undefined || v === "" || (Array.isArray(v) && v.length === 0) ||
+      v === null ||
+      v === undefined ||
+      v === "" ||
+      (Array.isArray(v) && v.length === 0) ||
       (typeof v === "number" && Number.isNaN(v));
     if (empty) missing.push(label);
   }

@@ -69,16 +69,16 @@ export default function EditBar() {
             <FiEye /> View site
           </Link>
         ) : (
-        <button
-          onClick={() => setEditing(!editing)}
-          className={`flex items-center gap-2 rounded-full px-5 py-3 transition-colors ${
-            editing ? "bg-main-orange text-gray-900 font-semibold" : "hover:bg-gray-800"
-          }`}
-          title="Toggle edit mode (shows edit controls on the page)"
-        >
-          {editing ? <FiEdit3 /> : <FiEye />}
-          {editing ? "Editing" : "Edit page"}
-        </button>
+          <button
+            onClick={() => setEditing(!editing)}
+            className={`flex items-center gap-2 rounded-full px-5 py-3 transition-colors ${
+              editing ? "bg-main-orange text-gray-900 font-semibold" : "hover:bg-gray-800"
+            }`}
+            title="Toggle edit mode (shows edit controls on the page)"
+          >
+            {editing ? <FiEdit3 /> : <FiEye />}
+            {editing ? "Editing" : "Edit page"}
+          </button>
         )}
 
         <button
@@ -120,8 +120,11 @@ export default function EditBar() {
           <FiSettings />
         </button>
         {surface === "site" && site && (
-          <Link href={`/dashboard/profiles/${site.profile.id}`} className="rounded-full p-3 hover:bg-gray-800"
-            title={`Open the workspace of “${site.profile.name}” (everything for this profile)`}>
+          <Link
+            href={`/dashboard/profiles/${site.profile.id}`}
+            className="rounded-full p-3 hover:bg-gray-800"
+            title={`Open the workspace of “${site.profile.name}” (everything for this profile)`}
+          >
             <FiLayout />
           </Link>
         )}

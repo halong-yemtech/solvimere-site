@@ -1,31 +1,32 @@
-import { useEffect } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Suspense, lazy, useEffect } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Assistant } from "./components/Assistant";
 import { CookieConsent } from "./components/CookieConsent";
 import { BackToTop, Footer, Header, useActiveSection } from "./components/Chrome";
-import Account from "./pages/Account";
-import Auth from "./pages/Auth";
 import Home from "./pages/Home";
-import Team from "./pages/Team";
-import Terms from "./pages/Terms";
-import Products from "./pages/Products";
-import Solutions from "./pages/Solutions";
-import Industries from "./pages/Industries";
-import Cases from "./pages/Cases";
-import Resources from "./pages/Resources";
-import About from "./pages/About";
+
+// The home page ships with the app; other pages load when first visited.
+const Team = lazy(() => import("./pages/Team"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Products = lazy(() => import("./pages/Products"));
+const Solutions = lazy(() => import("./pages/Solutions"));
+const Industries = lazy(() => import("./pages/Industries"));
+const Cases = lazy(() => import("./pages/Cases"));
+const Resources = lazy(() => import("./pages/Resources"));
+const About = lazy(() => import("./pages/About"));
 
 export default function App() {
   const location = useLocation();
   const active = useActiveSection();
 
   useEffect(() => {
-    if (!location.hash || /^(access_token|error|error_description|provider_token)=/.test(location.hash.slice(1))) {
+    if (!location.hash) {
       window.scrollTo({ top: 0, behavior: "auto" });
       return undefined;
     }
     const id = location.hash.slice(1);
-    let frames = 0;
+    // Wait for the target (pages load on demand), at most a few seconds.
+    const giveUpAt = performance.now() + 4000;
     let raf = 0;
     let observer;
     let settle;
@@ -55,7 +56,7 @@ export default function App() {
         settle = window.setTimeout(stop, 2500);
         return;
       }
-      if (frames++ < 30) raf = requestAnimationFrame(tryScroll);
+      if (performance.now() < giveUpAt) raf = requestAnimationFrame(tryScroll);
     };
     raf = requestAnimationFrame(tryScroll);
     return () => {
@@ -67,20 +68,23 @@ export default function App() {
   return (
     <>
       <Header active={location.pathname === "/team" ? "team" : location.pathname === "/" ? active : ""} />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/solutions" element={<Solutions />} />
-        <Route path="/industries" element={<Industries />} />
-        <Route path="/case-studies" element={<Cases />} />
-        <Route path="/resources" element={<Resources />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/team" element={<Team />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/login" element={<Auth mode="login" />} />
-        <Route path="/register" element={<Auth mode="register" />} />
-        <Route path="/account" element={<Account />} />
-      </Routes>
+      <Suspense fallback={<main className="page-loading" aria-busy="true" />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/solutions" element={<Solutions />} />
+          <Route path="/industries" element={<Industries />} />
+          <Route path="/case-studies" element={<Cases />} />
+          <Route path="/resources" element={<Resources />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/team" element={<Team />} />
+          <Route path="/terms" element={<Terms />} />
+          {/* Visitor accounts were removed; old links go home. */}
+          {["/login", "/register", "/account"].map((path) => (
+            <Route key={path} path={path} element={<Navigate to="/" replace />} />
+          ))}
+        </Routes>
+      </Suspense>
       <Footer />
       <CookieConsent />
       <Assistant />

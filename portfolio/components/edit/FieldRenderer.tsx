@@ -28,7 +28,15 @@ function Label({ field }: { field: { label: string; required?: boolean; descript
 }
 
 /** Renders a list of fields bound to `values` (one object level). */
-export function Fields({ schema, values, onChange }: { schema: FieldSchema[]; values: Values; onChange: (v: Values) => void }) {
+export function Fields({
+  schema,
+  values,
+  onChange,
+}: {
+  schema: FieldSchema[];
+  values: Values;
+  onChange: (v: Values) => void;
+}) {
   return (
     <div className="flex flex-wrap gap-x-4 gap-y-6">
       {schema.map((f, i) => (
@@ -38,7 +46,15 @@ export function Fields({ schema, values, onChange }: { schema: FieldSchema[]; va
   );
 }
 
-function FieldRenderer({ field, values, onChange }: { field: FieldSchema; values: Values; onChange: (v: Values) => void }) {
+function FieldRenderer({
+  field,
+  values,
+  onChange,
+}: {
+  field: FieldSchema;
+  values: Values;
+  onChange: (v: Values) => void;
+}) {
   if (field.type === "row") {
     return (
       <div className="w-full flex flex-wrap sm:flex-nowrap gap-4">
@@ -90,57 +106,94 @@ function FieldRenderer({ field, values, onChange }: { field: FieldSchema; values
           maxLength={field.maxLength}
           placeholder={field.type === "url" ? "https://…" : undefined}
           onChange={(e) => set(e.target.value)}
-        />
+        />,
       );
     case "color":
       return wrap(
         <div className="flex gap-3 items-center">
-          <input aria-label={`${field.label} picker`} type="color" value={/^#[0-9a-f]{6}$/i.test(String(value)) ? String(value) : "#000000"}
-            onChange={(e) => set(e.target.value)} className="h-14 w-16 rounded-lg bg-transparent cursor-pointer" />
-          <input className={inputCls} value={String(value ?? "")} onChange={(e) => set(e.target.value)} placeholder="#f59e0b" />
-        </div>
+          <input
+            aria-label={`${field.label} picker`}
+            type="color"
+            value={/^#[0-9a-f]{6}$/i.test(String(value)) ? String(value) : "#000000"}
+            onChange={(e) => set(e.target.value)}
+            className="h-14 w-16 rounded-lg bg-transparent cursor-pointer"
+          />
+          <input
+            className={inputCls}
+            value={String(value ?? "")}
+            onChange={(e) => set(e.target.value)}
+            placeholder="#f59e0b"
+          />
+        </div>,
       );
     case "textarea":
       return wrap(
-        <textarea className={`${inputCls} min-h-[9rem]`} value={String(value ?? "")} maxLength={field.maxLength}
-          onChange={(e) => set(e.target.value)} />
+        <textarea
+          className={`${inputCls} min-h-[9rem]`}
+          value={String(value ?? "")}
+          maxLength={field.maxLength}
+          onChange={(e) => set(e.target.value)}
+        />,
       );
     case "markdown":
       return <MarkdownInput field={field} value={String(value ?? "")} onChange={set} />;
     case "number":
       return wrap(
-        <input className={inputCls} type="number" min={field.min} max={field.max}
+        <input
+          className={inputCls}
+          type="number"
+          min={field.min}
+          max={field.max}
           value={value === null || value === undefined ? "" : String(value)}
-          onChange={(e) => set(e.target.value === "" ? null : Number(e.target.value))} />
+          onChange={(e) => set(e.target.value === "" ? null : Number(e.target.value))}
+        />,
       );
     case "checkbox":
       return (
         <label className="flex items-center gap-3 w-full cursor-pointer select-none">
-          <input type="checkbox" checked={Boolean(value)} onChange={(e) => set(e.target.checked)}
-            className="h-6 w-6 accent-[rgb(var(--accent))]" />
+          <input
+            type="checkbox"
+            checked={Boolean(value)}
+            onChange={(e) => set(e.target.checked)}
+            className="h-6 w-6 accent-[rgb(var(--accent))]"
+          />
           <span className="text-xl text-gray-300">{field.label}</span>
           {field.description && <span className="text-base text-gray-500">— {field.description}</span>}
         </label>
       );
     case "date": {
       const iso = value ? new Date(String(value)) : null;
-      const str = iso && !Number.isNaN(iso.getTime())
-        ? field.monthOnly ? iso.toISOString().slice(0, 7) : iso.toISOString().slice(0, 10)
-        : "";
+      const str =
+        iso && !Number.isNaN(iso.getTime())
+          ? field.monthOnly
+            ? iso.toISOString().slice(0, 7)
+            : iso.toISOString().slice(0, 10)
+          : "";
       return wrap(
-        <input className={inputCls} type={field.monthOnly ? "month" : "date"} value={str}
-          onChange={(e) => set(e.target.value ? `${e.target.value}${field.monthOnly ? "-01" : ""}T00:00:00.000Z` : null)} />
+        <input
+          className={inputCls}
+          type={field.monthOnly ? "month" : "date"}
+          value={str}
+          onChange={(e) =>
+            set(e.target.value ? `${e.target.value}${field.monthOnly ? "-01" : ""}T00:00:00.000Z` : null)
+          }
+        />,
       );
     }
     case "select":
     case "radio":
-      if (field.name === "icon") return wrap(<IconPicker value={String(value ?? "")} options={field.options} onChange={set} />, false);
+      if (field.name === "icon")
+        return wrap(<IconPicker value={String(value ?? "")} options={field.options} onChange={set} />, false);
       return wrap(
         <select className={inputCls} value={String(value ?? "")} onChange={(e) => set(e.target.value || null)}>
           {!field.required && <option value="">—</option>}
           {field.required && !value && <option value="">Choose…</option>}
-          {field.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
+          {field.options.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>,
       );
     case "upload":
       return wrap(<MediaField value={value as never} hasMany={field.hasMany} onChange={set} />, false);
@@ -153,23 +206,34 @@ function FieldRenderer({ field, values, onChange }: { field: FieldSchema; values
             {field.options.map((o) => {
               const on = ids.includes(o.value);
               return (
-                <button type="button" key={o.value}
+                <button
+                  type="button"
+                  key={o.value}
                   onClick={() => set(on ? ids.filter((x) => x !== o.value) : [...ids, o.value])}
-                  className={`rounded-full px-4 py-1.5 border ${on ? "bg-main-orange text-gray-900 border-main-orange" : "border-gray-600 text-gray-300 hover:border-gray-400"}`}>
+                  className={`rounded-full px-4 py-1.5 border ${on ? "bg-main-orange text-gray-900 border-main-orange" : "border-gray-600 text-gray-300 hover:border-gray-400"}`}
+                >
                   {o.label}
                 </button>
               );
             })}
             {field.options.length === 0 && <span className="text-gray-500">Nothing to choose from yet.</span>}
           </div>,
-          false
+          false,
         );
       }
       return wrap(
-        <select className={inputCls} value={String(idOf(value) ?? "")} onChange={(e) => set(e.target.value ? Number(e.target.value) : null)}>
+        <select
+          className={inputCls}
+          value={String(idOf(value) ?? "")}
+          onChange={(e) => set(e.target.value ? Number(e.target.value) : null)}
+        >
           <option value="">—</option>
-          {field.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
+          {field.options.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>,
       );
     }
     case "group":
@@ -184,13 +248,25 @@ function FieldRenderer({ field, values, onChange }: { field: FieldSchema; values
   }
 }
 
-function MarkdownInput({ field, value, onChange }: { field: FieldSchema & { label: string }; value: string; onChange: (v: string) => void }) {
+function MarkdownInput({
+  field,
+  value,
+  onChange,
+}: {
+  field: FieldSchema & { label: string };
+  value: string;
+  onChange: (v: string) => void;
+}) {
   const [preview, setPreview] = useState(false);
   return (
     <div className="w-full">
       <div className="flex items-end justify-between">
         <Label field={field} />
-        <button type="button" onClick={() => setPreview((p) => !p)} className="mb-2 text-lg text-main-orange hover:underline">
+        <button
+          type="button"
+          onClick={() => setPreview((p) => !p)}
+          className="mb-2 text-lg text-main-orange hover:underline"
+        >
           {preview ? "Edit" : "Preview"}
         </button>
       </div>
@@ -199,14 +275,22 @@ function MarkdownInput({ field, value, onChange }: { field: FieldSchema & { labe
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{value || "_Nothing yet_"}</ReactMarkdown>
         </article>
       ) : (
-        <textarea className={`${inputCls} min-h-[16rem] font-mono text-lg`} value={value} onChange={(e) => onChange(e.target.value)}
-          placeholder="Markdown: **bold**, *italic*, - lists, [links](https://…)" />
+        <textarea
+          className={`${inputCls} min-h-[16rem] font-mono text-lg`}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Markdown: **bold**, *italic*, - lists, [links](https://…)"
+        />
       )}
     </div>
   );
 }
 
-function ArrayInput({ field, rows, onChange }: {
+function ArrayInput({
+  field,
+  rows,
+  onChange,
+}: {
   field: Extract<FieldSchema, { type: "array" }>;
   rows: Values[];
   onChange: (rows: Values[]) => void;
@@ -226,47 +310,101 @@ function ArrayInput({ field, rows, onChange }: {
           <li key={(row.id as string) ?? i} className="flex gap-2 items-start rounded-xl bg-gray-800/40 p-3">
             <div className="flex-1 min-w-0">
               <Fields
-                schema={simple ? [{ ...field.fields[0], label: "", description: undefined } as FieldSchema] : field.fields}
+                schema={
+                  simple ? [{ ...field.fields[0], label: "", description: undefined } as FieldSchema] : field.fields
+                }
                 values={row}
                 onChange={(v) => onChange(rows.map((r, j) => (j === i ? v : r)))}
               />
             </div>
             <div className="flex flex-col gap-1 text-gray-400">
-              <button type="button" disabled={i === 0} onClick={() => move(i, -1)} className="p-1.5 rounded hover:bg-gray-700 disabled:opacity-30" title="Move up"><FiChevronUp /></button>
-              <button type="button" disabled={i === rows.length - 1} onClick={() => move(i, 1)} className="p-1.5 rounded hover:bg-gray-700 disabled:opacity-30" title="Move down"><FiChevronDown /></button>
-              <button type="button" onClick={() => onChange(rows.filter((_, j) => j !== i))} className="p-1.5 rounded hover:bg-red-900/60 hover:text-red-300" title="Remove"><FiTrash2 /></button>
+              <button
+                type="button"
+                disabled={i === 0}
+                onClick={() => move(i, -1)}
+                className="p-1.5 rounded hover:bg-gray-700 disabled:opacity-30"
+                title="Move up"
+              >
+                <FiChevronUp />
+              </button>
+              <button
+                type="button"
+                disabled={i === rows.length - 1}
+                onClick={() => move(i, 1)}
+                className="p-1.5 rounded hover:bg-gray-700 disabled:opacity-30"
+                title="Move down"
+              >
+                <FiChevronDown />
+              </button>
+              <button
+                type="button"
+                onClick={() => onChange(rows.filter((_, j) => j !== i))}
+                className="p-1.5 rounded hover:bg-red-900/60 hover:text-red-300"
+                title="Remove"
+              >
+                <FiTrash2 />
+              </button>
             </div>
           </li>
         ))}
       </ul>
-      <button type="button" onClick={() => onChange([...rows, defaultsFor(field.fields)])}
-        className="mt-3 flex items-center gap-2 rounded-lg border border-dashed border-gray-600 px-4 py-2 text-gray-300 hover:border-main-orange hover:text-main-orange">
+      <button
+        type="button"
+        onClick={() => onChange([...rows, defaultsFor(field.fields)])}
+        className="mt-3 flex items-center gap-2 rounded-lg border border-dashed border-gray-600 px-4 py-2 text-gray-300 hover:border-main-orange hover:text-main-orange"
+      >
         <FiPlus /> Add {singular.toLowerCase()}
       </button>
     </div>
   );
 }
 
-function IconPicker({ value, options, onChange }: { value: string; options: { label: string; value: string }[]; onChange: (v: string) => void }) {
+function IconPicker({
+  value,
+  options,
+  onChange,
+}: {
+  value: string;
+  options: { label: string; value: string }[];
+  onChange: (v: string) => void;
+}) {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const Current = iconRegistry[value as keyof typeof iconRegistry];
   const shown = options.filter((o) => o.label.toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      <button type="button" onClick={() => setOpen((o) => !o)} className={`${inputCls} flex items-center gap-3 text-left`}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className={`${inputCls} flex items-center gap-3 text-left`}
+      >
         {Current ? <Current className="text-3xl text-main-orange" /> : <span className="text-gray-500">No icon</span>}
         <span className="truncate">{options.find((o) => o.value === value)?.label ?? "Choose an icon"}</span>
       </button>
       {open && (
         <div className="mt-2 rounded-xl border border-gray-700 bg-gray-900 p-3">
-          <input autoFocus className={inputCls} placeholder="Search icons…" value={q} onChange={(e) => setQ(e.target.value)} />
+          <input
+            autoFocus
+            className={inputCls}
+            placeholder="Search icons…"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
           <div className="mt-3 max-h-64 overflow-y-auto grid grid-cols-[repeat(auto-fill,minmax(4.4rem,1fr))] gap-2">
             {shown.map((o) => {
               const I = iconRegistry[o.value as keyof typeof iconRegistry];
               return (
-                <button type="button" key={o.value} title={o.label} onClick={() => { onChange(o.value); setOpen(false); }}
-                  className={`aspect-square rounded-lg grid place-items-center text-3xl ${o.value === value ? "bg-main-orange text-gray-900" : "bg-gray-800 text-gray-300 hover:bg-gray-700"}`}>
+                <button
+                  type="button"
+                  key={o.value}
+                  title={o.label}
+                  onClick={() => {
+                    onChange(o.value);
+                    setOpen(false);
+                  }}
+                  className={`aspect-square rounded-lg grid place-items-center text-3xl ${o.value === value ? "bg-main-orange text-gray-900" : "bg-gray-800 text-gray-300 hover:bg-gray-700"}`}
+                >
                   {I ? <I /> : "?"}
                 </button>
               );

@@ -1,18 +1,17 @@
-import { createClient } from "@supabase/supabase-js";
+import { PostgrestClient } from "@supabase/postgrest-js";
 
 const url = import.meta.env.VITE_SUPABASE_URL;
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabaseConfigured = Boolean(url && key);
 
-export const supabase = supabaseConfigured ? createClient(url, key) : null;
-
-export async function authProviderEnabled(provider) {
-  if (!supabaseConfigured) return false;
-  const response = await fetch(`${url}/auth/v1/settings`, {
-    headers: { apikey: key, Authorization: `Bearer ${key}` },
-  });
-  if (!response.ok) return false;
-  const settings = await response.json();
-  return Boolean(settings?.external?.[provider]);
-}
+/**
+ * The public site only reads and writes tables (and calls one RPC) as the anonymous
+ * visitor: no sign-in, storage or realtime. So it uses Supabase's REST client alone
+ * instead of the full supabase-js bundle. Same API: supabase.from(…), supabase.rpc(…).
+ */
+export const supabase = supabaseConfigured
+  ? new PostgrestClient(`${url.replace(/\/$/, "")}/rest/v1`, {
+      headers: { apikey: key, Authorization: `Bearer ${key}` },
+    })
+  : null;

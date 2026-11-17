@@ -6,10 +6,7 @@ export default function DevelopmentSkeleton() {
     <SkeletonWrapper>
       <div className="mb-7">
         <Skeleton width={70} />
-        <Skeleton
-          style={{ marginTop: "0.625rem" } as React.CSSProperties}
-          height={7}
-        />
+        <Skeleton style={{ marginTop: "0.625rem" } as React.CSSProperties} height={7} />
       </div>
     </SkeletonWrapper>
   );

@@ -25,9 +25,7 @@ export function CookieConsent() {
     <div className="cookie-bar" role="dialog" aria-labelledby="cookie-title" aria-describedby="cookie-copy">
       <div className="cookie-copy">
         <p id="cookie-title">Cookie consent</p>
-        <p id="cookie-copy">
-          We use a cookie to remember this choice and keep the site working on your device.
-        </p>
+        <p id="cookie-copy">We use a cookie to remember this choice and keep the site working on your device.</p>
       </div>
       <div className="cookie-actions">
         <button type="button" className="cookie-decline" onClick={() => choose("declined")}>

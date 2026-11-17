@@ -1,6 +1,5 @@
 import { useEffect, useId, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useSiteAuth } from "../auth/SiteAuth";
 import { nav } from "../data";
 import { pageDefaults } from "../cms/defaults";
 import { usePageContent } from "../cms/Content";
@@ -15,7 +14,7 @@ export function Arrow() {
   );
 }
 
-export function Button({ href = "#contact", children, variant = "primary", className = "", type, onClick }) {
+export function Button({ href = "#contact", children, variant = "primary", className = "", type, onClick, disabled }) {
   const classNames = `btn btn-${variant} ${className}`.trim();
   const inner = (
     <>
@@ -27,7 +26,7 @@ export function Button({ href = "#contact", children, variant = "primary", class
   );
   if (type === "submit") {
     return (
-      <button type="submit" className={classNames}>
+      <button type="submit" className={classNames} disabled={disabled}>
         {inner}
       </button>
     );
@@ -96,9 +95,7 @@ export function Header({ active }) {
   const [open, setOpen] = useState(false);
   const [progress, setProgress] = useState(0);
   const location = useLocation();
-  const { user } = useSiteAuth();
   const settings = usePageContent("settings", pageDefaults.settings);
-  const accountLabel = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Account";
   const toContact = useContactLink();
 
   useEffect(() => {
@@ -128,9 +125,6 @@ export function Header({ active }) {
           ))}
         </nav>
         <div className="nav-actions">
-          <Link to={user ? "/account" : "/login"} className="nav-signin">
-            {user ? accountLabel : "Sign in"}
-          </Link>
           <Button href="/#contact" className="nav-cta" onClick={toContact}>
             Start a project
           </Button>
@@ -150,10 +144,6 @@ export function Header({ active }) {
           {nav.map((item) => (
             <NavAnchor key={item.id} item={item} active={active} onClick={() => setOpen(false)} />
           ))}
-          <Link to={user ? "/account" : "/login"} onClick={() => setOpen(false)}>
-            {user ? accountLabel : "Sign in"}
-          </Link>
-          <Link to="/register" onClick={() => setOpen(false)}>Create account</Link>
           <Button
             href="/#contact"
             onClick={(event) => {
@@ -209,11 +199,21 @@ export function Footer() {
         <div>
           <h3>Solutions</h3>
           <ul>
-            <li><Link to="/solutions">AI business automation</Link></li>
-            <li><Link to="/solutions">Customer intelligence</Link></li>
-            <li><Link to="/solutions">Data & analytics</Link></li>
-            <li><Link to="/products">Digital platforms</Link></li>
-            <li><Link to="/industries">Industries</Link></li>
+            <li>
+              <Link to="/solutions">AI business automation</Link>
+            </li>
+            <li>
+              <Link to="/solutions">Customer intelligence</Link>
+            </li>
+            <li>
+              <Link to="/solutions">Data & analytics</Link>
+            </li>
+            <li>
+              <Link to="/products">Digital platforms</Link>
+            </li>
+            <li>
+              <Link to="/industries">Industries</Link>
+            </li>
           </ul>
         </div>
         <div>
@@ -288,14 +288,13 @@ export function useActiveSection() {
   const location = useLocation();
   useEffect(() => {
     if (location.pathname !== "/") return undefined;
-    const ids = ["home", "about", "services", "process", "work", "testimonials", "insights", "contact"];
+    const ids = ["home", "about", "services", "process", "testimonials", "insights", "contact"];
     const map = {
       home: "home",
       about: "about",
       services: "services",
       process: "services",
-      work: "work",
-      testimonials: "work",
+      testimonials: "testimonials",
       insights: "insights",
       contact: "contact",
     };

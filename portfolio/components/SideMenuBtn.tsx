@@ -11,13 +11,7 @@ interface Props {
   last: boolean;
 }
 
-export default function SideMenuBtn({
-  menu,
-  active,
-  reactiveVar,
-  showMenu,
-  last,
-}: Props) {
+export default function SideMenuBtn({ menu, active, reactiveVar, showMenu, last }: Props) {
   function handleClick(): void {
     showMenu(false);
     reactiveVar(menu.id);

@@ -91,16 +91,11 @@ const Background = () => {
       },
       detectRetina: true,
     }),
-    [accent]
+    [accent],
   );
 
   if (init) {
-    return (
-      <Particles
-        id="tsparticles"
-        options={options}
-      />
-    );
+    return <Particles id="tsparticles" options={options} />;
   }
 
   return null;

@@ -8,7 +8,8 @@ import type { EditableCollection, EditableGlobal, EditTarget } from "@/lib/edit/
 import { useEdit } from "./EditProvider";
 import { useSite, useSiteOptional } from "../SiteProvider";
 
-const ring = "outline outline-2 outline-dashed outline-transparent hover:outline-main-orange/70 outline-offset-4 rounded";
+const ring =
+  "outline outline-2 outline-dashed outline-transparent hover:outline-main-orange/70 outline-offset-4 rounded";
 
 function PencilButton({ onClick, label }: { onClick: () => void; label: string }) {
   return (
@@ -98,7 +99,9 @@ export function EditableProfileArea({
       {children}
       <PencilButton
         label={label}
-        onClick={() => openDrawer({ kind: "collection", slug: "profiles", id: profile.id, tab, title: `Profile: ${profile.name}` })}
+        onClick={() =>
+          openDrawer({ kind: "collection", slug: "profiles", id: profile.id, tab, title: `Profile: ${profile.name}` })
+        }
       />
     </div>
   );
@@ -124,10 +127,15 @@ export function SectionTools({
   if (!editing) return null;
   const owner = profileId ?? site?.profile.id;
   const newDefaults = owner ? { ...defaults, profile: owner } : defaults;
-  const btn = "flex items-center gap-1.5 rounded-full border border-gray-600 px-4 py-1.5 text-lg text-gray-300 hover:border-main-orange hover:text-main-orange";
+  const btn =
+    "flex items-center gap-1.5 rounded-full border border-gray-600 px-4 py-1.5 text-lg text-gray-300 hover:border-main-orange hover:text-main-orange";
   return (
     <div className="flex gap-2">
-      <button type="button" className={btn} onClick={() => openDrawer({ kind: "new", slug, title: `New ${title}`, defaults: newDefaults })}>
+      <button
+        type="button"
+        className={btn}
+        onClick={() => openDrawer({ kind: "new", slug, title: `New ${title}`, defaults: newDefaults })}
+      >
         <FiPlus /> Add
       </button>
       {items.length > 1 && (
@@ -216,7 +224,15 @@ export function EditLinksButton({ label = "Edit links & accounts" }: { label?: s
   return (
     <button
       type="button"
-      onClick={() => openDrawer({ kind: "collection", slug: "profiles", id: profile.id, tab: "Links & accounts", title: `Profile: ${profile.name}` })}
+      onClick={() =>
+        openDrawer({
+          kind: "collection",
+          slug: "profiles",
+          id: profile.id,
+          tab: "Links & accounts",
+          title: `Profile: ${profile.name}`,
+        })
+      }
       className="flex items-center gap-1.5 rounded-full border border-gray-600 px-4 py-1.5 text-lg text-gray-300 hover:border-main-orange hover:text-main-orange"
     >
       <FiEdit2 /> {label}

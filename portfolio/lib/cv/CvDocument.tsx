@@ -18,14 +18,27 @@ Font.register({
 Font.registerHyphenationCallback((word) => [word]);
 
 const s = StyleSheet.create({
-  page: { fontFamily: "CvSerif", fontSize: 10, lineHeight: 1.25, color: "#000", paddingTop: 32, paddingBottom: 36, paddingHorizontal: 40 },
+  page: {
+    fontFamily: "CvSerif",
+    fontSize: 10,
+    lineHeight: 1.25,
+    color: "#000",
+    paddingTop: 32,
+    paddingBottom: 36,
+    paddingHorizontal: 40,
+  },
   name: { fontSize: 27, textAlign: "center", lineHeight: 1.1 },
   headline: { fontSize: 9.5, textAlign: "center", marginTop: 2 },
   contact: { fontSize: 9.5, textAlign: "center", marginTop: 1 },
   link: { color: "#000", textDecoration: "underline" },
   section: { marginTop: 9 },
   sectionTitle: {
-    fontSize: 12, fontWeight: "bold", borderBottomWidth: 0.6, borderBottomColor: "#777", paddingBottom: 1, marginBottom: 4,
+    fontSize: 12,
+    fontWeight: "bold",
+    borderBottomWidth: 0.6,
+    borderBottomColor: "#777",
+    paddingBottom: 1,
+    marginBottom: 4,
   },
   row: { flexDirection: "row", justifyContent: "space-between" },
   org: { fontWeight: "bold" },
@@ -73,7 +86,9 @@ function Entry({ e }: { e: CvEntry }) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View style={s.section}>
-      <Text style={s.sectionTitle} minPresenceAhead={40}>{title}</Text>
+      <Text style={s.sectionTitle} minPresenceAhead={40}>
+        {title}
+      </Text>
       {children}
     </View>
   );
@@ -83,7 +98,13 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export default function CvDocument({ data }: { data: CvData }) {
   const contact = [...data.contact];
   return (
-    <Document title={`${data.name} — CV`} author={data.name} subject="Curriculum vitae" creator="Portfolio CMS" producer="Portfolio CMS">
+    <Document
+      title={`${data.name} — CV`}
+      author={data.name}
+      subject="Curriculum vitae"
+      creator="Portfolio CMS"
+      producer="Portfolio CMS"
+    >
       <Page size="LETTER" style={s.page}>
         <Text style={s.name}>{data.name}</Text>
         {data.headline && <Text style={s.headline}>{data.headline}</Text>}
@@ -107,7 +128,9 @@ export default function CvDocument({ data }: { data: CvData }) {
 
         {data.experience.length > 0 && (
           <Section title="Professional Experience">
-            {data.experience.map((e, i) => <Entry key={i} e={e} />)}
+            {data.experience.map((e, i) => (
+              <Entry key={i} e={e} />
+            ))}
           </Section>
         )}
 
@@ -119,7 +142,9 @@ export default function CvDocument({ data }: { data: CvData }) {
 
         {data.education.length > 0 && (
           <Section title="Education">
-            {data.education.map((e, i) => <Entry key={i} e={e} />)}
+            {data.education.map((e, i) => (
+              <Entry key={i} e={e} />
+            ))}
           </Section>
         )}
       </Page>

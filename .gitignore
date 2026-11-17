@@ -1,3 +1,18 @@
-.env
-/node_modules
+# Dependencies
 node_modules
+
+# Build output (site and admin; the portfolio ignores its own in portfolio/.gitignore)
+dist
+
+# Local environment (see .env-example / admin/.env.example / portfolio/.env.example)
+.env
+.env.local
+
+# Local data exports
+solvimere_dump.sql
+
+# Editors and OS
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea

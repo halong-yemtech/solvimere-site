@@ -18,10 +18,7 @@ export default function Resources() {
   const [topic, setTopic] = useState("All");
   const [query, setQuery] = useState("");
   const needle = query.trim().toLowerCase();
-  const visible = useMemo(
-    () => articles.filter((item) => matches(item, topic, needle)),
-    [topic, needle],
-  );
+  const visible = useMemo(() => articles.filter((item) => matches(item, topic, needle)), [topic, needle]);
   const showFeatured = matches(featuredArticle, topic, needle);
 
   const subscribe = (event) => {
@@ -64,13 +61,7 @@ export default function Resources() {
             }
             lede="Industry notes, product updates, and practical guides."
           />
-          <Filters
-            label="Filter articles by topic"
-            options={resourceTopics}
-            value={topic}
-            onChange={setTopic}
-            counts
-          />
+          <Filters label="Filter articles by topic" options={resourceTopics} value={topic} onChange={setTopic} counts />
         </section>
 
         {showFeatured ? (

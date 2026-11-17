@@ -100,7 +100,11 @@ export const SiteSettings: GlobalConfig = {
                   defaultValue: false,
                   admin: { description: "Visitors see a maintenance page. Logged-in editors still see the site." },
                 },
-                { name: "message", type: "textarea", defaultValue: "The site is being updated. Please check back soon." },
+                {
+                  name: "message",
+                  type: "textarea",
+                  defaultValue: "The site is being updated. Please check back soon.",
+                },
               ],
             },
           ],

@@ -21,12 +21,8 @@ export default function Testimonial({ testimonial }: Props) {
           className="rounded-full w-[90px] h-[90px]"
         />
       )}
-      <h2 className="capitalize text-2xl font-semibold text-gray-300 mt-3 mb-1.5">
-        {testimonial.name}
-      </h2>
-      {testimonial.role && (
-        <p className="text-xl text-gray-500 text-center mb-6">{testimonial.role}</p>
-      )}
+      <h2 className="capitalize text-2xl font-semibold text-gray-300 mt-3 mb-1.5">{testimonial.name}</h2>
+      {testimonial.role && <p className="text-xl text-gray-500 text-center mb-6">{testimonial.role}</p>}
     </div>
   );
 }

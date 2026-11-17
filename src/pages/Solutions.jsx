@@ -95,8 +95,8 @@ export default function Solutions() {
               AI business automation <em>platform</em>
             </h2>
             <p>
-              Streamline operations with intelligent workflows, AI agents, and real-time insights. The
-              platform helps you automate repetitive tasks, improve efficiency, and make faster decisions.
+              Streamline operations with intelligent workflows, AI agents, and real-time insights. The platform helps
+              you automate repetitive tasks, improve efficiency, and make faster decisions.
             </p>
             <ul className="check-list">
               {platformPoints.map((point) => (

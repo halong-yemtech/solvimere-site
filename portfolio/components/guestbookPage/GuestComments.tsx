@@ -63,9 +63,7 @@ export default function GuestComments({ comments, error, hasMore, loadMore }: Pr
                 {formatDate(c.createdAt)}
               </time>
             </div>
-            <p className="mt-4 text-2xl tracking-wider text-gray-400 whitespace-pre-line break-words">
-              {c.comment}
-            </p>
+            <p className="mt-4 text-2xl tracking-wider text-gray-400 whitespace-pre-line break-words">{c.comment}</p>
           </motion.li>
         ))}
       </motion.ul>

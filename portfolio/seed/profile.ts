@@ -1,11 +1,8 @@
-
-export const upworkProfileUrl =
-  "https://www.upwork.com/freelancers/~0128b78af234b4cacd";
+export const upworkProfileUrl = "https://www.upwork.com/freelancers/~0128b78af234b4cacd";
 
 export const githubProfileUrl = "https://github.com/anthonyscott-works";
 
-export const linkedinProfileUrl =
-  "https://www.linkedin.com/in/anthony-scott-b1598a";
+export const linkedinProfileUrl = "https://www.linkedin.com/in/anthony-scott-b1598a";
 
 export const whatsappUrl = "https://wa.me/17325188483";
 
@@ -256,8 +253,7 @@ export const resumeEducation = [
     badge: "2010 - 2014",
     title: "Portland State University",
     subTitle: "Computer Science",
-    description:
-      "Focused on software engineering, algorithms, distributed systems, and database design.",
+    description: "Focused on software engineering, algorithms, distributed systems, and database design.",
     isExperience: false,
     logo: { url: profile.avatar },
   },

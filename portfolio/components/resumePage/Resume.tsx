@@ -12,9 +12,16 @@ export default function Resume() {
 
   return (
     <section className="h-full overflow-y-scroll myScroll">
-      <Title name="resume" actions={
-        <SectionTools slug="resume-entries" title="resume entry" items={resume.map((r) => ({ id: r.id, label: `${r.title} (${r.type})` }))} />
-      } />
+      <Title
+        name="resume"
+        actions={
+          <SectionTools
+            slug="resume-entries"
+            title="resume entry"
+            items={resume.map((r) => ({ id: r.id, label: `${r.title} (${r.type})` }))}
+          />
+        }
+      />
       <MyResume />
 
       <Title name="skills" />

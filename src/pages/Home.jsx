@@ -1,12 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  industries,
-  interests,
-  services,
-  stack,
-  stats,
-  steps,
-} from "../data";
+import { Link } from "react-router-dom";
+import { industries, interests, services, stack, stats, steps } from "../data";
 import { Icon } from "../components/Icons";
 import { Button, Eyebrow, Orbit } from "../components/Chrome";
 import { TeamGrid } from "../components/TeamGrid";
@@ -14,6 +8,8 @@ import { Reviews } from "../components/Reviews";
 import { pageDefaults } from "../cms/defaults";
 import { usePageContent } from "../cms/Content";
 import { RichTitle } from "../components/Story";
+import { useTeamMembers } from "../lib/team";
+import { supabase, supabaseConfigured } from "../lib/supabase";
 
 function useCount(target, active, decimals = 0) {
   const [value, setValue] = useState(0);
@@ -43,13 +39,7 @@ function Stat({ item, active }) {
     <div className="stat">
       <svg viewBox="0 0 100 100" aria-hidden="true">
         <circle cx="50" cy="50" r={r} className="ring-track" />
-        <circle
-          cx="50"
-          cy="50"
-          r={r}
-          className="ring-value"
-          style={{ strokeDasharray: `${dash} ${c}` }}
-        />
+        <circle cx="50" cy="50" r={r} className="ring-value" style={{ strokeDasharray: `${dash} ${c}` }} />
       </svg>
       <strong>
         {shown}
@@ -75,18 +65,18 @@ function Marquee({ items, reverse = false, render }) {
 
 export default function Home() {
   const home = usePageContent("home", pageDefaults.home);
-  const { photos, avatars, works, testimonials, reviews, insights } = home;
-  const [workIndex, setWorkIndex] = useState(0);
+  const { photos, avatars, testimonials, reviews, insights } = home;
+  const teamPage = usePageContent("team", pageDefaults.team);
+  const team = useTeamMembers(teamPage.members);
+  // Hero trust pill: real client faces (from testimonials) next to the team's.
+  const clientFaces = testimonials.filter((t) => t.avatar).slice(0, 4);
+  const teamFaces = team.filter((m) => m.image).slice(0, 4);
   const [quoteIndex, setQuoteIndex] = useState(0);
   const [statsOn, setStatsOn] = useState(false);
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (!works.length) return undefined;
-    const timer = setInterval(() => setWorkIndex((i) => (i + 1) % works.length), 4200);
-    return () => clearInterval(timer);
-  }, [works.length]);
+  const contactEmail = usePageContent("settings", pageDefaults.settings).email || "hello@solvimere.com";
 
   useEffect(() => {
     const el = document.getElementById("expertise");
@@ -109,7 +99,9 @@ export default function Home() {
     const uses = new Map();
     testimonials.forEach((t) => t.photo && uses.set(t.photo, (uses.get(t.photo) || 0) + 1));
     return testimonials.map((t) =>
-      t.photo && (uses.get(t.photo) === 1 || testimonials.length === 1) ? t.photo : t.avatar || t.photo || photos.session
+      t.photo && (uses.get(t.photo) === 1 || testimonials.length === 1)
+        ? t.photo
+        : t.avatar || t.photo || photos.session,
     );
   }, [testimonials, photos.session]);
 
@@ -121,9 +113,11 @@ export default function Home() {
     });
   }, [storyPhotos]);
 
-  function onSubmit(event) {
+  /** Saved to Supabase `contact_messages`; staff read it in Admin → Messages. */
+  async function onSubmit(event) {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    const formEl = event.currentTarget;
+    const data = new FormData(formEl);
     if (data.get("website")) return;
     const name = String(data.get("name") || "").trim();
     const email = String(data.get("email") || "").trim();
@@ -136,9 +130,29 @@ export default function Home() {
       setError("Enter a valid email so we can reply.");
       return;
     }
+    const company = String(data.get("company") || "").trim();
+    const topic = String(data.get("topic") || "").trim();
+    const details = [company && `Company: ${company}`, topic && `Interest: ${topic}`].filter(Boolean).join("\n");
     setError("");
+    setSent(false);
+    if (!supabaseConfigured) {
+      setError(`Messages can't be sent right now. Email us at ${contactEmail}.`);
+      return;
+    }
+    setSending(true);
+    const { error: insertError } = await supabase.from("contact_messages").insert({
+      name: name.slice(0, 120),
+      email,
+      message: (details ? `${details}\n\n${message}` : message).slice(0, 4000),
+      page: "/#contact",
+    });
+    setSending(false);
+    if (insertError) {
+      setError(`Your message couldn't be sent. Email us at ${contactEmail}.`);
+      return;
+    }
     setSent(true);
-    event.currentTarget.reset();
+    formEl.reset();
   }
 
   return (
@@ -147,14 +161,44 @@ export default function Home() {
         <div className="hero-glow" aria-hidden="true" />
         <div className="wrap hero-copy">
           <div className="trust-pill">
-            <span className="avatar-stack">
-              {avatars.map((person) => (
-                <img key={person.image} src={person.image} alt="" />
-              ))}
+            <span className="trust-group">
+              {clientFaces.length ? (
+                <span className="avatar-stack" role="group" aria-label="Some of our clients">
+                  {clientFaces.map((client) => (
+                    <img
+                      key={client.name}
+                      src={client.avatar}
+                      alt={client.name}
+                      title={`${client.name}${client.role ? `, ${client.role}` : ""}`}
+                    />
+                  ))}
+                </span>
+              ) : null}
+              <span>
+                Trusted by <strong>40+ enterprise partners</strong>
+              </span>
             </span>
-            <span>
-              Trusted by <strong>40+ enterprise partners</strong>
-            </span>
+            {teamFaces.length ? (
+              <>
+                <span className="trust-divider" aria-hidden="true" />
+                <span className="trust-group">
+                  <span className="avatar-stack is-team" role="group" aria-label="Some of our team">
+                    {teamFaces.map((member) => (
+                      <img
+                        key={member.id || member.name}
+                        src={member.image}
+                        alt={member.name}
+                        title={`${member.name}${member.roles?.[0] ? `, ${member.roles[0]}` : ""}`}
+                        style={{ "--avatar-scale": member.avatarScale || 1 }}
+                      />
+                    ))}
+                  </span>
+                  <span>
+                    Built by our <strong>{team.length} specialists</strong>
+                  </span>
+                </span>
+              </>
+            ) : null}
           </div>
           <h1>
             <RichTitle title={home.hero.title} emphasis={home.hero.emphasis} />
@@ -162,7 +206,7 @@ export default function Home() {
           <p>{home.hero.lede}</p>
           <div className="hero-actions">
             <Button href="#contact">Start a project</Button>
-            <Button href="#work" variant="ghost">
+            <Button href="/case-studies" variant="ghost">
               See our work
             </Button>
           </div>
@@ -178,12 +222,12 @@ export default function Home() {
               Precision Inspection · Computer vision
             </span>
           </div>
-          <a className="float-card center" href="#work">
+          <Link className="float-card center" to="/case-studies">
             <span className="mini-ico hot">
               <Icon name="pulse" />
             </span>
             See it in production
-          </a>
+          </Link>
           <div className="float-card right">
             <span className="mini-ico">
               <Icon name="shield" />
@@ -204,18 +248,15 @@ export default function Home() {
           <h2>
             Solvimere is a modern software studio.{" "}
             <span>
-              We help operators move faster by pairing people who know the domain with technology that
-              belongs in production, and processes that keep both honest.
+              We help operators move faster by pairing people who know the domain with technology that belongs in
+              production, and processes that keep both honest.
             </span>
           </h2>
           <Button href="#process">How we work</Button>
         </div>
         <div className="wrap about-photos">
           <figure>
-            <img
-              src={photos.aboutLeft}
-              alt="Solvimere consultant walking through metrics on a whiteboard"
-            />
+            <img src={photos.aboutLeft} alt="Solvimere consultant walking through metrics on a whiteboard" />
             <div className="years-badge">
               <strong>15+</strong>
               <span>Years of delivery</span>
@@ -223,10 +264,7 @@ export default function Home() {
           </figure>
           <Orbit text="BUILD • INNOVATE • SCALE • SHIP • " href="#services" />
           <figure>
-            <img
-              src={photos.aboutRight}
-              alt="Solvimere team working together in the studio"
-            />
+            <img src={photos.aboutRight} alt="Solvimere team working together in the studio" />
           </figure>
         </div>
       </section>
@@ -237,9 +275,7 @@ export default function Home() {
           <h2 className="center-title">
             Meet the people behind <em>Solvimere</em>
           </h2>
-          <p className="team-lead">
-            Curious minds. Different disciplines. One shared purpose.
-          </p>
+          <p className="team-lead">Curious minds. Different disciplines. One shared purpose.</p>
           <TeamGrid />
           <div className="team-band-action">
             <Button href="/team">Meet the team</Button>
@@ -336,7 +372,14 @@ export default function Home() {
                 <circle cx="520" cy="230" r="7" className="process-dot" />
                 <circle cx="470" cy="470" r="6" className="process-dot" />
                 <g clipPath="url(#process-shape)">
-                  <image href={photos.process} x="40" y="20" width="540" height="520" preserveAspectRatio="xMidYMid slice" />
+                  <image
+                    href={photos.process}
+                    x="40"
+                    y="20"
+                    width="540"
+                    height="520"
+                    preserveAspectRatio="xMidYMid slice"
+                  />
                   <rect x="40" y="20" width="540" height="520" fill="url(#process-shade)" />
                 </g>
               </svg>
@@ -372,11 +415,7 @@ export default function Home() {
             render={([id, label]) => (
               <span className="chip">
                 <span className="skill">
-                  {id === "lc" ? (
-                    "LC"
-                  ) : (
-                    <img src={`https://skillicons.dev/icons?i=${id}`} alt="" />
-                  )}
+                  {id === "lc" ? "LC" : <img src={`https://skillicons.dev/icons?i=${id}`} alt="" />}
                 </span>
                 {label}
               </span>
@@ -388,60 +427,12 @@ export default function Home() {
             render={([id, label]) => (
               <span className="chip">
                 <span className="skill">
-                  {id === "lc" ? (
-                    "LC"
-                  ) : (
-                    <img src={`https://skillicons.dev/icons?i=${id}`} alt="" />
-                  )}
+                  {id === "lc" ? "LC" : <img src={`https://skillicons.dev/icons?i=${id}`} alt="" />}
                 </span>
                 {label}
               </span>
             )}
           />
-        </div>
-      </section>
-
-      <section id="work" className="section work">
-        <div className="wrap work-head">
-          <div>
-            <Eyebrow>Our work in action</Eyebrow>
-            <h2>
-              Discover Our <em>Recent Work</em>
-            </h2>
-          </div>
-          <Button href="#contact">Explore Our Work</Button>
-        </div>
-        <div className="carousel" aria-label="Recent case studies">
-          {works.map((item, index) => {
-            let offset = index - workIndex;
-            if (offset > works.length / 2) offset -= works.length;
-            if (offset < -works.length / 2) offset += works.length;
-            const active = offset === 0;
-            return (
-              <article
-                key={item.title}
-                className={active ? "is-active" : ""}
-                style={{
-                  transform: `translateX(${offset * 104}%) scale(${active ? 1 : 0.9})`,
-                  opacity: Math.abs(offset) > 1 ? 0 : 1,
-                  zIndex: active ? 3 : 1,
-                }}
-              >
-                <img src={item.image} alt={item.title} />
-                {active && (
-                  <>
-                    <a className="work-go" href="#contact" aria-label={`Request the full ${item.title} case study`}>
-                      <ArrowIcon />
-                    </a>
-                    <div className="work-label">
-                      <small>{item.category}</small>
-                      <strong>{item.title}</strong>
-                    </div>
-                  </>
-                )}
-              </article>
-            );
-          })}
         </div>
       </section>
 
@@ -465,8 +456,8 @@ export default function Home() {
               <em>Production Software</em>
             </h2>
             <p>
-              Flagship AI and vision work sits on the same engineering discipline we use for products,
-              platforms, and the teams that run them.
+              Flagship AI and vision work sits on the same engineering discipline we use for products, platforms, and
+              the teams that run them.
             </p>
             <div className="stats">
               {stats.map((item) => (
@@ -488,8 +479,8 @@ export default function Home() {
                   Real teams, <em>measurable outcomes</em>
                 </h2>
                 <p>
-                  From factory floors to clinical teams, see how clients put production AI to work with
-                  Solvimere, with evaluation and monitoring built in at every step.
+                  From factory floors to clinical teams, see how clients put production AI to work with Solvimere, with
+                  evaluation and monitoring built in at every step.
                 </p>
                 <a className="story-link" href="#contact" aria-label="Start a project">
                   <Icon name="arrow" />
@@ -595,8 +586,8 @@ export default function Home() {
               <em>TOGETHER</em>
             </h2>
             <p>
-              Tell us what the system should see, decide, or automate. We reply with a clear next step,
-              usually within one business day. <a href="mailto:hello@solvimere.com">hello@solvimere.com</a>
+              Tell us what the system should see, decide, or automate. We reply with a clear next step, usually within
+              one business day. <a href="mailto:hello@solvimere.com">hello@solvimere.com</a>
             </p>
           </div>
           <img src={photos.cta} alt="" />
@@ -614,8 +605,8 @@ export default function Home() {
               You Need <em>Built</em>
             </h2>
             <p>
-              Share the cameras, data, product surface, or internal system you want to make smarter. We
-              typically reply within one business day.
+              Share the cameras, data, product surface, or internal system you want to make smarter. We typically reply
+              within one business day.
             </p>
             <div className="info-cards">
               <article>
@@ -675,8 +666,10 @@ export default function Home() {
               <input name="website" tabIndex={-1} autoComplete="off" />
             </label>
             {error && <p className="form-error">{error}</p>}
-            {sent && <p className="form-ok">Message ready. We’ll reply within one business day.</p>}
-            <Button type="submit" className="form-submit">Send message</Button>
+            {sent && <p className="form-ok">Message sent. We’ll reply within one business day.</p>}
+            <Button type="submit" className="form-submit" disabled={sending}>
+              {sending ? "Sending…" : "Send message"}
+            </Button>
           </form>
         </div>
       </section>

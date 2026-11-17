@@ -7,18 +7,22 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "admin": "npm --prefix admin run dev",
-    "portfolio": "bun --cwd portfolio run dev"
+    "admin": "bun --cwd admin run dev",
+    "portfolio": "bun --cwd portfolio run dev",
+    "build:admin": "bun --cwd admin run build",
+    "build:portfolio": "bun --cwd portfolio run build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.109.0",
-    "@tavus/widget": "^0.19.3",
+    "@supabase/postgrest-js": "2.119.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.5.2",
+    "prettier": "3.3.3",
     "supabase": "^2.121.0",
     "vite": "^6.3.5"
   }

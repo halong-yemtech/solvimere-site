@@ -11,9 +11,7 @@ export default function FactSkeleton({ border, pos }: Props) {
     <SkeletonWrapper>
       <div
         className={`w-full h-fit flex flex-col items-center py-10 px-12 relative vCustomLine before:right-0 ${
-          border
-            ? `${pos === 1 ? "before:hidden sm:before:block" : "before:block"}`
-            : "before:hidden"
+          border ? `${pos === 1 ? "before:hidden sm:before:block" : "before:block"}` : "before:hidden"
         }`}
       >
         <Skeleton circle={true} width={65} height={65} />

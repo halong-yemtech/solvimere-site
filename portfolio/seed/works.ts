@@ -55,31 +55,13 @@ The scribe uses **NLP** and speech recognition to transcribe and understand medi
 - Developed and optimized NLP models for accurate medical note generation
 - Integrated speech recognition for real-time doctor-patient transcription
 - Ensured seamless cloud integration for scalability and security`,
-    images: workImages(aiScribeFolder, [
-      "01.png",
-      "02.png",
-      "03.png",
-      "04.png",
-      "05.png",
-    ]),
+    images: workImages(aiScribeFolder, ["01.png", "02.png", "03.png", "04.png", "05.png"]),
     workUrl: upworkProfileUrl,
     githubUrl: githubProfileUrl,
     clientName: "Heidi Health",
     ownerName: "Anthony Scott",
-    techStack: [
-      "Python",
-      "PyTorch",
-      "NLP",
-      "LLM",
-      "Node.js",
-      "React",
-      "AWS",
-    ],
-    userActions: [
-      "NLP Model Development",
-      "Speech Recognition Integration",
-      "Cloud Deployment",
-    ],
+    techStack: ["Python", "PyTorch", "NLP", "LLM", "Node.js", "React", "AWS"],
+    userActions: ["NLP Model Development", "Speech Recognition Integration", "Cloud Deployment"],
     date: new Date("2024-08-01"),
   },
   "2": {
@@ -102,19 +84,8 @@ The scribe uses **NLP** and speech recognition to transcribe and understand medi
     githubUrl: githubProfileUrl,
     clientName: "Kyogreen",
     ownerName: "Anthony Scott",
-    techStack: [
-      "React",
-      "Node.js",
-      "MongoDB",
-      "PyTorch",
-      "Machine Learning",
-      "NLP",
-    ],
-    userActions: [
-      "ML Model Development",
-      "Data Pipeline Engineering",
-      "Cloud Deployment",
-    ],
+    techStack: ["React", "Node.js", "MongoDB", "PyTorch", "Machine Learning", "NLP"],
+    userActions: ["ML Model Development", "Data Pipeline Engineering", "Cloud Deployment"],
     date: new Date("2024-05-15"),
   },
   "3": {
@@ -137,11 +108,7 @@ The scribe uses **NLP** and speech recognition to transcribe and understand medi
     clientName: "Manufacturing Client",
     ownerName: "Anthony Scott",
     techStack: ["n8n", "PostgreSQL", "Power BI", "REST API", "Slack", "Docker"],
-    userActions: [
-      "Project Management",
-      "Dashboard Design",
-      "Factory Automation",
-    ],
+    userActions: ["Project Management", "Dashboard Design", "Factory Automation"],
     date: new Date("2024-02-10"),
   },
 };

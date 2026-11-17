@@ -1,17 +1,5 @@
+import { portfolioSlug } from "../lib/slug";
 import { TeamMail } from "./TeamMail";
-
-/**
- * URL segment of a member's portfolio: "Ha Long" → "halong".
- * Must match the portfolio app's slug rule (portfolio/lib/basePath.ts → compactSlug).
- */
-export function portfolioSlug(name) {
-  return String(name || "")
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "")
-    .slice(0, 60);
-}
 
 export function portfolioPath(person) {
   const slug = portfolioSlug(person.name);

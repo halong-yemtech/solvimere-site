@@ -30,14 +30,17 @@ export async function ensureVersions(payload: Payload) {
     const db = payload.db as unknown as Db;
     // Postgres (Supabase) keeps Payload's tables in their own schema.
     const prefix = db.name === "postgres" && db.schemaName ? `"${db.schemaName}".` : "";
-    const table = (slug: string, version = false) => `${prefix}"${version ? "_" : ""}${slug.replace(/-/g, "_")}${version ? "_v" : ""}"`;
+    const table = (slug: string, version = false) =>
+      `${prefix}"${version ? "_" : ""}${slug.replace(/-/g, "_")}${version ? "_v" : ""}"`;
 
     const parts = [
       ...collections.map(
-        (s) => `SELECT '${s}' AS slug, 'c' AS kind, id FROM ${table(s)} WHERE id NOT IN (SELECT parent_id FROM ${table(s, true)} WHERE parent_id IS NOT NULL)`
+        (s) =>
+          `SELECT '${s}' AS slug, 'c' AS kind, id FROM ${table(s)} WHERE id NOT IN (SELECT parent_id FROM ${table(s, true)} WHERE parent_id IS NOT NULL)`,
       ),
       ...globals.map(
-        (s) => `SELECT '${s}' AS slug, 'g' AS kind, id FROM ${table(s)} WHERE NOT EXISTS (SELECT 1 FROM ${table(s, true)})`
+        (s) =>
+          `SELECT '${s}' AS slug, 'g' AS kind, id FROM ${table(s)} WHERE NOT EXISTS (SELECT 1 FROM ${table(s, true)})`,
       ),
     ];
     const query = sql.raw(parts.join(" UNION ALL "));
@@ -47,7 +50,12 @@ export async function ensureVersions(payload: Payload) {
     for (const r of rows) {
       const slug = String(r.slug);
       if (r.kind === "c") {
-        await payload.update({ collection: slug as never, id: Number(r.id), data: { _status: "published" } as never, depth: 0 });
+        await payload.update({
+          collection: slug as never,
+          id: Number(r.id),
+          data: { _status: "published" } as never,
+          depth: 0,
+        });
       } else {
         await payload.updateGlobal({ slug: slug as never, data: { _status: "published" } as never, depth: 0 });
       }

@@ -10,9 +10,16 @@ export default function Statistics() {
   const { statistics } = useSite();
   return (
     <section className="h-full overflow-y-scroll myScroll">
-      <Title name="statistics" actions={
-        <SectionTools slug="statistics" title="statistic" items={statistics.map((s) => ({ id: s.id, label: s.title }))} />
-      } />
+      <Title
+        name="statistics"
+        actions={
+          <SectionTools
+            slug="statistics"
+            title="statistic"
+            items={statistics.map((s) => ({ id: s.id, label: s.title }))}
+          />
+        }
+      />
       <StatisticsList />
 
       <Title name="links" actions={<EditLinksButton />} />

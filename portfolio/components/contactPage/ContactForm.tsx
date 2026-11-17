@@ -14,7 +14,7 @@ interface Inputs {
 
 const isValidEmail = (email: string) =>
   /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-    email
+    email,
   );
 
 export default function ContactForm() {
@@ -36,9 +36,7 @@ export default function ContactForm() {
   // Runs once per submit attempt (not on every keystroke).
   const onInvalid = (errors: FieldErrors<Inputs>) => {
     const missing = Object.values(errors).some((e) => e?.type === "required");
-    toast.error(
-      missing ? "Please fill in your name, email and message." : "Invalid Email"
-    );
+    toast.error(missing ? "Please fill in your name, email and message." : "Invalid Email");
   };
 
   return (

@@ -46,4 +46,3 @@ export const GuestbookEntries: CollectionConfig = {
     { name: "approved", type: "checkbox", defaultValue: true, admin: { position: "sidebar" } },
   ],
 };
-

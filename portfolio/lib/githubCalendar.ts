@@ -27,7 +27,11 @@ export function parseContributionsHtml(username: string, html: string): Contribu
     const id = /\bid="([^"]+)"/.exec(tag)?.[1];
     const level = Number(/data-level="(\d)"/.exec(tag)?.[1] ?? 0);
     if (!date) continue;
-    days.push({ date, count: (id && counts.get(id)) || 0, level: Math.min(4, Math.max(0, level)) as ContributionDay["level"] });
+    days.push({
+      date,
+      count: (id && counts.get(id)) || 0,
+      level: Math.min(4, Math.max(0, level)) as ContributionDay["level"],
+    });
   }
   if (!days.length) throw new Error("Couldn't read the contribution calendar");
   days.sort((a, b) => a.date.localeCompare(b.date));

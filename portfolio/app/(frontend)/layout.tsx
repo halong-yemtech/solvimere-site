@@ -19,12 +19,16 @@ const geistMono = Geist_Mono({
 // Only downloaded when chosen in Site settings → Appearance.
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], preload: false });
 
+// Portfolios are part of the Solvimere site: use its icon (served by the site at /favicon.png).
+const icons: Metadata["icons"] = { icon: [{ url: "/favicon.png", type: "image/png" }] };
+
 export async function generateMetadata(): Promise<Metadata> {
   const profile = (await getSiteData())?.profile;
-  if (!profile) return { title: "Portfolio" };
+  if (!profile) return { title: "Portfolio", icons };
   return {
     title: `${profile.name} | ${profile.jobTitle}`,
     description: profile.metaDescription || undefined,
+    icons,
   };
 }
 
@@ -43,9 +47,7 @@ export default async function RootLayout({
       <head>
         <style id="theme-vars" dangerouslySetInnerHTML={{ __html: cssVars }} />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}>
-        {children}
-      </body>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}>{children}</body>
       {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
     </html>
   );

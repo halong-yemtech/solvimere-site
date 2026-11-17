@@ -1,4 +1,4 @@
-import { team, avatars, insights, reviews, testimonials, works } from "../data.js";
+import { team, avatars, insights, reviews, testimonials } from "../data.js";
 import {
   aboutStats,
   aboutValues,
@@ -39,7 +39,6 @@ export const pageDefaults = {
       cta: "/images/photos/cta.jpg",
     },
     avatars: avatars.map((image) => ({ image })),
-    works,
     testimonials,
     reviews,
     insights,
@@ -126,8 +125,7 @@ export const pageDefaults = {
       emphasis: "possibility.",
       lede: "Solvimere is a technology company based in Singapore, bringing together developers, designers, and AI specialists to create intelligent digital products and automation systems that help businesses grow faster, smarter, and with more control.",
     },
-    mission:
-      "To build intelligent digital solutions that help businesses grow faster, smarter, and more efficiently.",
+    mission: "To build intelligent digital solutions that help businesses grow faster, smarter, and more efficiently.",
     vision: "To create a future where technology empowers people and businesses worldwide.",
     values: aboutValues,
     stats: aboutStats,
@@ -138,16 +136,4 @@ export const pageDefaults = {
       presence: "/images/photos/about-right.webp",
     },
   },
-};
-
-export const pageTitles = {
-  home: "Home",
-  settings: "Site settings",
-  team: "Team",
-  products: "Products",
-  solutions: "Solutions",
-  industries: "Industries",
-  "case-studies": "Case studies",
-  resources: "Resources",
-  about: "About",
 };

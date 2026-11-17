@@ -67,20 +67,10 @@ import {
   SiFlutter,
   SiX,
 } from "react-icons/si";
-import {
-  RiRobot2Line,
-} from "react-icons/ri";
-import {
-  DiCodeigniter,
-} from "react-icons/di";
-import {
-  GiCondorEmblem,
-} from "react-icons/gi";
-import {
-  MdDashboard,
-  MdDesignServices,
-  MdOutlineSupportAgent,
-} from "react-icons/md";
+import { RiRobot2Line } from "react-icons/ri";
+import { DiCodeigniter } from "react-icons/di";
+import { GiCondorEmblem } from "react-icons/gi";
+import { MdDashboard, MdDesignServices, MdOutlineSupportAgent } from "react-icons/md";
 import type { IconName } from "@/lib/iconNames";
 
 // Explicit imports keep the bundle small (a wildcard import pulls in every icon).

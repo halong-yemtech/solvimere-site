@@ -2,14 +2,27 @@ const STAR = "m10 1.8 2.1 4.6 5 .6-3.7 3.4.9 5-4.3-2.4L5.7 15.4l.9-5L2.9 7l5-.6L
 
 /** Small brand marks for the rating platforms; unknown platforms show their initial. */
 function PlatformMark({ platform }) {
-  switch (String(platform || "").toLowerCase().replace(/[^a-z]/g, "")) {
+  switch (
+    String(platform || "")
+      .toLowerCase()
+      .replace(/[^a-z]/g, "")
+  ) {
     case "google":
       return (
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.7Z" />
-          <path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.6-4.9h-4v3.1A12 12 0 0 0 12 24Z" />
+          <path
+            fill="#4285F4"
+            d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.7Z"
+          />
+          <path
+            fill="#34A853"
+            d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.6-4.9h-4v3.1A12 12 0 0 0 12 24Z"
+          />
           <path fill="#FBBC05" d="M5.4 14.4a7.2 7.2 0 0 1 0-4.7V6.6h-4a12 12 0 0 0 0 10.9l4-3.1Z" />
-          <path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.4 6.6l4 3.1C6.3 6.9 8.9 4.8 12 4.8Z" />
+          <path
+            fill="#EA4335"
+            d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.4 6.6l4 3.1C6.3 6.9 8.9 4.8 12 4.8Z"
+          />
         </svg>
       );
     case "trustpilot":
@@ -22,14 +35,26 @@ function PlatformMark({ platform }) {
       return (
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <rect width="24" height="24" rx="6" fill="#1D2B4F" />
-          <path fill="none" stroke="#F2563C" strokeWidth="3" strokeLinecap="round" d="M17 7.2A6.5 6.5 0 1 0 18.5 12H12.5" />
+          <path
+            fill="none"
+            stroke="#F2563C"
+            strokeWidth="3"
+            strokeLinecap="round"
+            d="M17 7.2A6.5 6.5 0 1 0 18.5 12H12.5"
+          />
         </svg>
       );
     case "sortlist":
       return (
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <rect width="24" height="24" rx="6" fill="#0E1B3D" />
-          <path fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" d="M16 7.5c-1-.9-2.4-1.4-4-1.4-2.2 0-3.8 1.1-3.8 2.8 0 3.7 7.9 2.1 7.9 6.1 0 1.8-1.7 3-4.1 3-1.7 0-3.2-.6-4.2-1.6" />
+          <path
+            fill="none"
+            stroke="#fff"
+            strokeWidth="2.6"
+            strokeLinecap="round"
+            d="M16 7.5c-1-.9-2.4-1.4-4-1.4-2.2 0-3.8 1.1-3.8 2.8 0 3.7 7.9 2.1 7.9 6.1 0 1.8-1.7 3-4.1 3-1.7 0-3.2-.6-4.2-1.6"
+          />
           <circle cx="17.6" cy="17.4" r="1.5" fill="#3D7BFF" />
         </svg>
       );
@@ -48,7 +73,14 @@ function PlatformMark({ platform }) {
         </svg>
       );
     default:
-      return <span className="review-initial">{String(platform || "?").trim().charAt(0).toUpperCase()}</span>;
+      return (
+        <span className="review-initial">
+          {String(platform || "?")
+            .trim()
+            .charAt(0)
+            .toUpperCase()}
+        </span>
+      );
   }
 }
 

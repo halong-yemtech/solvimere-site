@@ -88,14 +88,21 @@ async function schemaContext(payload: Payload, user: TypedUser, profileId: numbe
   const p = await payload
     .findByID({ collection: "profiles", id: profileId, draft: true, depth: 0, user, overrideAccess: false })
     .catch(() => null);
-  const platforms = ((p?.links ?? []) as { platform?: string; url?: string }[]).filter((l) => l.url).map((l) => String(l.platform));
+  const platforms = ((p?.links ?? []) as { platform?: string; url?: string }[])
+    .filter((l) => l.url)
+    .map((l) => String(l.platform));
   return { profileId, platforms };
 }
 
 async function assertProfile(payload: Payload, user: TypedUser, profileId: unknown): Promise<number> {
   const id = Number(profileId);
   if (!Number.isInteger(id)) throw new Error("Choose the profile this item belongs to.");
-  const found = await payload.count({ collection: "profiles", where: { id: { equals: id } }, user, overrideAccess: false });
+  const found = await payload.count({
+    collection: "profiles",
+    where: { id: { equals: id } },
+    user,
+    overrideAccess: false,
+  });
   if (!found.totalDocs) throw new Error("That profile doesn't exist.");
   return id;
 }
@@ -103,7 +110,7 @@ async function assertProfile(payload: Payload, user: TypedUser, profileId: unkno
 // ── load ─────────────────────────────────────────────────────
 
 export async function loadForEdit(
-  target: EditTarget | { kind: "new"; slug: EditableCollection; profileId?: number }
+  target: EditTarget | { kind: "new"; slug: EditableCollection; profileId?: number },
 ): Promise<ActionResult<{ schema: FieldSchema[]; doc: Record<string, unknown> | null }>> {
   return run(async () => {
     const { payload, user } = await ctx();
@@ -115,12 +122,18 @@ export async function loadForEdit(
     assertTarget(target);
     if (target.kind === "collection") {
       const doc = await payload.findByID({
-        collection: target.slug, id: target.id, draft: true, depth: 1, user, overrideAccess: false,
+        collection: target.slug,
+        id: target.id,
+        draft: true,
+        depth: 1,
+        user,
+        overrideAccess: false,
       });
       // A profile's own account pickers list every platform (accounts may be added in the same form).
-      const sc = target.slug === "profiles"
-        ? { profileId: target.id }
-        : await schemaContext(payload, user, ownerOf(doc as unknown as Record<string, unknown>));
+      const sc =
+        target.slug === "profiles"
+          ? { profileId: target.id }
+          : await schemaContext(payload, user, ownerOf(doc as unknown as Record<string, unknown>));
       return { schema: await serializeFields(payload, collectionFields(payload, target.slug), sc), doc: doc as never };
     }
     const doc = await payload.findGlobal({ slug: target.slug, draft: true, depth: 1, user, overrideAccess: false });
@@ -137,11 +150,22 @@ export async function saveDoc(target: EditTarget, data: Record<string, unknown>)
     const clean = cleanData(data);
     if (target.kind === "collection") {
       await payload.update({
-        collection: target.slug, id: target.id, data: clean as never, draft: true, user, overrideAccess: false, depth: 0,
+        collection: target.slug,
+        id: target.id,
+        data: clean as never,
+        draft: true,
+        user,
+        overrideAccess: false,
+        depth: 0,
       });
     } else {
       await payload.updateGlobal({
-        slug: target.slug, data: clean as never, draft: true, user, overrideAccess: false, depth: 0,
+        slug: target.slug,
+        data: clean as never,
+        draft: true,
+        user,
+        overrideAccess: false,
+        depth: 0,
       });
     }
     refresh();
@@ -158,8 +182,21 @@ export async function saveField(target: EditTarget, path: string, value: unknown
     const { payload, user } = await ctx();
     assertTarget(target);
     const current = (target.kind === "collection"
-      ? await payload.findByID({ collection: target.slug, id: target.id, draft: true, depth: 0, user, overrideAccess: false })
-      : await payload.findGlobal({ slug: target.slug, draft: true, depth: 0, user, overrideAccess: false })) as unknown as Record<string, unknown>;
+      ? await payload.findByID({
+          collection: target.slug,
+          id: target.id,
+          draft: true,
+          depth: 0,
+          user,
+          overrideAccess: false,
+        })
+      : await payload.findGlobal({
+          slug: target.slug,
+          draft: true,
+          depth: 0,
+          user,
+          overrideAccess: false,
+        })) as unknown as Record<string, unknown>;
     const group = { ...((current[head] as unknown as Record<string, unknown>) ?? {}), [sub]: value };
     const res = await saveDoc(target, { [head]: group });
     if (!res.ok) throw new Error(res.error);
@@ -171,7 +208,7 @@ export async function saveField(target: EditTarget, path: string, value: unknown
 export async function createItem(
   slug: EditableCollection,
   data: Record<string, unknown>,
-  profileId?: number
+  profileId?: number,
 ): Promise<ActionResult<{ id: number }>> {
   return run(async () => {
     const { payload, user } = await ctx();
@@ -180,7 +217,12 @@ export async function createItem(
     if (slug === "profiles") delete clean.profile;
     else clean.profile = await assertProfile(payload, user, profileId ?? clean.profile);
     const doc = await payload.create({
-      collection: slug, data: clean as never, draft: true, user, overrideAccess: false, depth: 0,
+      collection: slug,
+      data: clean as never,
+      draft: true,
+      user,
+      overrideAccess: false,
+      depth: 0,
     });
     refresh();
     return { id: doc.id as number };
@@ -192,8 +234,12 @@ export async function deleteItem(slug: EditableCollection, id: number): Promise<
     const { payload, user } = await ctx();
     assertCollection(slug);
     if (slug === "profiles") {
-      const [activeLive, activeDraft] = await Promise.all([activeProfileId(payload, user, false), activeProfileId(payload, user, true)]);
-      if (activeLive === id || activeDraft === id) throw new Error("This is the active profile. Make another profile active first.");
+      const [activeLive, activeDraft] = await Promise.all([
+        activeProfileId(payload, user, false),
+        activeProfileId(payload, user, true),
+      ]);
+      if (activeLive === id || activeDraft === id)
+        throw new Error("This is the active profile. Make another profile active first.");
       // A profile owns its content: delete it with the profile. Categories last (works refer to them).
       for (const c of [...CONTENT_SLUGS.filter((x) => x !== "work-categories"), "work-categories" as const]) {
         await payload.delete({ collection: c, where: { profile: { equals: id } }, user, overrideAccess: false });
@@ -213,7 +259,13 @@ export async function reorderItems(slug: EditableCollection, ids: number[]): Pro
     const keys = generateNKeysBetween(null, null, ids.length);
     for (const [i, id] of ids.entries()) {
       await payload.update({
-        collection: slug, id, data: { _order: keys[i] } as never, draft: true, user, overrideAccess: false, depth: 0,
+        collection: slug,
+        id,
+        data: { _order: keys[i] } as never,
+        draft: true,
+        user,
+        overrideAccess: false,
+        depth: 0,
       });
     }
     refresh();
@@ -243,7 +295,13 @@ export async function listMedia(page = 1): Promise<ActionResult<{ items: MediaIt
   return run(async () => {
     const { payload, user } = await ctx();
     const res = await payload.find({
-      collection: "media", sort: "-createdAt", limit: 40, page, depth: 0, user, overrideAccess: false,
+      collection: "media",
+      sort: "-createdAt",
+      limit: 40,
+      page,
+      depth: 0,
+      user,
+      overrideAccess: false,
     });
     return { items: res.docs.map((d) => toMedia(d as never)), hasNextPage: res.hasNextPage };
   });
@@ -256,14 +314,24 @@ async function pendingChanges(payload: Payload, user: TypedUser, profileId?: num
   const out: PendingChange[] = [];
   for (const slug of EDITABLE_COLLECTIONS) {
     const cfg = payload.collections[slug].config;
-    const scope: Where[] = profileId === undefined ? [] : [slug === "profiles" ? { id: { equals: profileId } } : { profile: { equals: profileId } }];
+    const scope: Where[] =
+      profileId === undefined
+        ? []
+        : [slug === "profiles" ? { id: { equals: profileId } } : { profile: { equals: profileId } }];
     const res = await payload.find({
-      collection: slug, draft: true, where: { and: [{ _status: { equals: "draft" } }, ...scope] }, depth: 0, limit: 500,
-      pagination: false, user, overrideAccess: false,
+      collection: slug,
+      draft: true,
+      where: { and: [{ _status: { equals: "draft" } }, ...scope] },
+      depth: 0,
+      limit: 500,
+      pagination: false,
+      user,
+      overrideAccess: false,
     });
     for (const d of res.docs as unknown as Record<string, unknown>[]) {
       const published = await payload.count({
-        collection: slug, where: { and: [{ id: { equals: d.id } }, { _status: { equals: "published" } }] },
+        collection: slug,
+        where: { and: [{ id: { equals: d.id } }, { _status: { equals: "published" } }] },
       });
       out.push({
         target: { kind: "collection", slug, id: d.id as number },
@@ -279,11 +347,21 @@ async function pendingChanges(payload: Payload, user: TypedUser, profileId?: num
     // A global's row may not exist yet (status defaults to "draft"), so look at
     // its newest saved version instead.
     const latest = await payload.findGlobalVersions({
-      slug, sort: "-updatedAt", limit: 1, depth: 0, user, overrideAccess: false,
+      slug,
+      sort: "-updatedAt",
+      limit: 1,
+      depth: 0,
+      user,
+      overrideAccess: false,
     });
     if ((latest.docs[0]?.version as { _status?: string } | undefined)?._status === "draft") {
       const cfg = payload.globals.config.find((c) => c.slug === slug);
-      out.push({ target: { kind: "global", slug }, label: String(cfg?.label ?? slug), group: "Settings", isNew: false });
+      out.push({
+        target: { kind: "global", slug },
+        label: String(cfg?.label ?? slug),
+        group: "Settings",
+        isNew: false,
+      });
     }
   }
   return out;
@@ -299,15 +377,29 @@ export async function getPendingChanges(profileId?: number): Promise<ActionResul
 async function publishOne(payload: Payload, user: TypedUser, t: EditTarget) {
   if (t.kind === "collection") {
     await payload.update({
-      collection: t.slug, id: t.id, data: { _status: "published" } as never, user, overrideAccess: false, depth: 0,
+      collection: t.slug,
+      id: t.id,
+      data: { _status: "published" } as never,
+      user,
+      overrideAccess: false,
+      depth: 0,
     });
   } else {
-    await payload.updateGlobal({ slug: t.slug, data: { _status: "published" } as never, user, overrideAccess: false, depth: 0 });
+    await payload.updateGlobal({
+      slug: t.slug,
+      data: { _status: "published" } as never,
+      user,
+      overrideAccess: false,
+      depth: 0,
+    });
   }
 }
 
 /** Publish every pending draft (or only `targets`, or only one profile's). */
-export async function publish(targets?: EditTarget[], profileId?: number): Promise<ActionResult<{ published: number }>> {
+export async function publish(
+  targets?: EditTarget[],
+  profileId?: number,
+): Promise<ActionResult<{ published: number }>> {
   return run(async () => {
     const { payload, user } = await ctx();
     const list = targets ?? (await pendingChanges(payload, user, profileId)).map((p) => p.target);
@@ -321,7 +413,10 @@ export async function publish(targets?: EditTarget[], profileId?: number): Promi
 }
 
 /** Throw away drafts: restore the last published version, or delete never-published items. */
-export async function discard(targets?: EditTarget[], profileId?: number): Promise<ActionResult<{ discarded: number }>> {
+export async function discard(
+  targets?: EditTarget[],
+  profileId?: number,
+): Promise<ActionResult<{ discarded: number }>> {
   return run(async () => {
     const { payload, user } = await ctx();
     const all = await pendingChanges(payload, user, profileId);
@@ -336,15 +431,32 @@ export async function discard(targets?: EditTarget[], profileId?: number): Promi
         const v = await payload.findVersions({
           collection: t.slug,
           where: { and: [{ parent: { equals: t.id } }, { "version._status": { equals: "published" } }] },
-          sort: "-updatedAt", limit: 1, depth: 0, user, overrideAccess: false,
+          sort: "-updatedAt",
+          limit: 1,
+          depth: 0,
+          user,
+          overrideAccess: false,
         });
-        if (v.docs[0]) await payload.restoreVersion({ collection: t.slug, id: v.docs[0].id, user, overrideAccess: false, depth: 0 });
+        if (v.docs[0])
+          await payload.restoreVersion({ collection: t.slug, id: v.docs[0].id, user, overrideAccess: false, depth: 0 });
       } else {
         const v = await payload.findGlobalVersions({
-          slug: t.slug, where: { "version._status": { equals: "published" } }, sort: "-updatedAt", limit: 1, depth: 0,
-          user, overrideAccess: false,
+          slug: t.slug,
+          where: { "version._status": { equals: "published" } },
+          sort: "-updatedAt",
+          limit: 1,
+          depth: 0,
+          user,
+          overrideAccess: false,
         });
-        if (v.docs[0]) await payload.restoreGlobalVersion({ slug: t.slug, id: String(v.docs[0].id), user, overrideAccess: false, depth: 0 });
+        if (v.docs[0])
+          await payload.restoreGlobalVersion({
+            slug: t.slug,
+            id: String(v.docs[0].id),
+            user,
+            overrideAccess: false,
+            depth: 0,
+          });
       }
     }
     refresh();
@@ -358,15 +470,30 @@ export async function listVersions(target: EditTarget): Promise<ActionResult<Ver
   return run(async () => {
     const { payload, user } = await ctx();
     assertTarget(target);
-    const res = target.kind === "collection"
-      ? await payload.findVersions({
-          collection: target.slug, where: { parent: { equals: target.id } }, sort: "-updatedAt", limit: 30, depth: 0,
-          user, overrideAccess: false,
-        })
-      : await payload.findGlobalVersions({ slug: target.slug, sort: "-updatedAt", limit: 30, depth: 0, user, overrideAccess: false });
+    const res =
+      target.kind === "collection"
+        ? await payload.findVersions({
+            collection: target.slug,
+            where: { parent: { equals: target.id } },
+            sort: "-updatedAt",
+            limit: 30,
+            depth: 0,
+            user,
+            overrideAccess: false,
+          })
+        : await payload.findGlobalVersions({
+            slug: target.slug,
+            sort: "-updatedAt",
+            limit: 30,
+            depth: 0,
+            user,
+            overrideAccess: false,
+          });
     return res.docs.map((v) => ({
       id: v.id,
-      status: ((v.version as { _status?: string })._status === "published" ? "published" : "draft") as VersionItem["status"],
+      status: ((v.version as { _status?: string })._status === "published"
+        ? "published"
+        : "draft") as VersionItem["status"],
       updatedAt: String(v.updatedAt),
       latest: Boolean((v as { latest?: boolean }).latest),
     }));
@@ -379,10 +506,24 @@ export async function restoreVersion(target: EditTarget, versionId: string | num
     const { payload, user } = await ctx();
     assertTarget(target);
     if (target.kind === "collection") {
-      await payload.restoreVersion({ collection: target.slug, id: versionId as never, draft: true, user, overrideAccess: false, depth: 0 });
+      await payload.restoreVersion({
+        collection: target.slug,
+        id: versionId as never,
+        draft: true,
+        user,
+        overrideAccess: false,
+        depth: 0,
+      });
     } else {
       // `draft` is supported by the operation but missing from the local API type.
-      await payload.restoreGlobalVersion({ slug: target.slug, id: String(versionId), draft: true, user, overrideAccess: false, depth: 0 } as never);
+      await payload.restoreGlobalVersion({
+        slug: target.slug,
+        id: String(versionId),
+        draft: true,
+        user,
+        overrideAccess: false,
+        depth: 0,
+      } as never);
     }
     refresh();
     return undefined;
@@ -407,7 +548,9 @@ export interface ProfileSummary {
 async function ownedCount(payload: Payload, user: TypedUser, profileId: number) {
   let n = 0;
   for (const slug of CONTENT_SLUGS) {
-    n += (await payload.count({ collection: slug, where: { profile: { equals: profileId } }, user, overrideAccess: false })).totalDocs;
+    n += (
+      await payload.count({ collection: slug, where: { profile: { equals: profileId } }, user, overrideAccess: false })
+    ).totalDocs;
   }
   return n;
 }
@@ -422,7 +565,16 @@ export async function listProfiles(): Promise<ActionResult<ProfileSummary[]>> {
   return run(async () => {
     const { payload, user } = await ctx();
     const [res, active] = await Promise.all([
-      payload.find({ collection: "profiles", draft: true, sort: "_order", depth: 1, limit: 200, pagination: false, user, overrideAccess: false }),
+      payload.find({
+        collection: "profiles",
+        draft: true,
+        sort: "_order",
+        depth: 1,
+        limit: 200,
+        pagination: false,
+        user,
+        overrideAccess: false,
+      }),
       activeProfileId(payload, user, false),
     ]);
     const firstId = res.docs[0]?.id;
@@ -437,7 +589,7 @@ export async function listProfiles(): Promise<ActionResult<ProfileSummary[]>> {
         isActive: active ? active === p.id : p.id === firstId,
         avatarUrl: p.avatar && typeof p.avatar === "object" ? (p.avatar.url ?? null) : null,
         items: await ownedCount(payload, user, p.id),
-      }))
+      })),
     );
   });
 }
@@ -449,30 +601,65 @@ export async function listProfiles(): Promise<ActionResult<ProfileSummary[]>> {
 export async function setActiveProfile(id: number): Promise<ActionResult> {
   return run(async () => {
     const { payload, user } = await ctx();
-    const profile = await payload.findByID({ collection: "profiles", id, draft: true, depth: 0, user, overrideAccess: false });
+    const profile = await payload.findByID({
+      collection: "profiles",
+      id,
+      draft: true,
+      depth: 0,
+      user,
+      overrideAccess: false,
+    });
     if (profile._status === "draft") {
       const everPublished = await payload.count({
-        collection: "profiles", where: { and: [{ id: { equals: id } }, { _status: { equals: "published" } }] },
+        collection: "profiles",
+        where: { and: [{ id: { equals: id } }, { _status: { equals: "published" } }] },
       });
       if (!everPublished.totalDocs) throw new Error("Publish this profile before making it active.");
     }
-    const live = await payload.findGlobal({ slug: "site-settings", draft: false, depth: 0, user, overrideAccess: false });
-    const latest = await payload.findGlobalVersions({ slug: "site-settings", sort: "-updatedAt", limit: 1, depth: 0, user, overrideAccess: false });
-    const pendingDraft = (latest.docs[0]?.version as { _status?: string } | undefined)?._status === "draft"
-      ? (latest.docs[0].version as unknown as Record<string, unknown>)
-      : null;
-    const { id: _i, createdAt: _c, updatedAt: _u, globalType: _g, ...liveData } = live as unknown as Record<string, unknown>;
+    const live = await payload.findGlobal({
+      slug: "site-settings",
+      draft: false,
+      depth: 0,
+      user,
+      overrideAccess: false,
+    });
+    const latest = await payload.findGlobalVersions({
+      slug: "site-settings",
+      sort: "-updatedAt",
+      limit: 1,
+      depth: 0,
+      user,
+      overrideAccess: false,
+    });
+    const pendingDraft =
+      (latest.docs[0]?.version as { _status?: string } | undefined)?._status === "draft"
+        ? (latest.docs[0].version as unknown as Record<string, unknown>)
+        : null;
+    const {
+      id: _i,
+      createdAt: _c,
+      updatedAt: _u,
+      globalType: _g,
+      ...liveData
+    } = live as unknown as Record<string, unknown>;
     // Publish the live settings with only the active profile changed …
     await payload.updateGlobal({
-      slug: "site-settings", data: { ...liveData, activeProfile: id, _status: "published" } as never,
-      user, overrideAccess: false, depth: 0,
+      slug: "site-settings",
+      data: { ...liveData, activeProfile: id, _status: "published" } as never,
+      user,
+      overrideAccess: false,
+      depth: 0,
     });
     // … then put any pending draft back on top, with the new selection.
     if (pendingDraft) {
       const { id: _a, createdAt: _b, updatedAt: _d, globalType: _e, ...draftData } = pendingDraft;
       await payload.updateGlobal({
-        slug: "site-settings", data: { ...draftData, activeProfile: id } as never, draft: true,
-        user, overrideAccess: false, depth: 0,
+        slug: "site-settings",
+        data: { ...draftData, activeProfile: id } as never,
+        draft: true,
+        user,
+        overrideAccess: false,
+        depth: 0,
       });
     }
     refresh();
@@ -482,9 +669,15 @@ export async function setActiveProfile(id: number): Promise<ActionResult> {
 
 /** Strip ids so arrays and nested groups get fresh rows when copied. */
 const stripIds = (v: unknown): unknown =>
-  Array.isArray(v) ? v.map(stripIds)
-    : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).filter(([k]) => k !== "id").map(([k, x]) => [k, stripIds(x)]))
-    : v;
+  Array.isArray(v)
+    ? v.map(stripIds)
+    : v && typeof v === "object"
+      ? Object.fromEntries(
+          Object.entries(v)
+            .filter(([k]) => k !== "id")
+            .map(([k, x]) => [k, stripIds(x)]),
+        )
+      : v;
 
 /** Data of an item ready to be created again under `profileId`. */
 function copyData(doc: Record<string, unknown>, profileId: number, categoryMap?: Map<number, number>) {
@@ -504,12 +697,24 @@ async function copyItems(payload: Payload, user: TypedUser, fromId: number, toId
   const categoryMap = new Map<number, number>();
   for (const slug of ["work-categories" as const, ...CONTENT_SLUGS.filter((c) => c !== "work-categories")]) {
     const res = await payload.find({
-      collection: slug, draft: true, where: { profile: { equals: fromId } }, sort: "_order", depth: 0, limit: 1000,
-      pagination: false, user, overrideAccess: false,
+      collection: slug,
+      draft: true,
+      where: { profile: { equals: fromId } },
+      sort: "_order",
+      depth: 0,
+      limit: 1000,
+      pagination: false,
+      user,
+      overrideAccess: false,
     });
     for (const d of res.docs as unknown as Record<string, unknown>[]) {
       const created = await payload.create({
-        collection: slug, data: copyData(d, toId, categoryMap) as never, draft: true, user, overrideAccess: false, depth: 0,
+        collection: slug,
+        data: copyData(d, toId, categoryMap) as never,
+        draft: true,
+        user,
+        overrideAccess: false,
+        depth: 0,
       });
       if (slug === "work-categories") categoryMap.set(d.id as number, created.id as number);
     }
@@ -520,16 +725,42 @@ async function copyItems(payload: Payload, user: TypedUser, fromId: number, toId
 export async function duplicateProfile(id: number): Promise<ActionResult<{ id: number }>> {
   return run(async () => {
     const { payload, user } = await ctx();
-    const src = await payload.findByID({ collection: "profiles", id, draft: true, depth: 0, user, overrideAccess: false });
-    const { id: _i, createdAt: _c, updatedAt: _u, _status: _s, _order: _o, ...data } = src as unknown as Record<string, unknown>;
+    const src = await payload.findByID({
+      collection: "profiles",
+      id,
+      draft: true,
+      depth: 0,
+      user,
+      overrideAccess: false,
+    });
+    const {
+      id: _i,
+      createdAt: _c,
+      updatedAt: _u,
+      _status: _s,
+      _order: _o,
+      ...data
+    } = src as unknown as Record<string, unknown>;
     let slug = `${src.slug}-copy`;
-    for (let n = 2; (await payload.count({ collection: "profiles", where: { slug: { equals: slug } } })).totalDocs; n++) {
+    for (
+      let n = 2;
+      (await payload.count({ collection: "profiles", where: { slug: { equals: slug } } })).totalDocs;
+      n++
+    ) {
       slug = `${src.slug}-copy-${n}`;
     }
     const copy = await payload.create({
       collection: "profiles",
-      data: { ...(stripIds(data) as object), internalName: `${src.internalName} (copy)`, slug, visibility: "private" } as never,
-      draft: true, user, overrideAccess: false, depth: 0,
+      data: {
+        ...(stripIds(data) as object),
+        internalName: `${src.internalName} (copy)`,
+        slug,
+        visibility: "private",
+      } as never,
+      draft: true,
+      user,
+      overrideAccess: false,
+      depth: 0,
     });
     await copyItems(payload, user, id, copy.id as number);
     refresh();
@@ -539,7 +770,9 @@ export async function duplicateProfile(id: number): Promise<ActionResult<{ id: n
 
 /** Put a copy of one item on another profile (instead of sharing it). */
 export async function duplicateItemToProfile(
-  slug: EditableCollection, id: number, targetProfileId: number
+  slug: EditableCollection,
+  id: number,
+  targetProfileId: number,
 ): Promise<ActionResult<{ id: number }>> {
   return run(async () => {
     const { payload, user } = await ctx();
@@ -551,14 +784,39 @@ export async function duplicateItemToProfile(
     if (slug === "works") {
       // Map categories by name onto the target profile's categories.
       const [mine, theirs] = await Promise.all([
-        payload.find({ collection: "work-categories", draft: true, where: { profile: { equals: ownerOf(doc as never) } }, depth: 0, limit: 500, pagination: false, user, overrideAccess: false }),
-        payload.find({ collection: "work-categories", draft: true, where: { profile: { equals: to } }, depth: 0, limit: 500, pagination: false, user, overrideAccess: false }),
+        payload.find({
+          collection: "work-categories",
+          draft: true,
+          where: { profile: { equals: ownerOf(doc as never) } },
+          depth: 0,
+          limit: 500,
+          pagination: false,
+          user,
+          overrideAccess: false,
+        }),
+        payload.find({
+          collection: "work-categories",
+          draft: true,
+          where: { profile: { equals: to } },
+          depth: 0,
+          limit: 500,
+          pagination: false,
+          user,
+          overrideAccess: false,
+        }),
       ]);
       const byName = new Map(theirs.docs.map((c) => [c.name, c.id as number]));
-      categoryMap = new Map(mine.docs.filter((c) => byName.has(c.name)).map((c) => [c.id as number, byName.get(c.name)!]));
+      categoryMap = new Map(
+        mine.docs.filter((c) => byName.has(c.name)).map((c) => [c.id as number, byName.get(c.name)!]),
+      );
     }
     const created = await payload.create({
-      collection: slug, data: copyData(doc as never, to, categoryMap) as never, draft: true, user, overrideAccess: false, depth: 0,
+      collection: slug,
+      data: copyData(doc as never, to, categoryMap) as never,
+      draft: true,
+      user,
+      overrideAccess: false,
+      depth: 0,
     });
     refresh();
     return { id: created.id as number };
@@ -578,14 +836,26 @@ export interface ProfileItemList {
 export async function listProfileItems(profileId: number): Promise<ActionResult<ProfileItemList[]>> {
   return run(async () => {
     const { payload, user } = await ctx();
-    const text = (v: unknown) => (typeof v === "string" ? v : v && typeof v === "object" && "en" in v ? String((v as { en: string }).en) : undefined);
+    const text = (v: unknown) =>
+      typeof v === "string"
+        ? v
+        : v && typeof v === "object" && "en" in v
+          ? String((v as { en: string }).en)
+          : undefined;
     return Promise.all(
       CONTENT_SLUGS.map(async (slug) => {
         const cfg = payload.collections[slug].config;
         const titleField = cfg.admin?.useAsTitle ?? "id";
         const res = await payload.find({
-          collection: slug, draft: true, where: { profile: { equals: profileId } }, sort: "_order", depth: 0, limit: 1000,
-          pagination: false, user, overrideAccess: false,
+          collection: slug,
+          draft: true,
+          where: { profile: { equals: profileId } },
+          sort: "_order",
+          depth: 0,
+          limit: 1000,
+          pagination: false,
+          user,
+          overrideAccess: false,
         });
         return {
           slug,
@@ -600,7 +870,7 @@ export async function listProfileItems(profileId: number): Promise<ActionResult<
             };
           }),
         };
-      })
+      }),
     );
   });
 }

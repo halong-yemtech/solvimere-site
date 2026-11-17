@@ -4,18 +4,29 @@ import type { FieldSchema } from "../lib/edit/types";
 
 const schema: FieldSchema[] = [
   { type: "text", name: "title", label: "Title", required: true },
-  { type: "row", fields: [
-    { type: "number", name: "price", label: "Price", required: true },
-    { type: "checkbox", name: "featured", label: "Featured" },
-  ] },
+  {
+    type: "row",
+    fields: [
+      { type: "number", name: "price", label: "Price", required: true },
+      { type: "checkbox", name: "featured", label: "Featured" },
+    ],
+  },
   { type: "upload", name: "images", label: "Images", hasMany: true },
   { type: "upload", name: "cover", label: "Cover", hasMany: false },
   { type: "relationship", name: "categories", label: "Categories", hasMany: true, options: [] },
   { type: "date", name: "date", label: "Date", monthOnly: true },
-  { type: "group", name: "quote", label: "Quote", fields: [{ type: "text", name: "text", label: "Text", required: true }] },
-  { type: "array", name: "features", label: "Features", fields: [
-    { type: "text", name: "feature", label: "Feature", required: true },
-  ] },
+  {
+    type: "group",
+    name: "quote",
+    label: "Quote",
+    fields: [{ type: "text", name: "text", label: "Text", required: true }],
+  },
+  {
+    type: "array",
+    name: "features",
+    label: "Features",
+    fields: [{ type: "text", name: "feature", label: "Feature", required: true }],
+  },
 ];
 
 describe("normalize", () => {
@@ -67,7 +78,11 @@ describe("missingRequired", () => {
 describe("defaultsFor", () => {
   test("seeds arrays, hasMany relations and checkboxes", () => {
     expect(defaultsFor(schema)).toEqual({
-      featured: false, images: [], categories: [], quote: {}, features: [],
+      featured: false,
+      images: [],
+      categories: [],
+      quote: {},
+      features: [],
     });
   });
 });

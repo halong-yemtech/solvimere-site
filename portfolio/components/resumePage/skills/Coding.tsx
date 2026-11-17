@@ -13,9 +13,7 @@ export default function Coding({ coding }: Props) {
           <div key={b.id} className="text-center">
             <div
               className="radial-progress text-main-orange text-2xl"
-              style={
-                { "--value": b.percent, "--size": "9rem" } as React.CSSProperties
-              }
+              style={{ "--value": b.percent, "--size": "9rem" } as React.CSSProperties}
             >
               <span className="text-gray-300">{b.percent}%</span>
             </div>

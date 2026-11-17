@@ -33,10 +33,32 @@ export default function SetupForm() {
       <form onSubmit={onSubmit} className="space-y-5">
         <input name="name" placeholder="Your name" autoComplete="name" className={field} />
         <input name="email" type="email" placeholder="Email" autoComplete="username" required className={field} />
-        <input name="password" type="password" placeholder="Password (min. 8 characters)" minLength={8} autoComplete="new-password" required className={field} />
-        <input name="confirm" type="password" placeholder="Repeat password" minLength={8} autoComplete="new-password" required className={field} />
-        {error && <p role="alert" className="text-lg text-red-400">{error}</p>}
-        <button type="submit" disabled={busy} className={primary}>{busy ? "Creating…" : "Create admin account"}</button>
+        <input
+          name="password"
+          type="password"
+          placeholder="Password (min. 8 characters)"
+          minLength={8}
+          autoComplete="new-password"
+          required
+          className={field}
+        />
+        <input
+          name="confirm"
+          type="password"
+          placeholder="Repeat password"
+          minLength={8}
+          autoComplete="new-password"
+          required
+          className={field}
+        />
+        {error && (
+          <p role="alert" className="text-lg text-red-400">
+            {error}
+          </p>
+        )}
+        <button type="submit" disabled={busy} className={primary}>
+          {busy ? "Creating…" : "Create admin account"}
+        </button>
       </form>
     </AuthCard>
   );

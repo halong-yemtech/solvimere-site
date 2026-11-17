@@ -1,7 +1,16 @@
 import type { IconType } from "react-icons";
 import { FaWhatsapp } from "react-icons/fa";
 import {
-  FiActivity, FiBriefcase, FiCalendar, FiGlobe, FiInfo, FiMail, FiMapPin, FiPhone, FiTag, FiUser,
+  FiActivity,
+  FiBriefcase,
+  FiCalendar,
+  FiGlobe,
+  FiInfo,
+  FiMail,
+  FiMapPin,
+  FiPhone,
+  FiTag,
+  FiUser,
 } from "react-icons/fi";
 
 const ICONS: Record<string, IconType> = {

@@ -39,7 +39,11 @@ export default function LoginForm({ redirect }: { redirect: string | null }) {
     <AuthCard
       title="Sign in"
       subtitle="Manage your portfolio"
-      footer={<Link href="/forgot-password" className="hover:text-main-orange">Forgot your password?</Link>}
+      footer={
+        <Link href="/forgot-password" className="hover:text-main-orange">
+          Forgot your password?
+        </Link>
+      }
     >
       <form onSubmit={onSubmit} className="space-y-5">
         <label className="block">
@@ -50,8 +54,14 @@ export default function LoginForm({ redirect }: { redirect: string | null }) {
           <span className="block mb-2 text-lg uppercase tracking-wider text-gray-400">Password</span>
           <input name="password" type="password" autoComplete="current-password" required className={field} />
         </label>
-        {error && <p role="alert" className="text-lg text-red-400">{error}</p>}
-        <button type="submit" disabled={busy} className={primary}>{busy ? "Signing in…" : "Sign in"}</button>
+        {error && (
+          <p role="alert" className="text-lg text-red-400">
+            {error}
+          </p>
+        )}
+        <button type="submit" disabled={busy} className={primary}>
+          {busy ? "Signing in…" : "Sign in"}
+        </button>
       </form>
     </AuthCard>
   );

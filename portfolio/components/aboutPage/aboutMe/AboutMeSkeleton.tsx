@@ -6,10 +6,7 @@ export default function AboutMeSkeleton() {
     <SkeletonWrapper>
       <div className="p-12">
         <Skeleton width={400} />
-        <Skeleton
-          count={2}
-          style={{ marginTop: "1rem" } as React.CSSProperties}
-        />
+        <Skeleton count={2} style={{ marginTop: "1rem" } as React.CSSProperties} />
         <div className="grid grid-cols-1 sm:grid-cols-2 mt-6 gap-y-2">
           <Skeleton width={270} />
           <Skeleton width={270} />

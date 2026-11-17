@@ -29,17 +29,22 @@ export type DrawerTarget =
 
 /** Trimmed, serializable description of a Payload field, enough to render a form. */
 export type FieldSchema =
-  | BaseField<"text" | "textarea" | "email" | "markdown" | "color" | "url"> & { maxLength?: number }
-  | BaseField<"number"> & { min?: number; max?: number }
+  | (BaseField<"text" | "textarea" | "email" | "markdown" | "color" | "url"> & { maxLength?: number })
+  | (BaseField<"number"> & { min?: number; max?: number })
   | BaseField<"checkbox">
-  | BaseField<"date"> & { monthOnly?: boolean }
-  | BaseField<"select" | "radio"> & { options: { label: string; value: string }[] }
-  | BaseField<"upload"> & { hasMany: boolean; mimeTypes?: string[] }
-  | BaseField<"relationship"> & { hasMany: boolean; options: { label: string; value: number | string }[] }
-  | BaseField<"array"> & { fields: FieldSchema[]; labels?: { singular: string; plural: string } }
-  | BaseField<"group"> & { fields: FieldSchema[] }
+  | (BaseField<"date"> & { monthOnly?: boolean })
+  | (BaseField<"select" | "radio"> & { options: { label: string; value: string }[] })
+  | (BaseField<"upload"> & { hasMany: boolean; mimeTypes?: string[] })
+  | (BaseField<"relationship"> & { hasMany: boolean; options: { label: string; value: number | string }[] })
+  | (BaseField<"array"> & { fields: FieldSchema[]; labels?: { singular: string; plural: string } })
+  | (BaseField<"group"> & { fields: FieldSchema[] })
   | { type: "row"; fields: FieldSchema[]; name?: undefined; width?: undefined }
-  | { type: "tabs"; tabs: { label: string; description?: string; fields: FieldSchema[] }[]; name?: undefined; width?: undefined };
+  | {
+      type: "tabs";
+      tabs: { label: string; description?: string; fields: FieldSchema[] }[];
+      name?: undefined;
+      width?: undefined;
+    };
 
 interface BaseField<T extends string> {
   type: T;

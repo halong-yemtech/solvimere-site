@@ -12,7 +12,12 @@ const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
 const parse = (d: string) => new Date(`${d}T00:00:00Z`);
 
 function describe(day: ContributionDay) {
-  const date = parse(day.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" });
+  const date = parse(day.date).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
   const what = day.count === 0 ? "No contributions" : `${day.count} contribution${day.count === 1 ? "" : "s"}`;
   return `${what} on ${date}`;
 }
@@ -98,7 +103,8 @@ export default function GithubCalendar({ username }: { username: string }) {
       <p className="mb-3 text-xl text-gray-300">
         {data ? (
           <>
-            <span className="font-semibold text-gray-100">{data.total.toLocaleString("en-US")}</span> contributions in the last year
+            <span className="font-semibold text-gray-100">{data.total.toLocaleString("en-US")}</span> contributions in
+            the last year
           </>
         ) : (
           <span className="inline-block h-5 w-64 animate-pulse rounded bg-gray-700/60 align-middle" />
@@ -130,7 +136,8 @@ export default function GithubCalendar({ username }: { username: string }) {
               <span className="pr-1 text-[1.05rem] leading-none text-gray-400 self-center">{label}</span>
               {Array.from({ length: cols }, (_, col) => {
                 const day = weeks[col]?.[row];
-                if (!data) return <span key={col} className="aspect-square rounded-[2px] bg-gray-700/40 animate-pulse" />;
+                if (!data)
+                  return <span key={col} className="aspect-square rounded-[2px] bg-gray-700/40 animate-pulse" />;
                 if (!day) return <span key={col} className="aspect-square" />;
                 return (
                   <span

@@ -11,19 +11,14 @@ export default function Price({ plan }: Props) {
   return (
     <div className="py-10 px-12 flex flex-col items-center">
       <MyIcon Icon={plan.icon} />
-      <h3 className="text-[1.6rem] text-gray-300 font-semibold capitalize mt-4 tracking-wider">
-        {plan.name}
-      </h3>
+      <h3 className="text-[1.6rem] text-gray-300 font-semibold capitalize mt-4 tracking-wider">{plan.name}</h3>
       <div className="amount inline-flex items-center gap-2.5 my-5">
         <sup className="text-[1.6rem] text-gray-300">$</sup>
         <span className="text-[4.2rem] text-gray-300 font-semibold">{plan.price}</span>
         {plan.period && <sub className="text-[1.6rem] text-gray-300 mt-4">{plan.period}</sub>}
       </div>
       {plan.features.map((f) => (
-        <p
-          key={f.id}
-          className={`text-2xl text-gray-400 mb-5 ${f.included ? "" : "line-through decoration-2"}`}
-        >
+        <p key={f.id} className={`text-2xl text-gray-400 mb-5 ${f.included ? "" : "line-through decoration-2"}`}>
           {f.feature}
         </p>
       ))}

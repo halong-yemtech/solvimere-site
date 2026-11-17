@@ -16,7 +16,15 @@ type Values = Record<string, unknown>;
  * save action), rendered inline. `tabs` picks which of the document's tabs to
  * show, so one form can cover a single section of a profile.
  */
-export default function DocForm({ target, tabs: only, compact = false }: { target: EditTarget; tabs?: string[]; compact?: boolean }) {
+export default function DocForm({
+  target,
+  tabs: only,
+  compact = false,
+}: {
+  target: EditTarget;
+  tabs?: string[];
+  compact?: boolean;
+}) {
   const { refresh, pending } = useEdit();
   const [schema, setSchema] = useState<FieldSchema[] | null>(null);
   const [values, setValues] = useState<Values>({});
@@ -52,7 +60,8 @@ export default function DocForm({ target, tabs: only, compact = false }: { targe
   async function save() {
     if (!schema || saving) return;
     const missing = missingRequired(schema, values);
-    if (missing.length) return toast.error(`Please fill in: ${missing.slice(0, 4).join(", ")}${missing.length > 4 ? "…" : ""}`);
+    if (missing.length)
+      return toast.error(`Please fill in: ${missing.slice(0, 4).join(", ")}${missing.length > 4 ? "…" : ""}`);
     setSaving(true);
     const res = await saveDoc(target, normalize(schema, values));
     setSaving(false);
@@ -91,15 +100,25 @@ export default function DocForm({ target, tabs: only, compact = false }: { targe
         </section>
       ))}
 
-      <div className={`sticky bottom-28 z-10 flex items-center justify-end gap-3 rounded-xl border px-4 py-3 transition-colors ${dirty ? "border-main-orange/60 bg-gray-900/95 shadow-xl" : "border-gray-800 bg-gray-900/80"}`}>
+      <div
+        className={`sticky bottom-28 z-10 flex items-center justify-end gap-3 rounded-xl border px-4 py-3 transition-colors ${dirty ? "border-main-orange/60 bg-gray-900/95 shadow-xl" : "border-gray-800 bg-gray-900/80"}`}
+      >
         <span className="mr-auto text-lg text-gray-500">{dirty ? "Unsaved changes" : "All changes saved"}</span>
         {dirty && (
-          <button onClick={() => { setValues(JSON.parse(initial)); }} className="flex items-center gap-2 rounded-lg px-4 py-2 text-lg hover:bg-gray-800">
+          <button
+            onClick={() => {
+              setValues(JSON.parse(initial));
+            }}
+            className="flex items-center gap-2 rounded-lg px-4 py-2 text-lg hover:bg-gray-800"
+          >
             <FiRotateCcw /> Undo
           </button>
         )}
-        <button onClick={save} disabled={!dirty || saving}
-          className="flex items-center gap-2 rounded-lg bg-main-orange px-5 py-2 text-lg font-semibold text-gray-900 disabled:opacity-40">
+        <button
+          onClick={save}
+          disabled={!dirty || saving}
+          className="flex items-center gap-2 rounded-lg bg-main-orange px-5 py-2 text-lg font-semibold text-gray-900 disabled:opacity-40"
+        >
           <FiSave /> {saving ? "Saving…" : "Save draft"}
         </button>
       </div>

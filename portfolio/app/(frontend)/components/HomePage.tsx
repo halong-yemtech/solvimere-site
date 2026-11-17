@@ -14,10 +14,7 @@ import WorkLb from "@/components/worksPage/WorkLb";
 import SideMenuLb from "@/components/SideMenuLb";
 import { BiMenu } from "react-icons/bi";
 
-const clipPaths = [
-  "polygon(0 50%, 100% 50%, 100% 50%, 0 50%)",
-  "polygon(50% 0, 50% 0, 50% 100%, 50% 100%)",
-];
+const clipPaths = ["polygon(0 50%, 100% 50%, 100% 50%, 0 50%)", "polygon(50% 0, 50% 0, 50% 100%, 50% 100%)"];
 
 export default function HomePage() {
   const { menus, activeKey: menuId } = useMenus();
@@ -37,14 +34,9 @@ export default function HomePage() {
       {loaderPage && <LoaderPage />}
 
       <Background />
-      <AnimatePresence>
-        {workId !== null && <WorkLb workId={workId} reactiveVar={currentWork} />}
-      </AnimatePresence>
+      <AnimatePresence>{workId !== null && <WorkLb workId={workId} reactiveVar={currentWork} />}</AnimatePresence>
 
-      <SideMenuLb
-        sideMenu={sideMenu}
-        showMenu={showMenu}
-      />
+      <SideMenuLb sideMenu={sideMenu} showMenu={showMenu} />
 
       <button
         onClick={() => showMenu(true)}
@@ -82,16 +74,13 @@ export default function HomePage() {
                           clipPath: "polygon(0 0, 100% 0, 100% 100%, 0% 100%)",
                         },
                         exitState: {
-                          clipPath:
-                            clipPaths[
-                              Math.floor(Math.random() * clipPaths.length)
-                            ],
+                          clipPath: clipPaths[Math.floor(Math.random() * clipPaths.length)],
                         },
                       }}
                     >
                       <m.Component />
                     </motion.div>
-                  )
+                  ),
               )}
             </AnimatePresence>
           </div>

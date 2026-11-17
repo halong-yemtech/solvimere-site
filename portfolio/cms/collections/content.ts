@@ -32,7 +32,7 @@ const keepOwner: CollectionBeforeChangeHook = ({ data, originalDoc, operation })
 
 /** Public-read, admin-write, drag-to-reorder list shown on the site. */
 function contentCollection(
-  config: Omit<CollectionConfig, "access" | "fields"> & { fields: Field[] }
+  config: Omit<CollectionConfig, "access" | "fields"> & { fields: Field[] },
 ): CollectionConfig {
   return {
     orderable: true,
@@ -67,7 +67,12 @@ export const PricingPlans = contentCollection({
       type: "row",
       fields: [
         { name: "price", type: "number", required: true, admin: { width: "50%" } },
-        { name: "period", type: "text", defaultValue: "hour", admin: { width: "50%", description: "e.g. hour, month, project" } },
+        {
+          name: "period",
+          type: "text",
+          defaultValue: "hour",
+          admin: { width: "50%", description: "e.g. hour, month, project" },
+        },
       ],
     },
     {
@@ -78,8 +83,17 @@ export const PricingPlans = contentCollection({
         {
           type: "row",
           fields: [
-            accountRefField("account", { custom: true, width: "40%", description: "One of the profile's accounts, or a custom URL." }),
-            { name: "customUrl", type: "text", validate: url, admin: { width: "60%", description: "Only for “Custom URL”." } },
+            accountRefField("account", {
+              custom: true,
+              width: "40%",
+              description: "One of the profile's accounts, or a custom URL.",
+            }),
+            {
+              name: "customUrl",
+              type: "text",
+              validate: url,
+              admin: { width: "60%", description: "Only for “Custom URL”." },
+            },
           ],
         },
       ],
@@ -107,7 +121,12 @@ export const Clients = contentCollection({
     { name: "name", type: "text", required: true },
     { name: "url", type: "text", required: true, validate: url },
     iconField({ required: false, admin: { description: "Used when no logo image is uploaded." } }),
-    { name: "logo", type: "upload", relationTo: "media", admin: { description: "Optional logo (overrides the icon)." } },
+    {
+      name: "logo",
+      type: "upload",
+      relationTo: "media",
+      admin: { description: "Optional logo (overrides the icon)." },
+    },
   ],
 });
 
@@ -156,12 +175,25 @@ export const ResumeEntries = contentCollection({
       required: true,
       admin: { description: "e.g. 2019 - Present (entries ending in “Present” are highlighted)." },
     },
-    { name: "title", type: "text", required: true, admin: { description: "Experience: job title / role. Education: school." } },
+    {
+      name: "title",
+      type: "text",
+      required: true,
+      admin: { description: "Experience: job title / role. Education: school." },
+    },
     {
       type: "row",
       fields: [
-        { name: "subtitle", type: "text", admin: { width: "60%", description: "Experience: company. Education: degree / field." } },
-        { name: "location", type: "text", admin: { width: "40%", description: "Shown on the CV, e.g. “Boston, MA, USA”." } },
+        {
+          name: "subtitle",
+          type: "text",
+          admin: { width: "60%", description: "Experience: company. Education: degree / field." },
+        },
+        {
+          name: "location",
+          type: "text",
+          admin: { width: "40%", description: "Shown on the CV, e.g. “Boston, MA, USA”." },
+        },
       ],
     },
     {
@@ -175,7 +207,12 @@ export const ResumeEntries = contentCollection({
 export const Statistics = contentCollection({
   slug: "statistics",
   labels: { singular: "Statistic", plural: "Statistics" },
-  admin: { group: "Profile & About", useAsTitle: "title", defaultColumns: ["title", "value"], description: "Cards on the Stats page." },
+  admin: {
+    group: "Profile & About",
+    useAsTitle: "title",
+    defaultColumns: ["title", "value"],
+    description: "Cards on the Stats page.",
+  },
   fields: [
     {
       type: "row",
@@ -192,7 +229,12 @@ export const Statistics = contentCollection({
           type: "row",
           fields: [
             accountRefField("account", { custom: true, none: true, width: "40%" }),
-            { name: "customUrl", type: "text", validate: url, admin: { width: "60%", description: "Only for “Custom URL”." } },
+            {
+              name: "customUrl",
+              type: "text",
+              validate: url,
+              admin: { width: "60%", description: "Only for “Custom URL”." },
+            },
           ],
         },
       ],
@@ -203,7 +245,11 @@ export const Statistics = contentCollection({
 export const WorkCategories = contentCollection({
   slug: "work-categories",
   labels: { singular: "Work category", plural: "Work categories" },
-  admin: { group: "Portfolio", useAsTitle: "name", description: "Filter tabs on the Works page (“All” is added automatically)." },
+  admin: {
+    group: "Portfolio",
+    useAsTitle: "name",
+    description: "Filter tabs on the Works page (“All” is added automatically).",
+  },
   hooks: {
     beforeValidate: [
       async ({ data, req, originalDoc }) => {
@@ -224,7 +270,10 @@ export const WorkCategories = contentCollection({
           depth: 0,
           req,
         });
-        if (clash.totalDocs) throw new ValidationError({ errors: [{ message: `This profile already has a “${name}” category.`, path: "name" }] });
+        if (clash.totalDocs)
+          throw new ValidationError({
+            errors: [{ message: `This profile already has a “${name}” category.`, path: "name" }],
+          });
         return data;
       },
     ],
@@ -266,7 +315,11 @@ export const Works = contentCollection({
       fields: [
         { name: "client", type: "text", admin: { width: "33%" } },
         { name: "owner", type: "text", admin: { width: "33%" } },
-        { name: "date", type: "date", admin: { width: "33%", date: { pickerAppearance: "monthOnly", displayFormat: "MMM yyyy" } } },
+        {
+          name: "date",
+          type: "date",
+          admin: { width: "33%", date: { pickerAppearance: "monthOnly", displayFormat: "MMM yyyy" } },
+        },
       ],
     },
     {
@@ -371,7 +424,9 @@ export const BlogPosts = contentCollection({
     {
       name: "buttonLabel",
       type: "text",
-      admin: { description: "The button links to this profile's account for the platform above. Default: “Visit profile”." },
+      admin: {
+        description: "The button links to this profile's account for the platform above. Default: “Visit profile”.",
+      },
     },
   ],
 });

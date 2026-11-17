@@ -18,23 +18,13 @@ const getIconComponent = (iconName: string): IconType => {
   return icon ?? FaQuestionCircle;
 };
 
-export default function MyIcon({
-  Icon,
-  size,
-  iconClassName,
-  style,
-  wrapperClassName,
-}: Props) {
-  const IconComponent =
-    typeof Icon === "string" ? getIconComponent(Icon) : Icon;
+export default function MyIcon({ Icon, size, iconClassName, style, wrapperClassName }: Props) {
+  const IconComponent = typeof Icon === "string" ? getIconComponent(Icon) : Icon;
 
   if (wrapperClassName !== undefined) {
     return (
       <div className={wrapperClassName}>
-        <IconComponent
-          className={iconClassName || "text-5xl text-main-orange"}
-          style={style}
-        />
+        <IconComponent className={iconClassName || "text-5xl text-main-orange"} style={style} />
       </div>
     );
   }
@@ -45,10 +35,7 @@ export default function MyIcon({
         size ? size : "w-24 h-24"
       } rounded-full border-2 border-main-orange border-solid flex items-center justify-center`}
     >
-      <IconComponent
-        className={iconClassName || "text-5xl text-main-orange"}
-        style={style}
-      />
+      <IconComponent className={iconClassName || "text-5xl text-main-orange"} style={style} />
     </div>
   );
 }

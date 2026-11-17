@@ -20,30 +20,54 @@ export default function About() {
         <AboutMe />
       </EditableProfileArea>
 
-      <Title name="my services" actions={
-        <SectionTools slug="services" title="service" items={services.map((s) => ({ id: s.id, label: s.title }))} />
-      } />
+      <Title
+        name="my services"
+        actions={
+          <SectionTools slug="services" title="service" items={services.map((s) => ({ id: s.id, label: s.title }))} />
+        }
+      />
       <MyServices />
 
-      <Title name="pricing" actions={
-        <SectionTools slug="pricing-plans" title="pricing plan" items={pricingPlans.map((p) => ({ id: p.id, label: p.name }))} />
-      } />
+      <Title
+        name="pricing"
+        actions={
+          <SectionTools
+            slug="pricing-plans"
+            title="pricing plan"
+            items={pricingPlans.map((p) => ({ id: p.id, label: p.name }))}
+          />
+        }
+      />
       <Prices />
 
-      <Title name="clients" actions={
-        <SectionTools slug="clients" title="client" items={clients.map((c) => ({ id: c.id, label: c.name }))} />
-      } />
+      <Title
+        name="clients"
+        actions={
+          <SectionTools slug="clients" title="client" items={clients.map((c) => ({ id: c.id, label: c.name }))} />
+        }
+      />
       <BrandLogos />
 
-      <Title name="testimonials" actions={
-        <SectionTools slug="testimonials" title="testimonial"
-          items={testimonials.filter((t) => typeof t.id === "number").map((t) => ({ id: t.id as number, label: t.name }))} />
-      } />
+      <Title
+        name="testimonials"
+        actions={
+          <SectionTools
+            slug="testimonials"
+            title="testimonial"
+            items={testimonials
+              .filter((t) => typeof t.id === "number")
+              .map((t) => ({ id: t.id as number, label: t.name }))}
+          />
+        }
+      />
       <Testimonials />
 
-      <Title name="fun facts" actions={
-        <SectionTools slug="facts" title="fun fact" items={facts.map((f) => ({ id: f.id, label: f.description }))} />
-      } />
+      <Title
+        name="fun facts"
+        actions={
+          <SectionTools slug="facts" title="fun fact" items={facts.map((f) => ({ id: f.id, label: f.description }))} />
+        }
+      />
       <Facts />
     </section>
   );

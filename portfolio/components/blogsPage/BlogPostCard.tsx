@@ -9,7 +9,10 @@ import { SiUpwork } from "react-icons/si";
 import type { BlogPlatform, BlogPostData } from "@/lib/siteTypes";
 import GithubCalendar from "./GithubCalendar";
 
-const PLATFORMS: Record<BlogPlatform, { name: string; color: string; iconColor: string; Icon: React.ComponentType<{ className?: string }> }> = {
+const PLATFORMS: Record<
+  BlogPlatform,
+  { name: string; color: string; iconColor: string; Icon: React.ComponentType<{ className?: string }> }
+> = {
   upwork: { name: "Upwork", color: "#14a800", iconColor: "#ffffff", Icon: SiUpwork },
   github: { name: "GitHub", color: "#e6edf3", iconColor: "#0d1117", Icon: FaGithub },
   linkedin: { name: "LinkedIn", color: "#0a66c2", iconColor: "#ffffff", Icon: FaLinkedinIn },
@@ -20,7 +23,15 @@ const TAG_LIMIT = 14;
 /** Fill the row exactly, so there are no empty cells (classes spelled out for Tailwind). */
 const STAT_COLS = ["", "sm:grid-cols-1", "sm:grid-cols-2", "sm:grid-cols-3", "sm:grid-cols-4"];
 
-export default function BlogPostCard({ post, author, avatar }: { post: BlogPostData; author: string; avatar: string | null }) {
+export default function BlogPostCard({
+  post,
+  author,
+  avatar,
+}: {
+  post: BlogPostData;
+  author: string;
+  avatar: string | null;
+}) {
   const p = PLATFORMS[post.platform];
   const [allTags, setAllTags] = useState(false);
   const tags = allTags ? post.tags : post.tags.slice(0, TAG_LIMIT);
@@ -76,7 +87,10 @@ export default function BlogPostCard({ post, author, avatar }: { post: BlogPostD
               <li
                 key={b}
                 className="rounded-full border px-3.5 py-1 text-lg text-gray-200"
-                style={{ borderColor: `color-mix(in srgb, ${p.color} 55%, transparent)`, background: `color-mix(in srgb, ${p.color} 12%, transparent)` }}
+                style={{
+                  borderColor: `color-mix(in srgb, ${p.color} 55%, transparent)`,
+                  background: `color-mix(in srgb, ${p.color} 12%, transparent)`,
+                }}
               >
                 {b}
               </li>
@@ -85,7 +99,9 @@ export default function BlogPostCard({ post, author, avatar }: { post: BlogPostD
         )}
 
         {post.stats.length > 0 && (
-          <dl className={`mt-7 grid ${post.stats.length === 1 ? "grid-cols-1" : "grid-cols-2"} ${STAT_COLS[Math.min(post.stats.length, 4)]} max-sm:[&>*:last-child:nth-child(odd)]:col-span-2 gap-px overflow-hidden rounded-xl border border-gray-700/60 bg-gray-700/60`}>
+          <dl
+            className={`mt-7 grid ${post.stats.length === 1 ? "grid-cols-1" : "grid-cols-2"} ${STAT_COLS[Math.min(post.stats.length, 4)]} max-sm:[&>*:last-child:nth-child(odd)]:col-span-2 gap-px overflow-hidden rounded-xl border border-gray-700/60 bg-gray-700/60`}
+          >
             {post.stats.map((s) => (
               <div key={`${s.value}-${s.label}`} className="bg-gray-900/90 px-5 py-4">
                 <dt className="sr-only">{s.label}</dt>
@@ -113,7 +129,9 @@ export default function BlogPostCard({ post, author, avatar }: { post: BlogPostD
               loading="lazy"
               className="w-full h-auto rounded-xl border border-gray-700/60 bg-gray-900"
             />
-            {post.imageCaption && <figcaption className="mt-2 text-lg text-gray-500 text-center">{post.imageCaption}</figcaption>}
+            {post.imageCaption && (
+              <figcaption className="mt-2 text-lg text-gray-500 text-center">{post.imageCaption}</figcaption>
+            )}
           </figure>
         )}
 

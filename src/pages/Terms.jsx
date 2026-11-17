@@ -12,10 +12,9 @@ export default function Terms() {
         </h1>
         <p className="updated">Last updated: October 8, 2026</p>
         <p className="lede">
-          These Terms and Conditions (“Terms”) govern your access to and use of solvimere.com (the
-          “Website”) and any services that Solvimere (“we,” “us,” or “our”) provides to you. By using
-          the Website or engaging us for services, you agree to these Terms. If you do not agree, please
-          do not use the Website or our services.
+          These Terms and Conditions (“Terms”) govern your access to and use of solvimere.com (the “Website”) and any
+          services that Solvimere (“we,” “us,” or “our”) provides to you. By using the Website or engaging us for
+          services, you agree to these Terms. If you do not agree, please do not use the Website or our services.
         </p>
       </div>
       <div className="wrap terms-layout">

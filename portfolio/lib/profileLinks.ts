@@ -17,7 +17,13 @@ export const PLATFORMS = [
   { key: "youtube", label: "YouTube", icon: "FaYoutube", color: "#FF0000", hosts: ["youtube.com", "youtu.be"] },
   { key: "telegram", label: "Telegram", icon: "FaTelegram", color: "#26A5E4", hosts: ["t.me", "telegram.me"] },
   { key: "medium", label: "Medium", icon: "FaMedium", color: "#ffffff", hosts: ["medium.com"] },
-  { key: "stackoverflow", label: "Stack Overflow", icon: "FaStackOverflow", color: "#F58025", hosts: ["stackoverflow.com"] },
+  {
+    key: "stackoverflow",
+    label: "Stack Overflow",
+    icon: "FaStackOverflow",
+    color: "#F58025",
+    hosts: ["stackoverflow.com"],
+  },
   { key: "devto", label: "DEV", icon: "FaDev", color: "#ffffff", hosts: ["dev.to"] },
   { key: "website", label: "Website", icon: "FaGlobe", color: "#ffffff", hosts: [] },
   { key: "other", label: "Other", icon: "FaLink", color: "#ffffff", hosts: [] },
@@ -28,7 +34,8 @@ export const PLATFORM_KEYS = PLATFORMS.map((p) => p.key) as PlatformKey[];
 /** Platforms that can be referenced by key (each at most once per profile). */
 export const REFERENCEABLE = PLATFORM_KEYS.filter((k) => k !== "other");
 
-export const platformOf = (key: string | null | undefined) => PLATFORMS.find((p) => p.key === key) ?? PLATFORMS[PLATFORMS.length - 1];
+export const platformOf = (key: string | null | undefined) =>
+  PLATFORMS.find((p) => p.key === key) ?? PLATFORMS[PLATFORMS.length - 1];
 
 /** Special values of an account reference besides a platform key. */
 export const CUSTOM = "custom";

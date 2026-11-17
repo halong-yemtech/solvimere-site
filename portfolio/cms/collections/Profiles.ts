@@ -123,14 +123,25 @@ export const Profiles: CollectionConfig = {
                 {
                   type: "row",
                   fields: [
-                    { name: "headline", type: "text", admin: { width: "50%", description: "Under your name. Default: job title." } },
-                    { name: "location", type: "text", admin: { width: "50%", description: "Default: address, or residence." } },
+                    {
+                      name: "headline",
+                      type: "text",
+                      admin: { width: "50%", description: "Under your name. Default: job title." },
+                    },
+                    {
+                      name: "location",
+                      type: "text",
+                      admin: { width: "50%", description: "Default: address, or residence." },
+                    },
                   ],
                 },
                 {
                   name: "summary",
                   type: "textarea",
-                  admin: { rows: 6, description: "“Profile” paragraph. Default: your bio without formatting or emoji." },
+                  admin: {
+                    rows: 6,
+                    description: "“Profile” paragraph. Default: your bio without formatting or emoji.",
+                  },
                 },
                 {
                   name: "skills",

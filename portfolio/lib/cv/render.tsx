@@ -1,4 +1,5 @@
 import "server-only";
+import { verifyPreviewToken } from "@/lib/preview";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { getAdminUser } from "@/lib/auth";
 import { getSiteData } from "@/lib/site";
@@ -13,7 +14,8 @@ import { buildCvData, cvFileName } from "./data";
 export async function cvResponse(req: Request, slug?: string): Promise<Response> {
   const url = new URL(req.url);
   const wantsDraft = url.searchParams.get("draft") === "1";
-  const draft = wantsDraft && Boolean(await getAdminUser());
+  const draft =
+    wantsDraft && (Boolean(await getAdminUser()) || verifyPreviewToken(url.searchParams.get("preview"), slug));
   if (wantsDraft && !draft) return new Response("Not allowed", { status: 403 });
 
   const site = await getSiteData(draft, slug);

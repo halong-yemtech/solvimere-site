@@ -27,7 +27,9 @@ export default function DevBlogs() {
       <EditableProfileArea tab="Blog section" label="Edit blog intro">
         <div className={hasPosts ? "px-12 pt-10 pb-2" : "px-12 py-16 text-center"}>
           {blog.intro && (
-            <p className={`text-2xl text-gray-400 leading-relaxed ${hasPosts ? "" : "max-w-3xl mx-auto"}`}>{blog.intro}</p>
+            <p className={`text-2xl text-gray-400 leading-relaxed ${hasPosts ? "" : "max-w-3xl mx-auto"}`}>
+              {blog.intro}
+            </p>
           )}
           {blog.buttonUrl && !hasPosts && (
             <Link

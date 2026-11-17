@@ -48,24 +48,26 @@ export default function Cases() {
             lede="Every engagement is shaped around the client’s goals, data, and operational realities."
           />
 
-          {featured ? <article className="feature-band case-feature rise-card">
-            <div className="shot">
-              <img src={featured.image} alt="" />
-            </div>
-            <div>
-              <p className="kicker">{featured.category}</p>
-              <h2>{featured.title}</h2>
-              <p>{featured.summary}</p>
-              <ul className="metric-row">
-                {featured.metrics.map(([value, label]) => (
-                  <li key={label}>
-                    <strong>{value}</strong>
-                    <span>{label}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </article> : null}
+          {featured ? (
+            <article className="feature-band case-feature rise-card">
+              <div className="shot">
+                <img src={featured.image} alt="" />
+              </div>
+              <div>
+                <p className="kicker">{featured.category}</p>
+                <h2>{featured.title}</h2>
+                <p>{featured.summary}</p>
+                <ul className="metric-row">
+                  {featured.metrics.map(([value, label]) => (
+                    <li key={label}>
+                      <strong>{value}</strong>
+                      <span>{label}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </article>
+          ) : null}
 
           <div className="catalog case-grid">
             {rest.map((item, index) => (

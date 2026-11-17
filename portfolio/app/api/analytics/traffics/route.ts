@@ -42,9 +42,6 @@ export async function GET() {
     return NextResponse.json(totalVisitors);
   } catch (error) {
     console.error("Error fetching analytics data:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch analytics data" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch analytics data" }, { status: 500 });
   }
 }

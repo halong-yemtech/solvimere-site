@@ -20,14 +20,30 @@ export default function ForgotForm() {
     <AuthCard
       title="Forgot password"
       subtitle="We'll email you a link to choose a new one."
-      footer={<Link href="/login" className="hover:text-main-orange">← Back to sign in</Link>}
+      footer={
+        <Link href="/login" className="hover:text-main-orange">
+          ← Back to sign in
+        </Link>
+      }
     >
       {sent ? (
-        <p className="text-xl text-gray-300">If an account exists for that address, a reset link is on its way. It's valid for one hour.</p>
+        <p className="text-xl text-gray-300">
+          If an account exists for that address, a reset link is on its way. It's valid for one hour.
+        </p>
       ) : (
         <form onSubmit={onSubmit} className="space-y-5">
-          <input name="email" type="email" placeholder="Email" autoComplete="username" required autoFocus className={field} />
-          <button type="submit" disabled={busy} className={primary}>{busy ? "Sending…" : "Send reset link"}</button>
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            autoComplete="username"
+            required
+            autoFocus
+            className={field}
+          />
+          <button type="submit" disabled={busy} className={primary}>
+            {busy ? "Sending…" : "Send reset link"}
+          </button>
         </form>
       )}
     </AuthCard>

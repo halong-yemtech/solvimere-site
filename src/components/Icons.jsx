@@ -92,9 +92,7 @@ export function Icon({ name }) {
         <path d="M3 4h2l2.2 11h11.3l2-7H7" />
       </>
     ),
-    heart: (
-      <path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 4.6-7 9-7 9Z" />
-    ),
+    heart: <path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 4.6-7 9-7 9Z" />,
     building: (
       <>
         <path d="M4 21V5l8-2 8 2v16" />
@@ -118,12 +116,8 @@ export function Icon({ name }) {
         <path d="M3 18h18" />
       </>
     ),
-    pulse: (
-      <path d="M3 12h4l2-5 4 10 2-5h6" />
-    ),
-    shield: (
-      <path d="M12 3 5 6v6c0 4.2 2.8 7.2 7 9 4.2-1.8 7-4.8 7-9V6l-7-3Z" />
-    ),
+    pulse: <path d="M3 12h4l2-5 4 10 2-5h6" />,
+    shield: <path d="M12 3 5 6v6c0 4.2 2.8 7.2 7 9 4.2-1.8 7-4.8 7-9V6l-7-3Z" />,
     pin: (
       <>
         <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
@@ -189,12 +183,6 @@ export function Icon({ name }) {
       <>
         <path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.1A8 8 0 1 1 20 12Z" />
         <path d="M8.5 12h.01M12 12h.01M15.5 12h.01" strokeWidth="2.6" />
-      </>
-    ),
-    video: (
-      <>
-        <rect x="3" y="6.5" width="12.5" height="11" rx="2.5" />
-        <path d="m15.5 10.5 5-3v9l-5-3" />
       </>
     ),
     calendar: (

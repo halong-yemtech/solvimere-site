@@ -19,24 +19,17 @@ export default function Works() {
   }, [currentTab, works]);
 
   return (
-    <div
-      id="scrollableDiv"
-      className="lg:h-full h-[95rem] overflow-y-scroll myScroll"
-    >
-      <Title name="works" currentMenu={currentTab} actions={
-        <SectionTools slug="works" title="work" items={works.map((w) => ({ id: w.id, label: w.title }))} />
-      } />
+    <div id="scrollableDiv" className="lg:h-full h-[95rem] overflow-y-scroll myScroll">
+      <Title
+        name="works"
+        currentMenu={currentTab}
+        actions={<SectionTools slug="works" title="work" items={works.map((w) => ({ id: w.id, label: w.title }))} />}
+      />
 
       <motion.ul className="grid grid-cols-1 sm:grid-cols-2 relative vCustomLine before:hidden sm:before:block before:left-1/2 before:-translate-x-1/2 pt-12">
         <AnimatePresence>
           {filteredWorks.map((w, idx) => (
-            <Work
-              key={w.id}
-              title={w.title}
-              image={w.images[0]}
-              projectId={w.id}
-              priority={idx === 0}
-            />
+            <Work key={w.id} title={w.title} image={w.images[0]} projectId={w.id} priority={idx === 0} />
           ))}
         </AnimatePresence>
       </motion.ul>

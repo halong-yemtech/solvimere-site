@@ -7,8 +7,14 @@ import { EditProvider } from "@/components/edit/EditProvider";
 import HomePage from "./HomePage";
 
 /** Renders the portfolio for the active profile, or for `profileSlug` (/<slug>, e.g. /team/halong). */
-export default async function PortfolioView({ profileSlug }: { profileSlug?: string }) {
-  const { admin, site } = await getPageData(profileSlug);
+export default async function PortfolioView({
+  profileSlug,
+  previewToken,
+}: {
+  profileSlug?: string;
+  previewToken?: string;
+}) {
+  const { admin, preview, site } = await getPageData(profileSlug, previewToken);
 
   if (!site) {
     // A specific profile that doesn't exist or isn't public.
@@ -30,7 +36,7 @@ export default async function PortfolioView({ profileSlug }: { profileSlug?: str
   }
 
   // Maintenance mode: visitors get a holding page, admins keep working.
-  if (site.settings.maintenance.enabled && !admin) {
+  if (site.settings.maintenance.enabled && !admin && !preview) {
     return (
       <main className="flex items-center justify-center min-h-screen p-10 text-center bg-gray-900">
         <div className="max-w-2xl space-y-6 text-2xl text-gray-300">

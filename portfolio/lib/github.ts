@@ -30,8 +30,13 @@ async function fromApi(username: string, token: string): Promise<ContributionCal
   const json = await res.json();
   const cal = json?.data?.user?.contributionsCollection?.contributionCalendar;
   if (!cal) throw new Error(json?.errors?.[0]?.message || "GitHub user not found");
-  const days: ContributionDay[] = cal.weeks.flatMap((w: { contributionDays: { date: string; contributionCount: number; contributionLevel: string }[] }) =>
-    w.contributionDays.map((d) => ({ date: d.date, count: d.contributionCount, level: LEVELS[d.contributionLevel] ?? 0 }))
+  const days: ContributionDay[] = cal.weeks.flatMap(
+    (w: { contributionDays: { date: string; contributionCount: number; contributionLevel: string }[] }) =>
+      w.contributionDays.map((d) => ({
+        date: d.date,
+        count: d.contributionCount,
+        level: LEVELS[d.contributionLevel] ?? 0,
+      })),
   );
   return { username, total: cal.totalContributions, days };
 }

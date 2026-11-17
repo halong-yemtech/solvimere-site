@@ -41,7 +41,9 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 const databaseUri = process.env.DATABASE_URI || "";
 export const usePostgres = /^postgres(ql)?:\/\//.test(databaseUri);
 const storageEnabled = Boolean(
-  process.env.SUPABASE_S3_ENDPOINT && process.env.SUPABASE_S3_ACCESS_KEY_ID && process.env.SUPABASE_S3_SECRET_ACCESS_KEY
+  process.env.SUPABASE_S3_ENDPOINT &&
+    process.env.SUPABASE_S3_ACCESS_KEY_ID &&
+    process.env.SUPABASE_S3_SECRET_ACCESS_KEY,
 );
 
 if (!process.env.PAYLOAD_SECRET && process.env.NODE_ENV === "production") {

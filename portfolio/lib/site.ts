@@ -32,14 +32,20 @@ async function resolveProfile(
   payload: Payload,
   draft: boolean,
   activeId: number | null,
-  slug?: string
+  slug?: string,
 ): Promise<ProfileDoc | null> {
   if (slug) {
     const { docs } = await payload.find({
       collection: "profiles",
       where: draft
         ? { slug: { equals: slug } }
-        : { and: [{ slug: { equals: slug } }, { _status: { equals: "published" } }, { visibility: { equals: "public" } }] },
+        : {
+            and: [
+              { slug: { equals: slug } },
+              { _status: { equals: "published" } },
+              { visibility: { equals: "public" } },
+            ],
+          },
       depth: 1,
       limit: 1,
       draft,
@@ -134,7 +140,8 @@ export const getSiteData = cache(async (draft: boolean = false, profileSlug?: st
   const activeId = (idOf(settings.activeProfile) as number) || null;
   const isActive = activeId
     ? activeId === profile.id
-    : (await payload.find({ collection: "profiles", sort: "_order", limit: 1, depth: 0, draft })).docs[0]?.id === profile.id;
+    : (await payload.find({ collection: "profiles", sort: "_order", limit: 1, depth: 0, draft })).docs[0]?.id ===
+      profile.id;
 
   const avatar = image(profile.avatar);
 
@@ -200,8 +207,7 @@ export const getSiteData = cache(async (draft: boolean = false, profileSlug?: st
       email: str(profile.email),
       phone: str(profile.phone),
       phoneLink:
-        accountFor(links, "whatsapp")?.url ??
-        (profile.phone ? `tel:${profile.phone.replace(/[^\d+]/g, "")}` : null),
+        accountFor(links, "whatsapp")?.url ?? (profile.phone ? `tel:${profile.phone.replace(/[^\d+]/g, "")}` : null),
       // The map pins the address (stored once); a custom embed URL only overrides it.
       mapEmbedUrl:
         profile.mapEmbedUrl ||
@@ -218,7 +224,15 @@ export const getSiteData = cache(async (draft: boolean = false, profileSlug?: st
     },
     links,
     socialLinks: links
-      .map((l, i) => ({ id: i, label: l.label, url: l.url, icon: l.icon, color: l.color, info: l.info, show: l.showInIcons }))
+      .map((l, i) => ({
+        id: i,
+        label: l.label,
+        url: l.url,
+        icon: l.icon,
+        color: l.color,
+        info: l.info,
+        show: l.showInIcons,
+      }))
       .filter((l) => l.show)
       .map(({ show: _s, ...l }) => l),
     services: services.docs.map((d) => ({
@@ -263,7 +277,9 @@ export const getSiteData = cache(async (draft: boolean = false, profileSlug?: st
     })),
     blogPosts: blogPosts.docs.map((d) => ({
       id: d.id,
-      platform: (["upwork", "github", "linkedin"].includes(d.platform ?? "") ? d.platform : "other") as BlogPostData["platform"],
+      platform: (["upwork", "github", "linkedin"].includes(d.platform ?? "")
+        ? d.platform
+        : "other") as BlogPostData["platform"],
       title: d.title,
       headline: str(d.headline),
       location: str(profile.address),

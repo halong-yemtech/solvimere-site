@@ -2,18 +2,20 @@ import { useEffect } from "react";
 import { Button, Eyebrow } from "./Chrome";
 
 export function RichTitle({ title = "", emphasis = "" }) {
-  return String(title).split("\n").map((line, index) => {
-    const match = emphasis && line.includes(emphasis);
-    const [before, after] = match ? line.split(emphasis) : [line, ""];
-    return (
-      <span key={`${line}-${index}`}>
-        {index > 0 ? <br /> : null}
-        {before}
-        {match ? <em>{emphasis}</em> : null}
-        {match ? after : null}
-      </span>
-    );
-  });
+  return String(title)
+    .split("\n")
+    .map((line, index) => {
+      const match = emphasis && line.includes(emphasis);
+      const [before, after] = match ? line.split(emphasis) : [line, ""];
+      return (
+        <span key={`${line}-${index}`}>
+          {index > 0 ? <br /> : null}
+          {before}
+          {match ? <em>{emphasis}</em> : null}
+          {match ? after : null}
+        </span>
+      );
+    });
 }
 
 export function PageHero({ documentTitle, eyebrow, title, lede, actions, children }) {

@@ -7,8 +7,7 @@ type Result<T = undefined> = { ok: true; data: T } | { ok: false; error: string 
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-const clean = (v: unknown, max: number) =>
-  typeof v === "string" ? v.trim().slice(0, max) : "";
+const clean = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
 export async function sendContactMessage(input: {
   fullName: string;
@@ -40,7 +39,7 @@ const toComment = (d: { id: number; name: string; comment: string; createdAt: st
 });
 
 export async function getGuestbookComments(
-  page: number
+  page: number,
 ): Promise<Result<{ comments: GuestbookComment[]; hasNextPage: boolean }>> {
   try {
     const payload = await getPayloadClient();

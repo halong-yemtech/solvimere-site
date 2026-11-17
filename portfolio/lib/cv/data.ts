@@ -30,7 +30,11 @@ const EMOJI = /[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}\u{FE0E}\u{FE0F}\u{2
 
 /** Plain, printable text: no emoji, invisible marks or doubled spaces. */
 export function cleanText(s: string | null | undefined): string {
-  return (s ?? "").replace(INVISIBLE, "").replace(EMOJI, "").replace(/[ \t]+/g, " ").trim();
+  return (s ?? "")
+    .replace(INVISIBLE, "")
+    .replace(EMOJI, "")
+    .replace(/[ \t]+/g, " ")
+    .trim();
 }
 
 /** Markdown → plain text (keeps link text, drops emphasis, headings, list markers). */
@@ -56,7 +60,10 @@ export function toBullets(text: string): string[] {
 }
 
 const splitList = (s: string) =>
-  s.split(/[,;\n]/).map((x) => cleanText(x)).filter(Boolean);
+  s
+    .split(/[,;\n]/)
+    .map((x) => cleanText(x))
+    .filter(Boolean);
 
 const unique = (xs: string[]) => {
   const seen = new Set<string>();
@@ -82,21 +89,37 @@ export function buildCvData(site: SiteData): CvData {
       stripMarkdown(p.bio)
         .split(/\n\s*\n/)
         .map((para) => para.replace(/\s*\n\s*/g, " "))
-        .join(" ")
+        .join(" "),
     );
 
   const skills = cv.skills.trim()
     ? splitList(cv.skills)
-    : unique([
-        ...site.skills.coding.map((s) => s.name),
-        ...site.skills.development.map((s) => s.name),
-        ...site.skills.knowledge,
-      ].map(cleanText).filter(Boolean));
+    : unique(
+        [
+          ...site.skills.coding.map((s) => s.name),
+          ...site.skills.development.map((s) => s.name),
+          ...site.skills.knowledge,
+        ]
+          .map(cleanText)
+          .filter(Boolean),
+      );
 
   const entry = (r: SiteData["resume"][number]): CvEntry =>
     r.type === "experience"
-      ? { org: cleanText(r.subtitle), role: cleanText(r.title), period: cleanText(r.period), location: cleanText(r.location), bullets: toBullets(r.description) }
-      : { org: cleanText(r.title), role: cleanText(r.subtitle), period: cleanText(r.period), location: cleanText(r.location), bullets: toBullets(r.description) };
+      ? {
+          org: cleanText(r.subtitle),
+          role: cleanText(r.title),
+          period: cleanText(r.period),
+          location: cleanText(r.location),
+          bullets: toBullets(r.description),
+        }
+      : {
+          org: cleanText(r.title),
+          role: cleanText(r.subtitle),
+          period: cleanText(r.period),
+          location: cleanText(r.location),
+          bullets: toBullets(r.description),
+        };
 
   const location = cleanText(cv.location) || cleanText(p.address) || cleanText(p.residence);
   const phone = cleanText(p.phone);

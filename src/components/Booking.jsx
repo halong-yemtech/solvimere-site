@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase, supabaseConfigured } from "../lib/supabase";
-import { useSiteAuth } from "../auth/SiteAuth";
 import { Icon } from "./Icons";
 
 // Must match private.is_bookable_slot() in supabase/migrations/*_appointments.sql.
@@ -26,7 +25,14 @@ function zonedParts(ms, timeZone) {
     second: "2-digit",
   }).formatToParts(new Date(ms));
   const get = (type) => Number(parts.find((p) => p.type === type)?.value);
-  return { year: get("year"), month: get("month"), day: get("day"), hour: get("hour"), minute: get("minute"), second: get("second") };
+  return {
+    year: get("year"),
+    month: get("month"),
+    day: get("day"),
+    hour: get("hour"),
+    minute: get("minute"),
+    second: get("second"),
+  };
 }
 
 /** The UTC instant of a wall-clock time in a time zone (handles DST). */
@@ -64,11 +70,21 @@ const fmtDayShort = (ms) => new Date(ms).toLocaleDateString(undefined, { weekday
 const fmtDayNum = (ms) => new Date(ms).toLocaleDateString(undefined, { day: "numeric", month: "short" });
 const fmtTime = (ms) => new Date(ms).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
 const fmtFull = (ms) =>
-  new Date(ms).toLocaleString(undefined, { weekday: "long", day: "numeric", month: "long", hour: "numeric", minute: "2-digit" });
+  new Date(ms).toLocaleString(undefined, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 
 /** An .ics file so the visitor can add the meeting to their calendar. */
 function icsHref(startMs, title) {
-  const stamp = (ms) => new Date(ms).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const stamp = (ms) =>
+    new Date(ms)
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace(/\.\d{3}/, "");
   const body = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -87,7 +103,6 @@ function icsHref(startMs, title) {
 }
 
 export function Booking({ contactEmail }) {
-  const { user } = useSiteAuth();
   const [now] = useState(() => Date.now());
   const days = useMemo(() => upcomingDays(now), [now]);
   const [dayKey, setDayKey] = useState(days[0]?.key || "");
@@ -95,12 +110,7 @@ export function Booking({ contactEmail }) {
   const [loading, setLoading] = useState(true);
   const [unavailable, setUnavailable] = useState(!supabaseConfigured);
   const [slot, setSlot] = useState(null);
-  const [form, setForm] = useState({
-    name: user?.user_metadata?.full_name || "",
-    email: user?.email || "",
-    company: "",
-    topic: "",
-  });
+  const [form, setForm] = useState({ name: "", email: "", company: "", topic: "" });
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [booked, setBooked] = useState(null);
@@ -151,7 +161,6 @@ export function Booking({ contactEmail }) {
       company: form.company.trim(),
       topic: form.topic.trim(),
       visitor_timezone: visitorTz,
-      user_id: user?.id ?? null,
     });
     setPending(false);
     if (insertError) {
@@ -173,8 +182,8 @@ export function Booking({ contactEmail }) {
       <div className="booking">
         <p className="booking-note">
           Online booking isn&apos;t available right now. Email us at{" "}
-          <a href={`mailto:${contactEmail}?subject=${encodeURIComponent("Meeting request")}`}>{contactEmail}</a> with a few
-          times that suit you, and we&apos;ll confirm one.
+          <a href={`mailto:${contactEmail}?subject=${encodeURIComponent("Meeting request")}`}>{contactEmail}</a> with a
+          few times that suit you, and we&apos;ll confirm one.
         </p>
       </div>
     );
@@ -190,7 +199,9 @@ export function Booking({ contactEmail }) {
         <p>
           {fmtFull(booked)}
           <br />
-          <span>{SLOT_MINUTES} minutes · your time ({visitorTz})</span>
+          <span>
+            {SLOT_MINUTES} minutes · your time ({visitorTz})
+          </span>
         </p>
         <p className="booking-note">We&apos;ll email {form.email.trim()} to confirm, with the meeting link.</p>
         <a className="booking-ics" href={icsHref(booked, "Meeting with Solvimere")} download="solvimere-meeting.ics">
@@ -207,20 +218,47 @@ export function Booking({ contactEmail }) {
           <Icon name="chevL" /> {fmtFull(slot)}
         </button>
         <label>
-          Name
-          <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} autoComplete="name" required maxLength={120} />
+          <span>Name</span>
+          <input
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            autoComplete="name"
+            required
+            maxLength={120}
+          />
         </label>
         <label>
-          Email
-          <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} autoComplete="email" required maxLength={254} />
+          <span>Email</span>
+          <input
+            type="email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            autoComplete="email"
+            required
+            maxLength={254}
+          />
         </label>
         <label>
-          Company <small>(optional)</small>
-          <input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} autoComplete="organization" maxLength={160} />
+          <span>
+            Company <small>(optional)</small>
+          </span>
+          <input
+            value={form.company}
+            onChange={(e) => setForm({ ...form, company: e.target.value })}
+            autoComplete="organization"
+            maxLength={160}
+          />
         </label>
         <label>
-          What would you like to discuss? <small>(optional)</small>
-          <textarea rows="3" value={form.topic} onChange={(e) => setForm({ ...form, topic: e.target.value })} maxLength={2000} />
+          <span>
+            What would you like to discuss? <small>(optional)</small>
+          </span>
+          <textarea
+            rows="2"
+            value={form.topic}
+            onChange={(e) => setForm({ ...form, topic: e.target.value })}
+            maxLength={2000}
+          />
         </label>
         {error ? <p className="assistant-error">{error}</p> : null}
         <button type="submit" className="booking-submit" disabled={pending}>
@@ -233,7 +271,7 @@ export function Booking({ contactEmail }) {
   const free = (day?.slots || []).filter((ms) => !busy.has(ms));
   return (
     <div className="booking">
-      <p className="booking-note">Pick a time for a {SLOT_MINUTES}-minute video call with our team.</p>
+      <p className="booking-note">Pick a time for a {SLOT_MINUTES}-minute call with our team.</p>
       <div className="booking-days" role="tablist" aria-label="Day">
         {days.map((d) => (
           <button

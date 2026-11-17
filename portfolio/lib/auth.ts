@@ -4,12 +4,17 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getPayloadClient, getSiteData } from "./site";
 import { isAdminUser } from "@/cms/access";
+import { bridge } from "./adminBridge";
+import { verifyPreviewToken } from "./preview";
 
 /**
- * The logged-in CMS user for this request (from Payload's `payload-token`
- * cookie, shared with /admin), or null for visitors.
+ * The staff member behind this request: set by the admin bridge (/team/api/admin,
+ * Supabase sign-in on the Solvimere admin panel), else Payload's own session cookie.
+ * Null for visitors.
  */
 export const getCurrentUser = cache(async () => {
+  const bridged = bridge.getStore();
+  if (bridged) return bridged;
   const payload = await getPayloadClient();
   try {
     const { user } = await payload.auth({ headers: await headers() });
@@ -26,12 +31,13 @@ export const getAdminUser = cache(async () => {
 });
 
 /**
- * Admins see the latest drafts and get the editing UI; everyone else (visitors
- * and non-admin accounts) sees published content only.
+ * Visitors see published content only. A valid preview token (issued to staff by the
+ * admin panel) shows that profile's latest drafts.
  */
-export const getPageData = cache(async (profileSlug?: string) => {
+export const getPageData = cache(async (profileSlug?: string, previewToken?: string) => {
   const admin = await getAdminUser();
-  return { admin, site: await getSiteData(Boolean(admin), profileSlug) };
+  const preview = verifyPreviewToken(previewToken, profileSlug);
+  return { admin, preview, site: await getSiteData(Boolean(admin) || preview, profileSlug) };
 });
 
 /** For admin-only pages: the admin user, or a redirect (login, or home for non-admins). */

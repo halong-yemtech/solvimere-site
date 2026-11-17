@@ -35,10 +35,27 @@ export default async function ProfileWorkspacePage({ params, searchParams }: Pro
         summary={summary}
         checklist={checklist}
         initialTab={(await searchParams).tab ?? "overview"}
-        cv={site ? {
-          profile: { id: site.profile.id, slug: site.profile.slug, name: site.profile.name, isActive: site.profile.isActive, mode: site.profile.cv.mode, cvUrl: site.profile.cvUrl },
-          resume: site.resume.map((r) => ({ id: r.id, type: r.type, title: r.title, subtitle: r.subtitle, period: r.period })),
-        } : null}
+        cv={
+          site
+            ? {
+                profile: {
+                  id: site.profile.id,
+                  slug: site.profile.slug,
+                  name: site.profile.name,
+                  isActive: site.profile.isActive,
+                  mode: site.profile.cv.mode,
+                  cvUrl: site.profile.cvUrl,
+                },
+                resume: site.resume.map((r) => ({
+                  id: r.id,
+                  type: r.type,
+                  title: r.title,
+                  subtitle: r.subtitle,
+                  period: r.period,
+                })),
+              }
+            : null
+        }
       />
     </div>
   );

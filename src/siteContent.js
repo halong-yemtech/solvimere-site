@@ -93,10 +93,7 @@ export const products = [
   },
 ];
 
-export const productFilters = [
-  "All",
-  ...new Set(products.map((item) => item.category)),
-];
+export const productFilters = ["All", ...new Set(products.map((item) => item.category))];
 
 export const productStats = [
   ["40+", "AI agents deployed"],
@@ -329,8 +326,7 @@ export const caseStudies = [
   {
     category: "Manufacturing",
     title: "Predictive maintenance network",
-    summary:
-      "Unified machine telemetry and maintenance data to reduce downtime and improve operational resilience.",
+    summary: "Unified machine telemetry and maintenance data to reduce downtime and improve operational resilience.",
     image: "/images/photos/inspection.jpg",
     metrics: [
       ["28%", "Lower maintenance costs"],
@@ -427,13 +423,7 @@ export const articles = [
   },
 ];
 
-export const aboutValues = [
-  "Innovation",
-  "Customer success",
-  "Collaboration",
-  "Integrity",
-  "Long-term thinking",
-];
+export const aboutValues = ["Innovation", "Customer success", "Collaboration", "Integrity", "Long-term thinking"];
 
 export const aboutStats = [
   ["50+", "Team members"],

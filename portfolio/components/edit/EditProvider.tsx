@@ -108,7 +108,7 @@ export function EditProvider({
       refresh,
       busy,
     }),
-    [canEdit, surface, editing, setEditing, pending, refresh, busy]
+    [canEdit, surface, editing, setEditing, pending, refresh, busy],
   );
 
   return (

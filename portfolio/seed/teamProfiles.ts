@@ -50,7 +50,7 @@ function siteEnv(): Record<string, string> {
       .split("\n")
       .map((line) => line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/))
       .filter((m): m is RegExpMatchArray => Boolean(m))
-      .map((m) => [m[1], m[2].replace(/^["']|["']$/g, "")])
+      .map((m) => [m[1], m[2].replace(/^["']|["']$/g, "")]),
   );
 }
 
@@ -61,7 +61,7 @@ async function loadTeam(): Promise<TeamMember[]> {
   if (!url || !key) throw new Error("Set SUPABASE_URL and SUPABASE_ANON_KEY (or VITE_* in ../.env).");
   const res = await fetch(
     `${url}/rest/v1/team_members?select=name,role,email,avatar_url,bio,highlight_label,highlight_text,expertise_label,expertise_text,quote&order=sort_order`,
-    { headers: { apikey: key, Authorization: `Bearer ${key}` } }
+    { headers: { apikey: key, Authorization: `Bearer ${key}` } },
   );
   if (!res.ok) throw new Error(`Supabase team_members: ${res.status} ${await res.text()}`);
   return res.json();

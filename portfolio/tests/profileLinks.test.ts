@@ -1,5 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { accountFor, duplicatePlatforms, guessPlatform, resolveLink, sameUrl, toProfileLinks } from "../lib/profileLinks";
+import {
+  accountFor,
+  duplicatePlatforms,
+  guessPlatform,
+  resolveLink,
+  sameUrl,
+  toProfileLinks,
+} from "../lib/profileLinks";
 
 const links = toProfileLinks([
   { platform: "upwork", url: "https://www.upwork.com/freelancers/~01be", showInIcons: true },
@@ -56,7 +63,14 @@ describe("sameUrl", () => {
 
 describe("duplicatePlatforms", () => {
   test("each platform once, except Other", () => {
-    expect(duplicatePlatforms([{ platform: "upwork" }, { platform: "upwork" }, { platform: "other" }, { platform: "other" }])).toEqual(["Upwork"]);
+    expect(
+      duplicatePlatforms([
+        { platform: "upwork" },
+        { platform: "upwork" },
+        { platform: "other" },
+        { platform: "other" },
+      ]),
+    ).toEqual(["Upwork"]);
     expect(duplicatePlatforms([{ platform: "github" }, { platform: "linkedin" }])).toEqual([]);
   });
 });

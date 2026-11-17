@@ -27,16 +27,43 @@ export default function ResetForm({ token }: { token: string }) {
   return (
     <AuthCard
       title="Choose a new password"
-      footer={<Link href="/forgot-password" className="hover:text-main-orange">Need a new link?</Link>}
+      footer={
+        <Link href="/forgot-password" className="hover:text-main-orange">
+          Need a new link?
+        </Link>
+      }
     >
       {!token ? (
         <p className="text-xl text-red-400">This reset link is incomplete. Request a new one.</p>
       ) : (
         <form onSubmit={onSubmit} className="space-y-5">
-          <input name="password" type="password" placeholder="New password (min. 8 characters)" minLength={8} autoComplete="new-password" required autoFocus className={field} />
-          <input name="confirm" type="password" placeholder="Repeat new password" minLength={8} autoComplete="new-password" required className={field} />
-          {error && <p role="alert" className="text-lg text-red-400">{error}</p>}
-          <button type="submit" disabled={busy} className={primary}>{busy ? "Saving…" : "Save password"}</button>
+          <input
+            name="password"
+            type="password"
+            placeholder="New password (min. 8 characters)"
+            minLength={8}
+            autoComplete="new-password"
+            required
+            autoFocus
+            className={field}
+          />
+          <input
+            name="confirm"
+            type="password"
+            placeholder="Repeat new password"
+            minLength={8}
+            autoComplete="new-password"
+            required
+            className={field}
+          />
+          {error && (
+            <p role="alert" className="text-lg text-red-400">
+              {error}
+            </p>
+          )}
+          <button type="submit" disabled={busy} className={primary}>
+            {busy ? "Saving…" : "Save password"}
+          </button>
         </form>
       )}
     </AuthCard>

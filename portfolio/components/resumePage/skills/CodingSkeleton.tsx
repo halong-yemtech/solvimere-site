@@ -6,10 +6,7 @@ export default function CodingSkeleton() {
     <SkeletonWrapper>
       <div className="text-center">
         <Skeleton circle={true} width={90} height={90} />
-        <Skeleton
-          width={60}
-          style={{ marginTop: "1rem" } as React.CSSProperties}
-        />
+        <Skeleton width={60} style={{ marginTop: "1rem" } as React.CSSProperties} />
       </div>
     </SkeletonWrapper>
   );

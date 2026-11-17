@@ -32,7 +32,11 @@ export function makeVar<T>(initial: T): ReactiveVar<T> {
 }
 
 export function useReactiveVar<T>(v: ReactiveVar<T>): T {
-  return useSyncExternalStore(v.subscribe, () => v(), () => v());
+  return useSyncExternalStore(
+    v.subscribe,
+    () => v(),
+    () => v(),
+  );
 }
 
 export const currentWorkTab = makeVar<string>("All");

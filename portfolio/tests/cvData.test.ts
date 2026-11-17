@@ -4,30 +4,78 @@ import type { SiteData } from "../lib/siteTypes";
 
 function site(overrides: { cv?: Partial<SiteData["profile"]["cv"]>; resume?: SiteData["resume"] } = {}): SiteData {
   return {
-    settings: { sections: [], theme: { accent: "#f59e0b", font: "poppins" }, maintenance: { enabled: false, message: "" } },
+    settings: {
+      sections: [],
+      theme: { accent: "#f59e0b", font: "poppins" },
+      maintenance: { enabled: false, message: "" },
+    },
     profile: {
-      id: 1, slug: "main", isActive: true, visibility: "public",
-      name: "Hạ Long", jobTitle: "Senior Software Engineer", typingTitles: [], avatar: null, backgroundImages: [],
+      id: 1,
+      slug: "main",
+      isActive: true,
+      visibility: "public",
+      name: "Hạ Long",
+      jobTitle: "Senior Software Engineer",
+      typingTitles: [],
+      avatar: null,
+      backgroundImages: [],
       cvUrl: "/cv",
       cv: { mode: "generated", headline: "", location: "", summary: "", skills: "", ...overrides.cv },
-      hireLink: null, copyright: "",
+      hireLink: null,
+      copyright: "",
       bio: "👋 Hello! I am a **Senior Engineer**.\n\n⚙️ I build [APIs](https://x.dev) in *Go*.",
-      age: "", residence: "VN", status: "", address: "Da Nang, Vietnam", email: "me@example.com",
-      phone: "+1 ‪(541) 283-5485‬", phoneLink: null, mapEmbedUrl: null, quote: null,
-      blog: { intro: "", buttonLabel: "", buttonUrl: null }, metaDescription: "",
+      age: "",
+      residence: "VN",
+      status: "",
+      address: "Da Nang, Vietnam",
+      email: "me@example.com",
+      phone: "+1 ‪(541) 283-5485‬",
+      phoneLink: null,
+      mapEmbedUrl: null,
+      quote: null,
+      blog: { intro: "", buttonLabel: "", buttonUrl: null },
+      metaDescription: "",
     },
-    links: [], socialLinks: [], services: [], pricingPlans: [], clients: [], testimonials: [], facts: [], statistics: [], blogPosts: [],
+    links: [],
+    socialLinks: [],
+    services: [],
+    pricingPlans: [],
+    clients: [],
+    testimonials: [],
+    facts: [],
+    statistics: [],
+    blogPosts: [],
     resume: overrides.resume ?? [
-      { id: 1, type: "experience", period: "2019 - Present", title: "Backend Architect", subtitle: "Acme", location: "Remote", description: "- Built X\n• Shipped Y\n\n" },
-      { id: 2, type: "education", period: "2010 - 2014", title: "Portland State University", subtitle: "Computer Science", location: "", description: "" },
+      {
+        id: 1,
+        type: "experience",
+        period: "2019 - Present",
+        title: "Backend Architect",
+        subtitle: "Acme",
+        location: "Remote",
+        description: "- Built X\n• Shipped Y\n\n",
+      },
+      {
+        id: 2,
+        type: "education",
+        period: "2010 - 2014",
+        title: "Portland State University",
+        subtitle: "Computer Science",
+        location: "",
+        description: "",
+      },
     ],
     skills: {
-      coding: [{ id: "a", name: "Go", percent: 90 }, { id: "b", name: "Docker", percent: 80 }],
+      coding: [
+        { id: "a", name: "Go", percent: 90 },
+        { id: "b", name: "Docker", percent: 80 },
+      ],
       knowledge: ["REST APIs", "go"],
       development: [{ id: "c", name: "AWS", percent: 70 }],
       languages: [],
     },
-    workCategories: [], works: [],
+    workCategories: [],
+    works: [],
   };
 }
 
@@ -53,14 +101,26 @@ describe("buildCvData", () => {
     expect(cv.email).toBe("me@example.com");
     expect(cv.summary).toBe("Hello! I am a Senior Engineer. I build APIs in Go.");
     // Experience: company bold / role italic; education: school bold / degree italic.
-    expect(cv.experience).toEqual([{ org: "Acme", role: "Backend Architect", period: "2019 - Present", location: "Remote", bullets: ["Built X", "Shipped Y"] }]);
+    expect(cv.experience).toEqual([
+      {
+        org: "Acme",
+        role: "Backend Architect",
+        period: "2019 - Present",
+        location: "Remote",
+        bullets: ["Built X", "Shipped Y"],
+      },
+    ]);
     expect(cv.education[0]).toMatchObject({ org: "Portland State University", role: "Computer Science", bullets: [] });
     // Skills: coding + development + knowledge, de-duplicated case-insensitively.
     expect(cv.skills).toEqual(["Go", "Docker", "AWS", "REST APIs"]);
   });
 
   test("CV tab values override the defaults", () => {
-    const cv = buildCvData(site({ cv: { headline: "Staff Engineer", location: "Remote", summary: "Short summary.", skills: "Go; Rust,\nSQL" } }));
+    const cv = buildCvData(
+      site({
+        cv: { headline: "Staff Engineer", location: "Remote", summary: "Short summary.", skills: "Go; Rust,\nSQL" },
+      }),
+    );
     expect(cv.headline).toBe("Staff Engineer");
     expect(cv.contact[0]).toBe("Remote");
     expect(cv.summary).toBe("Short summary.");

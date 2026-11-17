@@ -3,10 +3,14 @@ import { withBase } from "@/lib/basePath";
 
 export const field =
   "w-full rounded-lg bg-gray-800 border border-gray-700 px-4 py-3 text-xl text-gray-200 placeholder:text-gray-500 focus:outline-none focus:border-main-orange";
-export const primary =
-  "w-full rounded-lg bg-main-orange text-gray-900 font-semibold text-xl py-3 disabled:opacity-60";
+export const primary = "w-full rounded-lg bg-main-orange text-gray-900 font-semibold text-xl py-3 disabled:opacity-60";
 
-export default function AuthCard({ title, subtitle, children, footer }: {
+export default function AuthCard({
+  title,
+  subtitle,
+  children,
+  footer,
+}: {
   title: string;
   subtitle?: string;
   children: React.ReactNode;
@@ -14,7 +18,11 @@ export default function AuthCard({ title, subtitle, children, footer }: {
 }) {
   return (
     <div className="rounded-2xl bg-gray-900 border border-gray-800 p-10 shadow-2xl">
-      <Link href="/" className="inline-grid place-items-center w-14 h-14 rounded-xl bg-main-orange text-gray-900 text-3xl font-bold" title="Back to the site">
+      <Link
+        href="/"
+        className="inline-grid place-items-center w-14 h-14 rounded-xl bg-main-orange text-gray-900 text-3xl font-bold"
+        title="Back to the site"
+      >
         P
       </Link>
       <h1 className="mt-6 text-[2.8rem] font-semibold text-gray-100">{title}</h1>

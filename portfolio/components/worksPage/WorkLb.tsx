@@ -49,17 +49,17 @@ export default function WorkLb({ workId, reactiveVar }: Props) {
         </button>
 
         {cover && (
-        <div className="relative w-full h-[30rem]">
-          <Image
-            src={cover.url}
-            alt={cover.alt || workData.title}
-            fill
-            sizes="(min-width: 840px) 800px, 95vw"
-            priority
-            style={{ objectFit: "cover" }}
-            className="rounded-t-lg"
-          />
-        </div>
+          <div className="relative w-full h-[30rem]">
+            <Image
+              src={cover.url}
+              alt={cover.alt || workData.title}
+              fill
+              sizes="(min-width: 840px) 800px, 95vw"
+              priority
+              style={{ objectFit: "cover" }}
+              className="rounded-t-lg"
+            />
+          </div>
         )}
 
         <div className="p-12">
@@ -94,10 +94,7 @@ export default function WorkLb({ workId, reactiveVar }: Props) {
           <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 mb-8">
             {workData.client && <MyInfo field="client" value={workData.client} />}
             {workData.owner && <MyInfo field="owner" value={workData.owner} />}
-            <MyInfo
-              field="categories"
-              value={workData.categories.join(", ") || "Project"}
-            />
+            <MyInfo field="categories" value={workData.categories.join(", ") || "Project"} />
             {workData.date && (
               <MyInfo
                 field="date"
@@ -110,17 +107,12 @@ export default function WorkLb({ workId, reactiveVar }: Props) {
           </ul>
 
           <article className="my-10 prose max-w-none prose-strong:text-main-orange">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {workData.description}
-            </ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{workData.description}</ReactMarkdown>
           </article>
 
           <div className="flex flex-wrap gap-3 mb-8">
             {workData.techStack.map((tech) => (
-              <span
-                key={tech}
-                className="text-[1.3rem] py-1.5 px-5 rounded-full bg-gray-800 text-gray-300 capitalize"
-              >
+              <span key={tech} className="text-[1.3rem] py-1.5 px-5 rounded-full bg-gray-800 text-gray-300 capitalize">
                 {tech}
               </span>
             ))}
@@ -128,10 +120,7 @@ export default function WorkLb({ workId, reactiveVar }: Props) {
 
           <ul className="space-y-3">
             {workData.highlights.map((action) => (
-              <li
-                key={action}
-                className="text-2xl text-gray-400 capitalize flex items-center gap-3"
-              >
+              <li key={action} className="text-2xl text-gray-400 capitalize flex items-center gap-3">
                 <span className="w-2 h-2 rounded-full bg-main-orange"></span>
                 {action}
               </li>

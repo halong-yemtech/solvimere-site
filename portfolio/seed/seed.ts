@@ -53,7 +53,7 @@ const payload = await getPayload({ config });
 const existing = await payload.count({ collection: "profiles" });
 if (existing.totalDocs > 0 && !process.env.SEED_FORCE) {
   payload.logger.info(
-    "The database already has content — nothing to do. Run with SEED_FORCE=1 to wipe site content and re-seed."
+    "The database already has content — nothing to do. Run with SEED_FORCE=1 to wipe site content and re-seed.",
   );
   process.exit(0);
 }
@@ -84,9 +84,7 @@ async function media(publicUrl: string, alt: string): Promise<number> {
 
 const avatar = await media(profile.avatar, profile.name);
 const backgrounds = await Promise.all(
-  ["/images/b-1.jpg", "/images/b-2.jpg", "/images/b-3.jpg"].map((u, i) =>
-    media(u, `Background ${i + 1}`)
-  )
+  ["/images/b-1.jpg", "/images/b-2.jpg", "/images/b-3.jpg"].map((u, i) => media(u, `Background ${i + 1}`)),
 );
 const cv = await media(profile.cv, `${profile.name} — CV`);
 
@@ -170,7 +168,10 @@ for (const [i, p] of prices.entries()) {
       icon: planIcons[i % planIcons.length],
       price: p.packagePrice,
       period: p.priceType,
-      orderLink: guessPlatform(p.freelanceUrl) === "upwork" ? { account: "upwork" } : { account: "custom", customUrl: p.freelanceUrl },
+      orderLink:
+        guessPlatform(p.freelanceUrl) === "upwork"
+          ? { account: "upwork" }
+          : { account: "custom", customUrl: p.freelanceUrl },
       profile: profile_,
       features: p.packageServices.map((f) => ({ feature: f.packageService, included: f.isIncluded })),
     },
@@ -181,7 +182,12 @@ for (const [i, p] of prices.entries()) {
 for (const c of clients.filter((c) => guessPlatform(c.link) === "website")) {
   await payload.create({
     collection: "clients",
-    data: { name: new URL(c.link).hostname.replace(/^www\./, ""), url: c.link, icon: c.icon as IconName, profile: profile_ },
+    data: {
+      name: new URL(c.link).hostname.replace(/^www\./, ""),
+      url: c.link,
+      icon: c.icon as IconName,
+      profile: profile_,
+    },
   });
 }
 
@@ -205,9 +211,12 @@ for (const s of statistics) {
     data: {
       title: s.title,
       value: s.info,
-      link: "externalLink" in s && s.externalLink
-        ? guessPlatform(s.externalLink) === "upwork" ? { account: "upwork" } : { account: "custom", customUrl: s.externalLink }
-        : { account: "none" },
+      link:
+        "externalLink" in s && s.externalLink
+          ? guessPlatform(s.externalLink) === "upwork"
+            ? { account: "upwork" }
+            : { account: "custom", customUrl: s.externalLink }
+          : { account: "none" },
       profile: profile_,
     },
   });
@@ -244,9 +253,7 @@ for (const w of works) {
     data: {
       title: d.title,
       images,
-      categories: w.workTabs
-        .map((t) => categoryIds.get(t.tab))
-        .filter((id): id is number => id !== undefined),
+      categories: w.workTabs.map((t) => categoryIds.get(t.tab)).filter((id): id is number => id !== undefined),
       description: d.description,
       client: d.clientName,
       owner: d.ownerName,
@@ -261,6 +268,6 @@ for (const w of works) {
 }
 
 payload.logger.info(
-  `Seed complete: ${mediaIds.size} media files, ${works.length} works. Open /setup to create your admin account (or /login if you have one).`
+  `Seed complete: ${mediaIds.size} media files, ${works.length} works. Open /setup to create your admin account (or /login if you have one).`,
 );
 process.exit(0);

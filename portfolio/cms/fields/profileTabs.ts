@@ -10,7 +10,10 @@ const url = (value: unknown) =>
  * profile's Links & accounts (lib/profileLinks.ts), so each URL is stored once.
  * `admin.custom.accountRef` lets the editor list only accounts the profile has.
  */
-export const accountRefField = (name: string, opts: { custom?: boolean; none?: boolean; description?: string; width?: string } = {}): Field => ({
+export const accountRefField = (
+  name: string,
+  opts: { custom?: boolean; none?: boolean; description?: string; width?: string } = {},
+): Field => ({
   name,
   type: "select",
   options: accountOptions(opts),
@@ -86,148 +89,158 @@ const linksTab: Tab = {
 
 /** Identity tabs of a profile (card, links, about, contact, quote, blog, SEO). */
 export const profileTabs: Tab[] = [
-        {
-          label: "Profile card",
-          fields: [
-            { name: "name", type: "text", required: true },
-            {
-              name: "jobTitle",
-              type: "text",
-              required: true,
-              admin: { description: "Used in the browser tab title and under the quote." },
-            },
-            {
-              name: "typingTitles",
-              type: "array",
-              labels: { singular: "Title", plural: "Titles" },
-              admin: { description: "Animated titles typed under your name." },
-              minRows: 1,
-              fields: [{ name: "title", type: "text", required: true }],
-            },
-            { name: "avatar", type: "upload", relationTo: "media", required: true },
-            {
-              name: "backgroundImages",
-              type: "upload",
-              relationTo: "media",
-              hasMany: true,
-              minRows: 1,
-              admin: { description: "Slideshow behind the profile photo." },
-            },
-            {
-              name: "cv",
-              label: "CV / Resume file",
-              type: "upload",
-              relationTo: "media",
-              admin: { description: "PDF opened by the “Download CV” buttons." },
-            },
-            {
-              name: "hireLink",
-              type: "group",
-              label: "Hire button",
-              admin: { description: "The second button on the profile card, e.g. “my upwork”." },
-              fields: [
-                {
-                  type: "row",
-                  fields: [
-                    accountRefField("account", { none: true, width: "60%" }),
-                    { name: "label", type: "text", defaultValue: "my upwork", admin: { width: "40%" } },
-                  ],
-                },
-              ],
-            },
-            { name: "copyright", type: "text", admin: { description: "Shown at the bottom of the mobile menu." } },
-          ],
+  {
+    label: "Profile card",
+    fields: [
+      { name: "name", type: "text", required: true },
+      {
+        name: "jobTitle",
+        type: "text",
+        required: true,
+        admin: { description: "Used in the browser tab title and under the quote." },
+      },
+      {
+        name: "typingTitles",
+        type: "array",
+        labels: { singular: "Title", plural: "Titles" },
+        admin: { description: "Animated titles typed under your name." },
+        minRows: 1,
+        fields: [{ name: "title", type: "text", required: true }],
+      },
+      { name: "avatar", type: "upload", relationTo: "media", required: true },
+      {
+        name: "backgroundImages",
+        type: "upload",
+        relationTo: "media",
+        hasMany: true,
+        minRows: 1,
+        admin: { description: "Slideshow behind the profile photo." },
+      },
+      {
+        name: "cv",
+        label: "CV / Resume file",
+        type: "upload",
+        relationTo: "media",
+        admin: { description: "PDF opened by the “Download CV” buttons." },
+      },
+      {
+        name: "hireLink",
+        type: "group",
+        label: "Hire button",
+        admin: { description: "The second button on the profile card, e.g. “my upwork”." },
+        fields: [
+          {
+            type: "row",
+            fields: [
+              accountRefField("account", { none: true, width: "60%" }),
+              { name: "label", type: "text", defaultValue: "my upwork", admin: { width: "40%" } },
+            ],
+          },
+        ],
+      },
+      { name: "copyright", type: "text", admin: { description: "Shown at the bottom of the mobile menu." } },
+    ],
+  },
+  linksTab,
+  {
+    label: "About me",
+    fields: [
+      {
+        name: "bio",
+        type: "textarea",
+        required: true,
+        admin: { rows: 8, description: "Supports Markdown: **bold**, *italic*, lists, links." },
+      },
+      {
+        type: "row",
+        fields: [
+          { name: "age", type: "text", admin: { width: "25%" } },
+          { name: "residence", type: "text", admin: { width: "25%" } },
+          { name: "status", type: "text", admin: { width: "25%" } },
+          { name: "hourlyRate", type: "number", admin: { width: "25%" } },
+        ],
+      },
+      { name: "address", type: "text" },
+    ],
+  },
+  {
+    label: "Contact",
+    fields: [
+      { name: "email", type: "email" },
+      {
+        name: "phone",
+        type: "text",
+        admin: {
+          description: "Shown as written; links to WhatsApp when the profile has a WhatsApp account, else calls.",
         },
-        linksTab,
-        {
-          label: "About me",
-          fields: [
-            {
-              name: "bio",
-              type: "textarea",
-              required: true,
-              admin: { rows: 8, description: "Supports Markdown: **bold**, *italic*, lists, links." },
-            },
-            {
-              type: "row",
-              fields: [
-                { name: "age", type: "text", admin: { width: "25%" } },
-                { name: "residence", type: "text", admin: { width: "25%" } },
-                { name: "status", type: "text", admin: { width: "25%" } },
-                { name: "hourlyRate", type: "number", admin: { width: "25%" } },
-              ],
-            },
-            { name: "address", type: "text" },
-          ],
+      },
+      {
+        name: "mapEmbedUrl",
+        type: "text",
+        validate: (v: unknown) =>
+          !v ||
+          String(v).startsWith("https://www.google.com/maps/embed") ||
+          "Use Google Maps → Share → Embed a map, and paste the src URL",
+        label: "Custom map (optional)",
+        admin: {
+          description:
+            'Leave empty to pin the profile’s address (About tab) on the map. Only to override: Google Maps → Share → Embed a map → copy the src="…" URL.',
         },
-        {
-          label: "Contact",
-          fields: [
-            { name: "email", type: "email" },
-            {
-              name: "phone",
-              type: "text",
-              admin: { description: "Shown as written; links to WhatsApp when the profile has a WhatsApp account, else calls." },
-            },
-            {
-              name: "mapEmbedUrl",
-              type: "text",
-              validate: (v: unknown) =>
-                !v || String(v).startsWith("https://www.google.com/maps/embed") ||
-                "Use Google Maps → Share → Embed a map, and paste the src URL",
-              label: "Custom map (optional)",
-              admin: { description: "Leave empty to pin the profile’s address (About tab) on the map. Only to override: Google Maps → Share → Embed a map → copy the src=\"…\" URL." },
-            },
-          ],
-        },
-        {
-          label: "Quote",
-          description: "The quote at the bottom of the Resume section.",
-          fields: [
-            {
-              name: "quote",
-              type: "group",
-              fields: [
-                { name: "text", type: "textarea" },
-                {
-                  type: "row",
-                  fields: [
-                    { name: "author", type: "text", admin: { width: "50%", description: "Defaults to your name." } },
-                    { name: "role", type: "text", admin: { width: "50%", description: "Defaults to your job title." } },
-                  ],
-                },
-                { name: "image", type: "upload", relationTo: "media", admin: { description: "Defaults to your avatar." } },
-              ],
-            },
-          ],
-        },
-        {
-          label: "Blog section",
-          fields: [
-            {
-              name: "blog",
-              type: "group",
-              fields: [
-                { name: "intro", type: "textarea" },
-                {
-                  type: "row",
-                  fields: [
-                    accountRefField("account", { none: true, width: "60%", description: "Button under the intro (shown when there are no posts)." }),
-                    { name: "buttonLabel", type: "text", defaultValue: "view upwork profile", admin: { width: "40%" } },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          label: "SEO",
-          fields: [
-            {
-              name: "metaDescription",
-              type: "textarea",
-              admin: { description: "Shown by search engines under your site title." },
-            },
-          ],
-        },
+      },
+    ],
+  },
+  {
+    label: "Quote",
+    description: "The quote at the bottom of the Resume section.",
+    fields: [
+      {
+        name: "quote",
+        type: "group",
+        fields: [
+          { name: "text", type: "textarea" },
+          {
+            type: "row",
+            fields: [
+              { name: "author", type: "text", admin: { width: "50%", description: "Defaults to your name." } },
+              { name: "role", type: "text", admin: { width: "50%", description: "Defaults to your job title." } },
+            ],
+          },
+          { name: "image", type: "upload", relationTo: "media", admin: { description: "Defaults to your avatar." } },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Blog section",
+    fields: [
+      {
+        name: "blog",
+        type: "group",
+        fields: [
+          { name: "intro", type: "textarea" },
+          {
+            type: "row",
+            fields: [
+              accountRefField("account", {
+                none: true,
+                width: "60%",
+                description: "Button under the intro (shown when there are no posts).",
+              }),
+              { name: "buttonLabel", type: "text", defaultValue: "view upwork profile", admin: { width: "40%" } },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    label: "SEO",
+    fields: [
+      {
+        name: "metaDescription",
+        type: "textarea",
+        admin: { description: "Shown by search engines under your site title." },
+      },
+    ],
+  },
 ];

@@ -3,7 +3,8 @@ import { parseContributionsHtml } from "../lib/githubCalendar";
 
 const cell = (id: string, date: string, level: number) =>
   `<td tabindex="0" style="width: 11px" data-date="${date}" id="${id}" data-level="${level}" role="gridcell" class="ContributionCalendar-day"></td>`;
-const tip = (id: string, text: string) => `<tool-tip id="t-${id}" for="${id}" popover="manual" class="sr-only">${text}</tool-tip>`;
+const tip = (id: string, text: string) =>
+  `<tool-tip id="t-${id}" for="${id}" popover="manual" class="sr-only">${text}</tool-tip>`;
 
 const html = `
   <h2 id="js-contribution-activity-description" class="f4">

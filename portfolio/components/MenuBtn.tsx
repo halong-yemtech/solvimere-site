@@ -9,12 +9,7 @@ interface Props {
   reactiveVar: ReactiveVar<SectionKey | null>;
 }
 
-export default function MenuBtn({
-  menu,
-  noBorder,
-  active,
-  reactiveVar,
-}: Props) {
+export default function MenuBtn({ menu, noBorder, active, reactiveVar }: Props) {
   return (
     <div
       onClick={() => reactiveVar(menu.id)}

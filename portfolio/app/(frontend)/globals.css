@@ -81,27 +81,15 @@ html {
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
-  background: linear-gradient(
-    135deg,
-    rgba(246, 184, 70, 0.4) 0%,
-    rgba(246, 184, 70, 0.01) 100%
-  );
+  background: linear-gradient(135deg, rgba(246, 184, 70, 0.4) 0%, rgba(246, 184, 70, 0.01) 100%);
 }
 
 .borderRight::before {
-  background: radial-gradient(
-    ellipse at right,
-    rgba(197, 202, 213, 0.15) 0,
-    rgba(255, 255, 255, 0) 70%
-  );
+  background: radial-gradient(ellipse at right, rgba(197, 202, 213, 0.15) 0, rgba(255, 255, 255, 0) 70%);
 }
 
 .lineLeft {
-  background: radial-gradient(
-    ellipse at left,
-    rgba(197, 202, 213, 0.15) 0,
-    rgba(255, 255, 255, 0) 70%
-  );
+  background: radial-gradient(ellipse at left, rgba(197, 202, 213, 0.15) 0, rgba(255, 255, 255, 0) 70%);
 }
 
 .vCustomLine::before {
@@ -110,19 +98,11 @@ html {
   width: 0.2rem;
   height: 100%;
   top: 0;
-  background: radial-gradient(
-    ellipse at top,
-    rgba(197, 202, 213, 0.15) 0,
-    rgba(255, 255, 255, 0) 70%
-  );
+  background: radial-gradient(ellipse at top, rgba(197, 202, 213, 0.15) 0, rgba(255, 255, 255, 0) 70%);
 }
 
 .borderLeft::before {
-  background: radial-gradient(
-    ellipse at left,
-    rgba(197, 202, 213, 0.15) 0,
-    rgba(255, 255, 255, 0) 70%
-  );
+  background: radial-gradient(ellipse at left, rgba(197, 202, 213, 0.15) 0, rgba(255, 255, 255, 0) 70%);
 }
 
 .profile::after {
@@ -134,19 +114,11 @@ html {
   height: 100%;
   border-radius: 0.5rem;
   z-index: -1;
-  background: linear-gradient(
-    135deg,
-    rgba(133, 87, 2, 0.4) 0%,
-    rgba(246, 184, 70, 0.01) 100%
-  );
+  background: linear-gradient(135deg, rgba(133, 87, 2, 0.4) 0%, rgba(246, 184, 70, 0.01) 100%);
 }
 
 .overlay {
-  background: linear-gradient(
-    135deg,
-    rgba(133, 87, 2, 0.4) 0%,
-    rgba(246, 184, 70, 0.01) 100%
-  );
+  background: linear-gradient(135deg, rgba(133, 87, 2, 0.4) 0%, rgba(246, 184, 70, 0.01) 100%);
 }
 
 .myShadow {
@@ -192,11 +164,7 @@ html {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: linear-gradient(
-    135deg,
-    rgba(246, 184, 70, 0.4) 0%,
-    rgba(246, 184, 70, 0.01) 100%
-  );
+  background: linear-gradient(135deg, rgba(246, 184, 70, 0.4) 0%, rgba(246, 184, 70, 0.01) 100%);
 }
 
 .quote::before,
@@ -236,11 +204,7 @@ html {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    135deg,
-    rgba(246, 184, 70, 0.4) 0%,
-    rgba(246, 184, 70, 0.01) 100%
-  );
+  background: linear-gradient(135deg, rgba(246, 184, 70, 0.4) 0%, rgba(246, 184, 70, 0.01) 100%);
   z-index: 2;
   opacity: 0;
   transition: all 0.3s ease;

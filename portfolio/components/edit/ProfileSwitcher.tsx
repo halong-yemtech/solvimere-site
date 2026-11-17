@@ -30,8 +30,11 @@ export default function ProfileSwitcher() {
 
   return (
     <div ref={ref} className="relative">
-      <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-2 rounded-full px-4 py-3 hover:bg-gray-800 max-w-[18rem]"
-        title="Profile shown on this page">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-2 rounded-full px-4 py-3 hover:bg-gray-800 max-w-[18rem]"
+        title="Profile shown on this page"
+      >
         <FiUser className="shrink-0" />
         <span className="truncate">{current.name}</span>
         <FiChevronUp className={`shrink-0 transition-transform ${open ? "" : "rotate-180"}`} />
@@ -41,8 +44,12 @@ export default function ProfileSwitcher() {
           <p className="px-3 py-2 text-base uppercase tracking-wider text-gray-500">View profile</p>
           {!profiles && <p className="px-3 py-2 text-gray-500">Loading…</p>}
           {profiles?.map((p) => (
-            <Link key={p.id} href={profilePath(p.slug)} onClick={() => setOpen(false)}
-              className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 hover:bg-gray-800">
+            <Link
+              key={p.id}
+              href={profilePath(p.slug)}
+              onClick={() => setOpen(false)}
+              className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 hover:bg-gray-800"
+            >
               <span className="truncate">
                 {p.internalName}
                 {p.isActive && <span className="ml-2 text-main-orange text-base">active</span>}
@@ -53,7 +60,10 @@ export default function ProfileSwitcher() {
               </span>
             </Link>
           ))}
-          <Link href="/dashboard/profiles" className="block mt-1 border-t border-gray-800 px-3 py-2 text-main-orange hover:underline">
+          <Link
+            href="/dashboard/profiles"
+            className="block mt-1 border-t border-gray-800 px-3 py-2 text-main-orange hover:underline"
+          >
             Manage profiles →
           </Link>
         </div>

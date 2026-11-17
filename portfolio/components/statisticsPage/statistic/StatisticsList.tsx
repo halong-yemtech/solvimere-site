@@ -32,13 +32,7 @@ export default function StatisticsList() {
     <ul className="grid grid-cols-1 gap-5 px-12 py-8 sm:grid-cols-2 md:grid-cols-3">
       {pageViews !== null && <Statistic title="page views" info={pageViews} />}
       {statistics.map((s) => (
-        <Statistic
-          key={s.id}
-          id={s.id}
-          title={s.title}
-          info={s.value}
-          externalLink={s.link ?? undefined}
-        />
+        <Statistic key={s.id} id={s.id} title={s.title} info={s.value} externalLink={s.link ?? undefined} />
       ))}
     </ul>
   );
