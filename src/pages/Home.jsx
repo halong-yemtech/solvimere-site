@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   industries,
   interests,
@@ -10,6 +10,7 @@ import {
 import { Icon } from "../components/Icons";
 import { Button, Eyebrow, Orbit } from "../components/Chrome";
 import { TeamGrid } from "../components/TeamGrid";
+import { Reviews } from "../components/Reviews";
 import { pageDefaults } from "../cms/defaults";
 import { usePageContent } from "../cms/Content";
 import { RichTitle } from "../components/Story";
@@ -74,7 +75,7 @@ function Marquee({ items, reverse = false, render }) {
 
 export default function Home() {
   const home = usePageContent("home", pageDefaults.home);
-  const { photos, avatars, logos, works, testimonials, insights } = home;
+  const { photos, avatars, works, testimonials, reviews, insights } = home;
   const [workIndex, setWorkIndex] = useState(0);
   const [quoteIndex, setQuoteIndex] = useState(0);
   const [statsOn, setStatsOn] = useState(false);
@@ -101,6 +102,24 @@ export default function Home() {
   }, []);
 
   const quote = testimonials[quoteIndex];
+
+  // The large photo must show the client being quoted. A photo shared by several
+  // testimonials is a generic placeholder, not that client, so use their own portrait.
+  const storyPhotos = useMemo(() => {
+    const uses = new Map();
+    testimonials.forEach((t) => t.photo && uses.set(t.photo, (uses.get(t.photo) || 0) + 1));
+    return testimonials.map((t) =>
+      t.photo && (uses.get(t.photo) === 1 || testimonials.length === 1) ? t.photo : t.avatar || t.photo || photos.session
+    );
+  }, [testimonials, photos.session]);
+
+  // Preload every client's photo so switching slides doesn't flash an empty frame.
+  useEffect(() => {
+    storyPhotos.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, [storyPhotos]);
 
   function onSubmit(event) {
     event.preventDefault();
@@ -175,16 +194,9 @@ export default function Home() {
             </span>
           </div>
         </div>
-        <div className="logo-band">
-          <p>Trusted by research, retail, and product teams</p>
-          <Marquee
-            items={logos}
-            render={(logo) => (
-              <img className="client-logo" src={logo.image} alt={logo.name} />
-            )}
-          />
-        </div>
       </section>
+
+      <Reviews content={reviews} />
 
       <section id="about" className="section about">
         <div className="wrap about-copy">
@@ -484,7 +496,7 @@ export default function Home() {
                 </a>
               </div>
               <figure className="story-photo" key={quote.name}>
-                <img src={quote.photo || photos.session} alt="" />
+                <img src={storyPhotos[quoteIndex]} alt={quote.name} />
                 <span className="quote-badge">
                   <Icon name="quote" />
                 </span>

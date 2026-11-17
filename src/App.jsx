@@ -27,16 +27,41 @@ export default function App() {
     const id = location.hash.slice(1);
     let frames = 0;
     let raf = 0;
+    let observer;
+    let settle;
+    const stop = () => {
+      observer?.disconnect();
+      window.clearTimeout(settle);
+      ["wheel", "touchstart", "keydown"].forEach((type) => window.removeEventListener(type, stop));
+    };
     const tryScroll = () => {
       const el = document.getElementById(id);
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "start" });
+        // Content above the target can still change height after we start scrolling
+        // (e.g. the team grid swapping its placeholder roster for the real one), which
+        // would leave us past the target. Re-align while the page settles, until the
+        // visitor scrolls themselves.
+        let first = true; // ResizeObserver reports once immediately; that isn't a change.
+        observer = new ResizeObserver(() => {
+          if (first) {
+            first = false;
+            return;
+          }
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        observer.observe(document.body);
+        ["wheel", "touchstart", "keydown"].forEach((type) => window.addEventListener(type, stop, { passive: true }));
+        settle = window.setTimeout(stop, 2500);
         return;
       }
       if (frames++ < 30) raf = requestAnimationFrame(tryScroll);
     };
     raf = requestAnimationFrame(tryScroll);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      stop();
+    };
   }, [location.pathname, location.hash]);
 
   return (

@@ -339,3 +339,33 @@ input[type="range"] {
   .split, .form-grid, .people article, .pair, .top.row { grid-template-columns: 1fr; }
   .top.row { display: grid; }
 }
+
+/* Appointments */
+.appt-tabs { display: flex; gap: 8px; }
+.appt-list { display: grid; gap: 12px; }
+.appt {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) minmax(200px, 1fr) auto;
+  gap: 8px 20px;
+  align-items: start;
+}
+.appt.is-cancelled { opacity: 0.6; }
+.appt-when, .appt-who { display: grid; gap: 4px; min-width: 0; }
+.appt-when span, .appt-who span { color: var(--muted); font-size: 13px; }
+.appt-who a { color: white; overflow-wrap: anywhere; }
+.appt-topic { grid-column: 1 / -1; grid-row: 2; margin: 0; white-space: pre-wrap; }
+.appt-actions { grid-column: 3; grid-row: 1; display: flex; gap: 8px; align-items: center; }
+.appt-actions select {
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: white;
+}
+.appt.is-confirmed .appt-actions select { border-color: rgba(127, 220, 164, 0.6); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 760px) {
+  .appt { grid-template-columns: 1fr; }
+  .appt-topic, .appt-actions { grid-column: auto; grid-row: auto; }
+}

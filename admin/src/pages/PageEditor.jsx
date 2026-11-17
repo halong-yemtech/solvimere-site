@@ -17,6 +17,12 @@ function mergeContent(fallback, remote) {
   return next;
 }
 
+// Content keys a page no longer uses. They're hidden in the editor and dropped from the
+// stored content on the next save.
+const OBSOLETE_KEYS = {
+  home: ["logos"], // the "Trusted by" logo strip, replaced by the Reviews section
+};
+
 export default function PageEditor() {
   const { slug } = useParams();
   const { profile } = useAuth();
@@ -41,7 +47,9 @@ export default function PageEditor() {
         const defaults = { ...(pageDefaults[slug] || {}) };
         if (slug === "team") delete defaults.members;
         setPage(data);
-        setContent(mergeContent(defaults, data.content || {}));
+        const merged = mergeContent(defaults, data.content || {});
+        (OBSOLETE_KEYS[slug] || []).forEach((key) => delete merged[key]);
+        setContent(merged);
         setStatus(data.status);
       });
   }, [slug]);

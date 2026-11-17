@@ -39,12 +39,8 @@ const nextConfig: NextConfig = {
     // the browser first; Vercel caps request bodies at 4.5 MB.
     serverActions: { bodySizeLimit: "4mb" },
   },
-  images: {
-    remotePatterns: [
-      // Media stored in Vercel Blob (when BLOB_READ_WRITE_TOKEN is set)
-      { protocol: "https", hostname: "*.public.blob.vercel-storage.com", pathname: "/**" },
-    ],
-  },
+  // Media is served by Payload from Supabase Storage under /team/api/media (same origin),
+  // so no remote image hosts are needed.
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       ".cjs": [".cts", ".cjs"],

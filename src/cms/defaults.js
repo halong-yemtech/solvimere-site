@@ -1,4 +1,4 @@
-import { team, avatars, insights, logos, testimonials, works } from "../data.js";
+import { team, avatars, insights, reviews, testimonials, works } from "../data.js";
 import {
   aboutStats,
   aboutValues,
@@ -39,9 +39,9 @@ export const pageDefaults = {
       cta: "/images/photos/cta.jpg",
     },
     avatars: avatars.map((image) => ({ image })),
-    logos: logos.map(([file, name]) => ({ name, image: `/images/logos/${file}.png` })),
     works,
     testimonials,
+    reviews,
     insights,
   },
   settings: {

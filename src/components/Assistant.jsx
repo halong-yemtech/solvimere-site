@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import "@tavus/widget";
 import { useSiteAuth } from "../auth/SiteAuth";
+import { pageDefaults } from "../cms/defaults";
+import { usePageContent } from "../cms/Content";
+import { Booking } from "./Booking";
+import { Icon } from "./Icons";
 
 const DEPLOYMENT_ID = "81ed903a-4a64-46e1-8ad3-701d9654201a";
 
@@ -45,18 +49,64 @@ function visitorContext(user) {
     : "The visitor is on solvimere.com and can talk or use chat about Solvimere's software, applied AI, and computer vision work.";
 }
 
+/**
+ * Tavus answers 403 "origin_forbidden" when the site's address isn't in the deployment's
+ * allowed origins, but the widget only logs it to the console. Ask once, so the visitor
+ * gets a clear message instead of a call that silently never starts.
+ */
+let initCheck;
+function checkDeployment() {
+  initCheck ??= fetch(`https://tavusapi.com/v2/deployments/${DEPLOYMENT_ID}/init`)
+    .then(async (res) => {
+      if (res.ok) return null;
+      const body = await res.json().catch(() => ({}));
+      return body.code === "origin_forbidden"
+        ? "Video chat isn't enabled for this website address yet."
+        : "Video chat is unavailable right now.";
+    })
+    .catch(() => null); // network hiccup: let the widget try and report its own errors
+  return initCheck;
+}
+
+/** An icon-only button with a label for screen readers and a hover tooltip. */
+function IconButton({ icon, label, onClick, primary = false, active = false, disabled = false, tipSide = "left" }) {
+  return (
+    <button
+      type="button"
+      className={`icon-btn ${primary ? "is-primary" : ""} ${active ? "is-active" : ""}`}
+      aria-label={label}
+      aria-pressed={active || undefined}
+      data-tip={label}
+      data-tip-side={tipSide}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      <Icon name={icon} />
+    </button>
+  );
+}
+
 export function Assistant() {
   const widgetRef = useRef(null);
   const { user } = useSiteAuth();
-  const [open, setOpen] = useState(false);
+  const settings = usePageContent("settings", pageDefaults.settings);
+  const [panel, setPanel] = useState(null); // null | "chat" | "book"
   const [draft, setDraft] = useState("");
-  const [pending, setPending] = useState(false);
+  const [phase, setPhase] = useState("idle"); // idle | starting | live
   const [error, setError] = useState("");
   const [messages, setMessages] = useState([]);
   const queue = useRef([]);
-  const live = useRef(false);
-  const talkWhenReady = useRef(false);
+  const ready = useRef(false);
+  const startWhenReady = useRef(false);
+  const phaseRef = useRef("idle");
+  const logRef = useRef(null);
 
+  const setPhaseBoth = (next) => {
+    phaseRef.current = next;
+    setPhase(next);
+  };
+
+  // Keep the collapsed widget out of the tab order and the accessibility tree.
   useEffect(() => {
     const el = widgetRef.current;
     if (!el) return undefined;
@@ -65,6 +115,11 @@ export function Assistant() {
       el.toggleAttribute("inert", !expanded);
       if (expanded) el.removeAttribute("aria-hidden");
       else el.setAttribute("aria-hidden", "true");
+      // Closed before the call connected (the widget sends no event for that).
+      if (!expanded && phaseRef.current === "starting") {
+        queue.current = [];
+        setPhaseBoth("idle");
+      }
     };
     sync();
     const observer = new MutationObserver(sync);
@@ -73,84 +128,107 @@ export function Assistant() {
   }, []);
 
   useEffect(() => {
+    const el = widgetRef.current;
+    // Methods may already be installed if the element was ready before this effect ran.
+    if (typeof el?.startConversation === "function") ready.current = true;
+
     function onProtocol(event) {
       const detail = event.detail;
       if (detail?.event_type !== "conversation.utterance") return;
       const speech = detail.properties?.speech;
-      const role = detail.properties?.role;
-      if (typeof speech !== "string" || !speech.trim()) return;
-      if (role === "user") return;
+      if (detail.properties?.role === "user" || typeof speech !== "string" || !speech.trim()) return;
       setMessages((current) => [...current, { from: "solvimere", text: speech }]);
     }
     function onReady() {
-      if (!talkWhenReady.current) return;
-      talkWhenReady.current = false;
-      const el = widgetRef.current;
-      el?.open?.();
-      el?.startConversation?.();
+      ready.current = true;
+      if (startWhenReady.current) {
+        startWhenReady.current = false;
+        widgetRef.current?.startConversation();
+      }
     }
     function onStarted() {
-      live.current = true;
-      const el = widgetRef.current;
+      setPhaseBoth("live");
+      setError("");
       const waiting = queue.current.splice(0);
-      waiting.forEach((text) => {
-        if (el?.tavus?.sendChat) el.tavus.sendChat(text);
-        else el?.sendMessage?.(text);
-      });
-      setPending(false);
+      waiting.forEach((text) =>
+        widgetRef.current?.sendMessage({ event_type: "conversation.respond", properties: { text } })
+      );
     }
     function onEnded() {
-      live.current = false;
-      setPending(false);
+      setPhaseBoth("idle");
+    }
+    function fail(message) {
+      startWhenReady.current = false;
+      queue.current = [];
+      setPhaseBoth("idle");
+      setError(message);
     }
     function onError(event) {
-      talkWhenReady.current = false;
-      setPending(false);
-      setError(event.detail?.message || "The assistant could not start.");
+      fail(event.detail?.message || "The assistant could not start.");
+    }
+    function onMode(event) {
+      if (event.detail?.mode === "unavailable") fail("The assistant is busy or unavailable right now.");
     }
     document.addEventListener("tavus:protocol-message", onProtocol);
     document.addEventListener("tavus:ready", onReady);
     document.addEventListener("tavus:conversation-started", onStarted);
     document.addEventListener("tavus:conversation-ended", onEnded);
     document.addEventListener("tavus:error", onError);
+    document.addEventListener("tavus:mode-change", onMode);
     return () => {
       document.removeEventListener("tavus:protocol-message", onProtocol);
       document.removeEventListener("tavus:ready", onReady);
       document.removeEventListener("tavus:conversation-started", onStarted);
       document.removeEventListener("tavus:conversation-ended", onEnded);
       document.removeEventListener("tavus:error", onError);
+      document.removeEventListener("tavus:mode-change", onMode);
     };
   }, []);
 
-  function talk() {
-    setError("");
-    const el = widgetRef.current;
-    if (typeof el?.startConversation !== "function") {
-      talkWhenReady.current = true;
-      return;
+  useEffect(() => {
+    logRef.current?.scrollTo({ top: logRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages, panel]);
+
+  /** Opens the video call. Only one start at a time; queued messages are sent once it's live. */
+  async function startCall() {
+    if (phaseRef.current !== "idle") {
+      widgetRef.current?.open?.();
+      return true;
     }
-    el.open?.();
-    el.startConversation();
+    setError("");
+    setPhaseBoth("starting");
+    const problem = await checkDeployment();
+    if (problem) {
+      queue.current = [];
+      setPhaseBoth("idle");
+      setError(problem);
+      return false;
+    }
+    if (ready.current) widgetRef.current.startConversation();
+    else startWhenReady.current = true;
+    return true;
+  }
+
+  async function talk() {
+    const ok = await startCall();
+    if (!ok) setPanel("chat"); // show the reason and the alternatives
   }
 
   function send(event) {
     event.preventDefault();
     const text = draft.trim();
     if (!text) return;
-    const el = widgetRef.current;
-    setMessages((current) => [...current, { from: "you", text }]);
     setDraft("");
-    setError("");
-    setOpen(true);
-    if (live.current && el?.tavus?.sendChat) {
-      el.tavus.sendChat(text);
+    setMessages((current) => [...current, { from: "you", text }]);
+    if (phaseRef.current === "live") {
+      widgetRef.current?.sendMessage({ event_type: "conversation.respond", properties: { text } });
       return;
     }
-    setPending(true);
     queue.current.push(text);
-    el?.open?.();
-    el?.startConversation?.();
+    startCall();
   }
+
+  const email = settings.email || "hello@solvimere.com";
 
   return (
     <>
@@ -162,41 +240,95 @@ export function Assistant() {
         custom-greeting={GREETING}
         memory-stores={user ? `${DEPLOYMENT_ID}-${user.id}` : undefined}
       />
-      {open ? (
-        <section className="assistant-chat" aria-label="Chat with Solvimere">
+      {panel ? (
+        <section className="assistant-chat" aria-label={panel === "book" ? "Book a meeting" : "Chat with Solvimere"}>
           <header>
             <div>
               <p>Solvimere</p>
-              <strong>Chat</strong>
+              <strong>{panel === "book" ? "Book a meeting" : "Chat"}</strong>
             </div>
             <div className="assistant-tools">
-              <button type="button" onClick={talk}>Talk</button>
-              <button type="button" onClick={() => setOpen(false)} aria-label="Close chat">Close</button>
+              {panel === "book" ? (
+                <IconButton icon="chat" label="Chat" tipSide="below" onClick={() => setPanel("chat")} />
+              ) : (
+                <IconButton icon="calendar" label="Book a meeting" tipSide="below" onClick={() => setPanel("book")} />
+              )}
+              <IconButton
+                icon="video"
+                label={phase === "live" ? "Return to video call" : "Start a video call"}
+                tipSide="below"
+                active={phase === "live"}
+                disabled={phase === "starting"}
+                onClick={talk}
+              />
+              <IconButton icon="close" label="Close" tipSide="below" onClick={() => setPanel(null)} />
             </div>
           </header>
-          <div className="assistant-log">
-            {messages.length === 0 ? <p className="assistant-empty">Ask about Solvimere. You can type here or start a video conversation.</p> : null}
-            {messages.map((message, index) => (
-              <p key={`${message.from}-${index}`} className={message.from === "you" ? "is-you" : "is-them"}>
-                {message.text}
-              </p>
-            ))}
-          </div>
-          {error ? <p className="assistant-error">{error}</p> : null}
-          <form onSubmit={send}>
-            <input
-              value={draft}
-              onChange={(event) => setDraft(event.target.value)}
-              placeholder="Type a message"
-              aria-label="Message"
-            />
-            <button type="submit" disabled={pending}>{pending ? "…" : "Send"}</button>
-          </form>
+
+          {panel === "book" ? (
+            <div className="assistant-body">
+              <Booking contactEmail={email} />
+            </div>
+          ) : (
+            <>
+              <div className="assistant-log" ref={logRef} aria-live="polite">
+                {messages.length === 0 ? (
+                  <p className="assistant-empty">
+                    Ask about Solvimere. Your first message starts a short video conversation with our assistant, and
+                    replies appear here too.
+                  </p>
+                ) : null}
+                {messages.map((message, index) => (
+                  <p key={`${message.from}-${index}`} className={message.from === "you" ? "is-you" : "is-them"}>
+                    {message.text}
+                  </p>
+                ))}
+                {phase === "starting" ? <p className="assistant-empty">Connecting…</p> : null}
+              </div>
+              {error ? (
+                <div className="assistant-error">
+                  <p>{error}</p>
+                  <p>
+                    <button type="button" className="link-btn" onClick={() => setPanel("book")}>
+                      Book a meeting
+                    </button>{" "}
+                    or email <a href={`mailto:${email}`}>{email}</a>.
+                  </p>
+                </div>
+              ) : null}
+              <form onSubmit={send}>
+                <input
+                  value={draft}
+                  onChange={(event) => setDraft(event.target.value)}
+                  placeholder="Type a message"
+                  aria-label="Message"
+                  maxLength={1000}
+                />
+                <button type="submit" className="icon-btn is-primary" aria-label="Send" disabled={!draft.trim()}>
+                  <Icon name="send" />
+                </button>
+              </form>
+            </>
+          )}
         </section>
       ) : (
-        <div className="assistant-launch">
-          <button type="button" onClick={() => setOpen(true)}>Chat</button>
-          <button type="button" onClick={talk}>Talk</button>
+        <div
+          className="assistant-launch"
+          role="toolbar"
+          aria-label="Contact Solvimere"
+          // Warm up the availability check so a click gets an answer right away.
+          onPointerEnter={checkDeployment}
+          onFocus={checkDeployment}
+        >
+          <IconButton icon="chat" label="Chat with us" primary onClick={() => setPanel("chat")} />
+          <IconButton
+            icon="video"
+            label={phase === "live" ? "Return to video call" : "Start a video call"}
+            active={phase === "live"}
+            disabled={phase === "starting"}
+            onClick={talk}
+          />
+          <IconButton icon="calendar" label="Book a meeting" onClick={() => setPanel("book")} />
         </div>
       )}
     </>

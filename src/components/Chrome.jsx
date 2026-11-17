@@ -15,7 +15,7 @@ export function Arrow() {
   );
 }
 
-export function Button({ href = "#contact", children, variant = "primary", className = "", type }) {
+export function Button({ href = "#contact", children, variant = "primary", className = "", type, onClick }) {
   const classNames = `btn btn-${variant} ${className}`.trim();
   const inner = (
     <>
@@ -34,13 +34,13 @@ export function Button({ href = "#contact", children, variant = "primary", class
   }
   if (href.startsWith("/")) {
     return (
-      <Link to={href} className={classNames}>
+      <Link to={href} className={classNames} onClick={onClick}>
         {inner}
       </Link>
     );
   }
   return (
-    <a href={href} className={classNames}>
+    <a href={href} className={classNames} onClick={onClick}>
       {inner}
     </a>
   );
@@ -76,6 +76,22 @@ export function Orbit({ text, href = "#services" }) {
   );
 }
 
+/**
+ * "Start a project" → the contact form on the home page (/#contact), from any page.
+ * Elsewhere the link navigates and App scrolls to #contact once Home renders; on the
+ * home page we scroll directly, so it also works when the URL already ends in #contact.
+ */
+function useContactLink() {
+  const location = useLocation();
+  return (event) => {
+    if (location.pathname !== "/" || location.hash !== "#contact") return;
+    const form = document.getElementById("contact");
+    if (!form) return;
+    event.preventDefault();
+    form.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+}
+
 export function Header({ active }) {
   const [open, setOpen] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -83,6 +99,7 @@ export function Header({ active }) {
   const { user } = useSiteAuth();
   const settings = usePageContent("settings", pageDefaults.settings);
   const accountLabel = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Account";
+  const toContact = useContactLink();
 
   useEffect(() => {
     const onScroll = () => {
@@ -114,7 +131,7 @@ export function Header({ active }) {
           <Link to={user ? "/account" : "/login"} className="nav-signin">
             {user ? accountLabel : "Sign in"}
           </Link>
-          <Button href="/#contact" className="nav-cta">
+          <Button href="/#contact" className="nav-cta" onClick={toContact}>
             Start a project
           </Button>
         </div>
@@ -137,7 +154,15 @@ export function Header({ active }) {
             {user ? accountLabel : "Sign in"}
           </Link>
           <Link to="/register" onClick={() => setOpen(false)}>Create account</Link>
-          <Button href="/#contact">Start a project</Button>
+          <Button
+            href="/#contact"
+            onClick={(event) => {
+              setOpen(false);
+              toContact(event);
+            }}
+          >
+            Start a project
+          </Button>
         </div>
       )}
     </header>

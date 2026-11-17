@@ -181,21 +181,6 @@ export const avatars = [
   "/images/avatars/f6.jpg",
 ];
 
-export const logos = [
-  ["bellomy", "Bellomy"],
-  ["clariti", "Clariti"],
-  ["eleven", "ElevenMR"],
-  ["enos", "Enos Answers"],
-  ["fieldwork", "Fieldwork"],
-  ["fullcircle", "Full Circle Research"],
-  ["harmon", "Harmon Research"],
-  ["indiefield", "Indiefield"],
-  ["kantar", "Kantar"],
-  ["quantify", "Quantify AI"],
-  ["quest", "Quest Mindshare"],
-  ["recon", "ReconMR"],
-];
-
 export const services = [
   {
     title: "Custom software engineering",
@@ -318,7 +303,7 @@ export const testimonials = [
     name: "Jesse Schenk",
     role: "Co-founder & CEO, Showfer Media LLC",
     avatar: "/images/clients/jesse-schenk.png",
-    photo: "/images/clients/customer-stories.jpg",
+    photo: "/images/clients/jesse-schenk.png",
   },
   {
     quote:
@@ -326,7 +311,7 @@ export const testimonials = [
     name: "Ari X",
     role: "Founder, CEO, Beejern",
     avatar: "/images/clients/ari-x.png",
-    photo: "/images/clients/customer-stories.jpg",
+    photo: "/images/clients/ari-x.png",
   },
   {
     quote:
@@ -334,7 +319,7 @@ export const testimonials = [
     name: "Tracy West",
     role: "EVP of Digital Content, Freecast",
     avatar: "/images/clients/tracy-west.webp",
-    photo: "/images/clients/customer-stories.jpg",
+    photo: "/images/clients/tracy-west.webp",
   },
   {
     quote:
@@ -342,7 +327,7 @@ export const testimonials = [
     name: "Joe Simonds",
     role: "CEO, Saltstrong",
     avatar: "/images/clients/joe-simonds.png",
-    photo: "/images/clients/customer-stories.jpg",
+    photo: "/images/clients/joe-simonds.png",
   },
 ];
 
@@ -547,3 +532,30 @@ export const terms = [
     ],
   },
 ];
+
+// Home page "ratings & recognition" section (editable in Admin → Pages → Home → Reviews).
+// `platform` picks the built-in logo (Google, Trustpilot, GoodFirms, Sortlist, Meta;
+// anything else shows its initial). Leave `url` empty to show a card without a link.
+export const reviews = {
+  ratingsLabel: "Rated by our clients",
+  badgesLabel: "Recognised by",
+  ratings: [
+    { platform: "Google", score: "4.9", count: "100+ reviews", url: "" },
+    { platform: "Trustpilot", score: "5.0", count: "", url: "" },
+    { platform: "GoodFirms", score: "5.0", count: "", url: "" },
+    { platform: "Sortlist", score: "5.0", count: "5+ reviews", url: "" },
+    { platform: "Meta", score: "5.0", count: "40+ reviews", url: "" },
+  ],
+  badges: [
+    { name: "Clutch 100 Fastest Growth 2023", image: "/images/badges/clutch-100-fastest-growth-2023.png", url: "" },
+    { name: "GoodFirms Top Web Development Company", image: "/images/badges/goodfirms-top-web-development.png", url: "" },
+    { name: "DesignRush Best B2B Digital Marketing Agencies", image: "/images/badges/designrush-best-b2b-digital-marketing.png", url: "" },
+    { name: "AppFutura Top Web Development Company", image: "/images/badges/appfutura-top-web-development.png", url: "" },
+    { name: "Clutch Top Software Developers 2019", image: "/images/badges/clutch-top-software-developers-2019.png", url: "" },
+    { name: "GoodFirms Top IT Services Company", image: "/images/badges/goodfirms-top-it-services.png", url: "" },
+    { name: "Top Developers Top E-Commerce Application Developer 2020", image: "/images/badges/topdevelopers-ecommerce-2020.png", url: "" },
+    { name: "Verified by 10SEOs", image: "/images/badges/10seos-verified.png", url: "" },
+    { name: "BusinessFirms Verified", image: "/images/badges/businessfirms-verified.png", url: "" },
+    { name: "SoftwareWorld Top Rated Software Development Companies", image: "/images/badges/softwareworld-top-rated.png", url: "" },
+  ],
+};

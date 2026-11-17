@@ -185,6 +185,31 @@ export function Icon({ name }) {
         <path d="M12 8v5l3 2" />
       </>
     ),
+    chat: (
+      <>
+        <path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.1A8 8 0 1 1 20 12Z" />
+        <path d="M8.5 12h.01M12 12h.01M15.5 12h.01" strokeWidth="2.6" />
+      </>
+    ),
+    video: (
+      <>
+        <rect x="3" y="6.5" width="12.5" height="11" rx="2.5" />
+        <path d="m15.5 10.5 5-3v9l-5-3" />
+      </>
+    ),
+    calendar: (
+      <>
+        <rect x="3.5" y="5" width="17" height="15" rx="2.5" />
+        <path d="M3.5 10h17M8 3v4M16 3v4" />
+        <path d="M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01" strokeWidth="2.4" />
+      </>
+    ),
+    send: (
+      <>
+        <path d="M21 3 10.5 13.5" />
+        <path d="M21 3 14.5 21l-4-7.5L3 9.5 21 3Z" />
+      </>
+    ),
   };
   return <svg {...common}>{paths[name]}</svg>;
 }

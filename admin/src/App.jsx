@@ -7,6 +7,7 @@ import PageList from "./pages/PageList";
 import PageEditor from "./pages/PageEditor";
 import Profiles from "./pages/Profiles";
 import Team from "./pages/Team";
+import Appointments from "./pages/Appointments";
 import Account from "./pages/Account";
 
 function Guard({ children, admin = false }) {
@@ -28,6 +29,7 @@ export default function App() {
       <Route path="/pages" element={<Guard><PageList /></Guard>} />
       <Route path="/pages/:slug" element={<Guard><PageEditor /></Guard>} />
       <Route path="/team" element={<Guard><Team /></Guard>} />
+      <Route path="/appointments" element={<Guard><Appointments /></Guard>} />
       <Route path="/profiles" element={<Guard admin><Profiles /></Guard>} />
       <Route path="/profiles/:id" element={<Guard admin><Account /></Guard>} />
       <Route path="/account" element={<Guard><Account /></Guard>} />
