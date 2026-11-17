@@ -3,7 +3,7 @@ import { pageDefaults } from "../cms/defaults";
 import { usePageContent } from "../cms/Content";
 import { Button, Eyebrow } from "../components/Chrome";
 import { RichTitle } from "../components/Story";
-import { TeamMail } from "../components/TeamMail";
+import { TeamActions, portfolioLinkProps } from "../components/TeamPortfolio";
 import { useTeamMembers } from "../lib/team";
 
 const CYCLE = 7200;
@@ -97,7 +97,7 @@ export default function Team() {
               <div className="team-on-photo">
                 <h2>{person.name}</h2>
               </div>
-              <TeamMail person={person} />
+              <TeamActions person={person} />
             </div>
             <div className="team-stage-copy">
               <p className="team-index">
@@ -176,13 +176,13 @@ export default function Team() {
               className={`team-card ${index === active ? "is-active" : ""}`}
               style={{ "--i": index }}
             >
-              <button
-                type="button"
+              {/* Hover/focus features the member above; a click opens their portfolio in a new tab. */}
+              <a
+                {...portfolioLinkProps(member)}
                 className="team-card-hit"
                 onMouseEnter={() => setActive(index)}
                 onFocus={() => setActive(index)}
-                onClick={() => setActive(index)}
-                aria-pressed={index === active}
+                aria-label={`${member.name}: view portfolio (opens in a new tab)`}
               >
                 <div className="team-photo">
                   <img src={member.image} alt="" style={{ "--avatar-scale": member.avatarScale || 1 }} />
@@ -194,8 +194,8 @@ export default function Team() {
                   <p className="team-role">{member.roles.join(" · ")}</p>
                   {member.bio ? <p className="bio">{member.bio}</p> : null}
                 </div>
-              </button>
-              <TeamMail person={member} />
+              </a>
+              <TeamActions person={member} />
             </article>
           ))}
         </div>

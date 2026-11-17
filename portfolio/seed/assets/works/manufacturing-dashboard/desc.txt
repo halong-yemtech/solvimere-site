@@ -1,0 +1,14 @@
+Title: Manufacturing Production Dashboard & Factory Automation
+Role: Project Management
+
+Description: I designed and implemented an automated production monitoring system that collects data from multiple sources, processes it in real time, and delivers live operational dashboards to production managers and business stakeholders.
+
+The Challenge
+- Production data scattered across multiple spreadsheets
+- Manual daily reporting consuming several hours
+- No real-time visibility into machine performance
+- Inventory shortages causing production delays
+- Quality issues identified too late
+- Difficult for management to monitor KPIs across departments
+
+Skills: n8n , PostgreSQL , Microsoft Power BI , REST API , Slack , Docker

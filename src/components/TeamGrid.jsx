@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import { pageDefaults } from "../cms/defaults";
 import { usePageContent } from "../cms/Content";
-import { TeamMail } from "./TeamMail";
+import { TeamActions, portfolioLinkProps } from "./TeamPortfolio";
 import { useTeamMembers } from "../lib/team";
 
 export function TeamGrid() {
@@ -30,10 +29,10 @@ export function TeamGrid() {
     <div ref={ref} className={`team-grid team-reveal is-compact ${visible ? "is-in" : ""}`}>
       {team.map((person, index) => (
         <article key={person.id || person.name} className="team-card" style={{ "--i": index }}>
-          <Link
-            to="/team"
+          <a
+            {...portfolioLinkProps(person)}
             className="team-card-hit"
-            aria-label={`${person.name}, ${person.roles[0]}`}
+            aria-label={`${person.name}, ${person.roles[0]}: view portfolio (opens in a new tab)`}
           >
             <div className="team-photo">
               <img src={person.image} alt="" style={{ "--avatar-scale": person.avatarScale || 1 }} />
@@ -44,8 +43,8 @@ export function TeamGrid() {
             <div className="team-copy">
               <p className="team-role">{person.roles.join(" · ")}</p>
             </div>
-          </Link>
-          <TeamMail person={person} />
+          </a>
+          <TeamActions person={person} />
         </article>
       ))}
     </div>

@@ -214,7 +214,7 @@ code { color: #d5e6ff; }
 .avatar-row { display: flex; align-items: start; gap: 14px; }
 .avatar-fields { display: grid; gap: 12px; flex: 1; min-width: 0; }
 .avatar-fields .field { margin: 0; }
-.avatar-fields small { color: var(--muted); font-size: 12px; font-weight: 500; line-height: 1.45; }
+.avatar-fields small, .field small { color: var(--muted); font-size: 12px; font-weight: 500; line-height: 1.45; }
 .avatar-frame {
   width: 88px;
   height: 88px;

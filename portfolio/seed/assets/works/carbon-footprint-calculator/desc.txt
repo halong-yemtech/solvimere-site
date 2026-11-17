@@ -1,0 +1,23 @@
+Title: Carbon Emission & Footprint Calculator for Sustainable Decisions
+
+React , Artificial Intelligence , Node.js , Machine Learning , Web & Mobile Design Consultation , Figma , MongoDB , PyTorch , LLM Prompt , Natural Language Processing
+
+Description:
+Web & Mobile Design
+React , Artificial Intelligence , Node.js , Machine Learning , Web & Mobile Design Consultation , Figma , MongoDB , PyTorch , LLM Prompt , Natural Language Processing
+We worked with Kyogreen to develop a carbon emission and carbon footprint calculator designed to help individuals and organizations measure and reduce their environmental impact. The tool uses advanced algorithms to analyze various data inputs, such as energy consumption, transportation, and waste, to calculate the total carbon emissions and footprint. The goal is to provide users with insights to make more sustainable, eco-friendly decisions.
+
+Key Technologies Used:
+
+- AI & Machine Learning: For predictive analytics and environmental impact modeling.
+- Data Analytics: For processing and analyzing data inputs to generate accurate carbon footprints.
+- Python: Used for developing the backend algorithms and calculation logic.
+- Cloud Computing: For scalable deployment and data storage.
+
+Role:
+We contributed to the development of the carbon footprint calculator by creating the algorithms for calculating emissions based on various user inputs. Our responsibilities included:
+
+Developing machine learning models to predict and calculate carbon footprints.
+Building data processing pipelines to analyze and interpret environmental data.
+Ensuring the system was scalable and reliable through cloud-based deployment.
+

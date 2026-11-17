@@ -30,6 +30,16 @@ function clean(value) {
   return String(value || "").trim();
 }
 
+/** Same rule as the site's team cards and the portfolio app: "Ha Long" → "halong". */
+function portfolioSlug(name) {
+  return String(name || "")
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "")
+    .slice(0, 60);
+}
+
 export default function Team() {
   const [members, setMembers] = useState([]);
   const [draft, setDraft] = useState(null);
@@ -246,6 +256,12 @@ export default function Team() {
             <label className="field">
               <span>Name</span>
               <input value={draft.name} onChange={(event) => update("name", event.target.value)} required />
+              {portfolioSlug(draft.name) ? (
+                <small>
+                  Portfolio: /team/{portfolioSlug(draft.name)} (the portfolio app&apos;s profile slug must be{" "}
+                  &ldquo;{portfolioSlug(draft.name)}&rdquo;)
+                </small>
+              ) : null}
             </label>
             <label className="field">
               <span>Role</span>

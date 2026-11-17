@@ -11,7 +11,7 @@ export function TeamMail({ person }) {
   const address = person.email || STUDIO;
   return (
     <a
-      className="team-mail"
+      className="team-action team-mail"
       href={memberMailto(person)}
       aria-label={`Email ${person.name}`}
       title={address}

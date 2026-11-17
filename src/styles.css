@@ -970,7 +970,7 @@ body.has-cookie-bar .to-top { bottom: 248px; }
 .team-on-photo {
   position: absolute;
   z-index: 1;
-  right: 64px;
+  right: 112px;
   bottom: 14px;
   left: 14px;
   color: white;
@@ -1111,7 +1111,7 @@ body.has-cookie-bar .to-top { bottom: 248px; }
   text-align: left;
   text-decoration: none;
 }
-.team-mail {
+.team-action {
   display: grid;
   place-items: center;
   flex: none;
@@ -1123,25 +1123,30 @@ body.has-cookie-bar .to-top { bottom: 248px; }
   color: white;
   backdrop-filter: blur(8px);
 }
-.team-card .team-mail,
-.team-stage-photo .team-mail {
+.team-actions {
   position: absolute;
   z-index: 2;
   right: 12px;
   bottom: 12px;
+  display: flex;
+  gap: 8px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease, background 0.25s ease, color 0.25s ease;
+  transition: opacity 0.25s ease;
 }
-.team-card .team-mail { top: calc(280px - 52px); bottom: auto; }
-.team-card:hover .team-mail,
-.team-card:focus-within .team-mail,
-.team-stage-photo:hover .team-mail,
-.team-stage-photo:focus-within .team-mail {
+.team-action { transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease; }
+@media (hover: none) {
+  .team-actions { opacity: 1; pointer-events: auto; }
+}
+.team-card .team-actions { top: calc(280px - 52px); bottom: auto; }
+.team-card:hover .team-actions,
+.team-card:focus-within .team-actions,
+.team-stage-photo:hover .team-actions,
+.team-stage-photo:focus-within .team-actions {
   opacity: 1;
   pointer-events: auto;
 }
-.team-mail svg {
+.team-action svg {
   width: 16px;
   height: 16px;
   fill: none;
@@ -1150,7 +1155,7 @@ body.has-cookie-bar .to-top { bottom: 248px; }
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.team-mail:hover {
+.team-action:hover {
   border-color: var(--primary);
   background: var(--primary);
   color: white;
@@ -1163,7 +1168,7 @@ body.has-cookie-bar .to-top { bottom: 248px; }
 }
 .team-card-hit:focus-visible { outline: none; }
 .team-card:has(.team-card-hit:focus-visible),
-.team-mail:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.team-action:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 .team-photo { position: relative; overflow: hidden; height: 280px; }
 .team-photo img {
   width: 100%;
@@ -1214,7 +1219,8 @@ body.has-cookie-bar .to-top { bottom: 248px; }
 .team-grid.is-compact { grid-template-columns: repeat(4, 1fr); }
 .team-grid.is-compact .team-photo { height: 220px; }
 .team-grid.is-compact .team-card h3 { font-size: 18px; }
-.team-grid.is-compact .team-card .team-mail { top: calc(220px - 42px); width: 32px; height: 32px; }
+.team-grid.is-compact .team-card .team-actions { top: calc(220px - 42px); gap: 6px; }
+.team-grid.is-compact .team-action { width: 32px; height: 32px; }
 .team-grid.is-compact .team-copy { padding: 12px 14px 14px; }
 .team-grid.is-compact .team-role { font-size: 13px; }
 @media (max-width: 1100px) {

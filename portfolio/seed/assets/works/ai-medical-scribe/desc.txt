@@ -1,0 +1,24 @@
+Title: AI Medical Scribe for Clinicians: Automating Patient Documentation
+
+Description:
+AI Apps & Integration
+Python , Machine Learning , PyTorch , NLP Tokenization , Natural Language Processing , LLM Prompt , Large Language Model , Figma , Node.js , React , AWS Application
+I worked with Heidi Health to develop an AI-powered medical scribe designed to assist clinicians by automating the process of documenting patient encounters. This AI tool listens to doctor-patient conversations in real time and generates accurate medical notes, enabling clinicians to focus more on patient care rather than administrative tasks.
+
+The AI scribe uses Natural Language Processing (NLP) and speech recognition to transcribe and understand medical conversations, ensuring that the generated notes are both accurate and compliant with medical standards.
+
+Key Technologies Used:
+
+- Artificial Intelligence (AI) & Machine Learning: To power the scribe's decision-making and note generation.
+- Natural Language Processing (NLP): For understanding and processing medical terminology and context.
+- Speech Recognition: To accurately transcribe doctor-patient conversations in real time.
+- Cloud Computing: For scalable deployment and integration with electronic health records (EHR) systems.
+- Python & TensorFlow: Used for AI model development and machine learning algorithm implementation.
+
+My Role:
+I was involved in the development and integration of the AI algorithms for transcribing medical conversations and creating accurate medical records. My tasks included:
+
+Developing and optimizing NLP models for accurate medical note generation.
+Integrating speech recognition for real-time transcription of doctor-patient conversations.
+Ensuring the system’s seamless integration with cloud infrastructure for scalability and security.
+

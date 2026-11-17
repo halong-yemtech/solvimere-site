@@ -1,3 +1,9 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    {
+      "source": "/team/:path+",
+      "destination": "https://solvimere-ha-portfolio.vercel.app/team/:path+"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

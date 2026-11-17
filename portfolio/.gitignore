@@ -1,0 +1,22 @@
+# dependencies
+node_modules
+
+# next.js build output
+.next
+out
+next-env.d.ts
+*.tsbuildinfo
+
+# env files (keep .env.example committed)
+.env
+.env*.local
+
+# misc
+.DS_Store
+*.log
+
+# Payload CMS local data (recreate with `bun run seed`)
+/media
+/portfolio.db
+/portfolio.db-*
+.vercel
