@@ -628,11 +628,11 @@ export const reviews = {
   ratingsLabel: "Rated by our clients",
   badgesLabel: "Recognised by",
   ratings: [
-    { platform: "Google", score: "4.9", count: "100+ reviews", url: "" },
+    { platform: "Google", score: "4.9", count: "10+ reviews", url: "" },
     { platform: "Trustpilot", score: "5.0", count: "", url: "" },
     { platform: "GoodFirms", score: "5.0", count: "", url: "" },
     { platform: "Sortlist", score: "5.0", count: "5+ reviews", url: "" },
-    { platform: "Meta", score: "5.0", count: "40+ reviews", url: "" },
+    { platform: "Meta", score: "5.0", count: "10+ reviews", url: "" },
   ],
   badges: [
     { name: "Clutch 100 Fastest Growth 2023", image: "/images/badges/clutch-100-fastest-growth-2023.png", url: "" },
