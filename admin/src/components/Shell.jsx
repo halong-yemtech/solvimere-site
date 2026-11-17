@@ -24,7 +24,7 @@ export function Shell({ children }) {
             Profiles
           </NavLink>
           <NavLink to="/portfolio/media">Media</NavLink>
-          <NavLink to="/portfolio/inbox">Inbox</NavLink>
+          <NavLink to="/portfolio/guestbook">Guest book</NavLink>
           <NavLink to="/portfolio/settings">Settings</NavLink>
           <p className="nav-label">Account</p>
           {profile?.role === "admin" ? <NavLink to="/profiles">Staff</NavLink> : null}

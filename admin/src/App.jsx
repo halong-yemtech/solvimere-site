@@ -12,7 +12,7 @@ import Messages from "./pages/Messages";
 import Portfolios from "./pages/Portfolios";
 import PortfolioWorkspace from "./pages/PortfolioWorkspace";
 import PortfolioMedia from "./pages/PortfolioMedia";
-import PortfolioInbox from "./pages/PortfolioInbox";
+import PortfolioGuestbook from "./pages/PortfolioGuestbook";
 import PortfolioSettings from "./pages/PortfolioSettings";
 import Account from "./pages/Account";
 
@@ -96,10 +96,10 @@ export default function App() {
         }
       />
       <Route
-        path="/portfolio/inbox"
+        path="/portfolio/guestbook"
         element={
           <Guard>
-            <PortfolioInbox />
+            <PortfolioGuestbook />
           </Guard>
         }
       />

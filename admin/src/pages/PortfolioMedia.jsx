@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { call, isImage, portfolioUrl, uploadMedia } from "../lib/portfolio";
+import { deleteMedia, isImage, listAllMedia, mediaUsage, updateMediaAlt, uploadMedia } from "../portfolio/api";
 
-const kb = (n) => (n > 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
+const size = (n) =>
+  n > 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round((n || 0) / 1024))} KB`;
 
-/** Portfolio images and PDFs (stored in Supabase Storage). */
+/** Images and PDFs used in portfolios (Supabase Storage, `portfolio` bucket). */
 export default function PortfolioMedia() {
   const fileRef = useRef(null);
   const [items, setItems] = useState(null);
@@ -15,7 +16,7 @@ export default function PortfolioMedia() {
   const [message, setMessage] = useState("");
 
   function load() {
-    call("listMediaLibrary")
+    listAllMedia()
       .then(setItems)
       .catch((err) => setError(err.message));
   }
@@ -26,7 +27,7 @@ export default function PortfolioMedia() {
     setAlt(item.alt);
     setUsage(null);
     setMessage("");
-    call("mediaUsage", item.id)
+    mediaUsage(item.id)
       .then(setUsage)
       .catch(() => setUsage([]));
   }
@@ -53,8 +54,9 @@ export default function PortfolioMedia() {
   async function saveAlt(event) {
     event.preventDefault();
     try {
-      await call("updateMediaAlt", selected.id, alt);
+      await updateMediaAlt(selected.id, alt);
       setItems((all) => all.map((m) => (m.id === selected.id ? { ...m, alt } : m)));
+      setSelected((s) => ({ ...s, alt }));
       setMessage("Description saved.");
     } catch (err) {
       setError(err.message);
@@ -65,7 +67,7 @@ export default function PortfolioMedia() {
     const warn = usage?.length ? `It's used by ${usage.join(", ")}. ` : "";
     if (!window.confirm(`${warn}Delete ${selected.filename}? This can't be undone.`)) return;
     try {
-      await call("deleteMedia", selected.id);
+      await deleteMedia(selected);
       setItems((all) => all.filter((m) => m.id !== selected.id));
       setSelected(null);
       setMessage("File deleted.");
@@ -86,7 +88,7 @@ export default function PortfolioMedia() {
         <div>
           <p className="eyebrow">Portfolio</p>
           <h1>Media library</h1>
-          <p>Images and PDFs used in portfolios, stored in Supabase Storage. Drop files anywhere here to upload.</p>
+          <p>Images and PDFs used in portfolios. Drop files anywhere here to upload.</p>
         </div>
         <button type="button" className="primary" disabled={busy} onClick={() => fileRef.current?.click()}>
           {busy ? "Uploading…" : "Upload"}
@@ -114,7 +116,7 @@ export default function PortfolioMedia() {
               title={m.filename}
             >
               {isImage(m) ? (
-                <img src={portfolioUrl(m.url)} alt={m.alt} loading="lazy" />
+                <img src={m.url} alt={m.alt} loading="lazy" />
               ) : (
                 <span className="sf-thumb is-file">{m.filename}</span>
               )}
@@ -124,11 +126,9 @@ export default function PortfolioMedia() {
         {selected ? (
           <form className="panel editor" onSubmit={saveAlt}>
             <h2>{selected.filename}</h2>
-            {isImage(selected) ? (
-              <img className="pf-media-preview" src={portfolioUrl(selected.url)} alt={selected.alt} />
-            ) : null}
+            {isImage(selected) ? <img className="pf-media-preview" src={selected.url} alt={selected.alt} /> : null}
             <p>
-              {selected.mimeType} · {kb(selected.filesize)}
+              {selected.mimeType} · {size(selected.filesize)}
               {selected.width ? ` · ${selected.width}×${selected.height}` : ""}
             </p>
             <label className="field">
@@ -146,7 +146,7 @@ export default function PortfolioMedia() {
               <button type="submit" className="primary" disabled={alt === selected.alt}>
                 Save description
               </button>
-              <a className="ghost" href={portfolioUrl(selected.url)} target="_blank" rel="noreferrer">
+              <a className="ghost" href={selected.url} target="_blank" rel="noreferrer">
                 Open
               </a>
               <button type="button" className="danger" onClick={remove}>

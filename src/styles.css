@@ -3263,3 +3263,34 @@ body.has-cookie-bar .assistant-chat {
   width: 26px;
   height: 26px;
 }
+
+/* Generated CV (/team/<name>/cv) */
+.cv-page {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+  background: #0b0d12;
+}
+.cv-page > p {
+  margin: auto;
+  color: var(--muted);
+}
+.cv-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+.cv-bar a {
+  color: white;
+  font-weight: 650;
+}
+.cv-page iframe {
+  width: 100%;
+  height: calc(100vh - 46px);
+  border: 0;
+  background: white;
+}

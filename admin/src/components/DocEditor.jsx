@@ -1,16 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
-import { call } from "../lib/portfolio";
-import { defaultsFor, Fields, missingRequired, normalize } from "./SchemaForm";
-
-const fmt = (iso) =>
-  new Date(iso).toLocaleString(undefined, { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+import { loadDoc, saveDoc } from "../portfolio/api";
+import { Fields, defaultsFor, missingRequired, normalize } from "./SchemaForm";
 
 /**
- * Edit one portfolio document: a profile, a list item, or Site settings.
- * `target`: { kind: "collection", slug, id } | { kind: "global", slug } | { kind: "new", slug, profileId }.
- * Saves are drafts; publishing happens from the workspace's "Publish" bar.
+ * Edit one portfolio document. `target`:
+ *   { kind: "profile", id? }                      a profile (no id: new)
+ *   { kind: "item", itemKind, profileId, id? }    a work, résumé entry, … (no id: new)
+ *   { kind: "settings" }                          portfolio settings
+ * Saving publishes immediately.
  */
-export function DocEditor({ target, onSaved, onCancel, compact = false }) {
+export function DocEditor({ target, onSaved, onCancel, compact = false, savedNotice = "Saved. Changes are live." }) {
   const [schema, setSchema] = useState(null);
   const [values, setValues] = useState({});
   const [initial, setInitial] = useState("{}");
@@ -18,16 +17,15 @@ export function DocEditor({ target, onSaved, onCancel, compact = false }) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [saving, setSaving] = useState(false);
-  const [history, setHistory] = useState(null);
-  const isNew = target.kind === "new";
+  const isNew = target.kind !== "settings" && target.id == null;
   const dirty = schema !== null && JSON.stringify(values) !== initial;
   const key = JSON.stringify(target);
 
   const load = useCallback(async () => {
     setError("");
     try {
-      const res = await call("loadForEdit", target);
-      const doc = res.doc ?? defaultsFor(res.schema);
+      const res = await loadDoc(target);
+      const doc = isNew ? { ...defaultsFor(res.schema), ...res.values } : res.values;
       setSchema(res.schema);
       setValues(doc);
       setInitial(JSON.stringify(doc));
@@ -40,7 +38,6 @@ export function DocEditor({ target, onSaved, onCancel, compact = false }) {
   useEffect(() => {
     setSchema(null);
     setTab(0);
-    setHistory(null);
     load();
   }, [load]);
 
@@ -64,42 +61,14 @@ export function DocEditor({ target, onSaved, onCancel, compact = false }) {
     setError("");
     setNotice("");
     try {
-      const data = normalize(schema, values);
-      if (isNew) {
-        const created = await call("createItem", target.slug, data, target.profileId);
-        onSaved?.(created.id);
-        return;
-      }
-      await call("saveDoc", target, data);
+      const id = await saveDoc(target, normalize(schema, values));
       setInitial(JSON.stringify(values));
-      setNotice("Saved as draft. Publish to make it live.");
-      onSaved?.();
+      setNotice(savedNotice);
+      onSaved?.(id);
     } catch (err) {
-      setError(err.message);
+      setError(/duplicate key.*slug/i.test(err.message) ? "Another profile already uses that address." : err.message);
     } finally {
       setSaving(false);
-    }
-  }
-
-  async function showHistory() {
-    if (history) return setHistory(null);
-    try {
-      setHistory(await call("listVersions", target));
-    } catch (err) {
-      setError(err.message);
-    }
-  }
-
-  async function restore(version) {
-    if (!window.confirm(`Restore the version from ${fmt(version.updatedAt)} as a new draft?`)) return;
-    try {
-      await call("restoreVersion", target, version.id);
-      setHistory(null);
-      await load();
-      setNotice("Version restored as a draft. Publish to make it live.");
-      onSaved?.();
-    } catch (err) {
-      setError(err.message);
     }
   }
 
@@ -130,41 +99,14 @@ export function DocEditor({ target, onSaved, onCancel, compact = false }) {
       {shown.description ? <p className="sf-help">{shown.description}</p> : null}
       <Fields schema={shown.fields} values={values} onChange={setValues} />
 
-      {history ? (
-        <div className="panel doc-history">
-          <h2>Version history</h2>
-          {history.length === 0 ? <p>No earlier versions.</p> : null}
-          <ul>
-            {history.map((v) => (
-              <li key={v.id}>
-                <span>
-                  {fmt(v.updatedAt)} · <em className={`pill is-${v.status}`}>{v.status}</em>
-                  {v.latest ? " · current" : ""}
-                </span>
-                {!v.latest ? (
-                  <button type="button" className="ghost" onClick={() => restore(v)}>
-                    Restore
-                  </button>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-
       <div className={`doc-bar ${dirty ? "is-dirty" : ""}`}>
         <span>
           {error ? (
             <b className="error">{error}</b>
           ) : (
-            notice || (dirty ? "Unsaved changes" : isNew ? "New item" : "All changes saved")
+            notice || (dirty ? "Unsaved changes" : isNew ? "New" : "No changes")
           )}
         </span>
-        {!isNew ? (
-          <button type="button" className="ghost" onClick={showHistory}>
-            {history ? "Hide history" : "History"}
-          </button>
-        ) : null}
         {dirty && !isNew ? (
           <button type="button" className="ghost" onClick={() => setValues(JSON.parse(initial))}>
             Undo
@@ -172,11 +114,11 @@ export function DocEditor({ target, onSaved, onCancel, compact = false }) {
         ) : null}
         {onCancel ? (
           <button type="button" className="ghost" onClick={onCancel}>
-            {isNew || !dirty ? "Close" : "Cancel"}
+            {dirty ? "Cancel" : "Close"}
           </button>
         ) : null}
         <button type="submit" className="primary" disabled={saving || (!dirty && !isNew)}>
-          {saving ? "Saving…" : isNew ? "Create draft" : "Save draft"}
+          {saving ? "Saving…" : isNew ? "Create" : "Save"}
         </button>
       </div>
     </form>

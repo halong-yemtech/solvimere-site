@@ -1,82 +1,75 @@
 # Solvimere
 
-The Solvimere website, its admin panel, and team members' portfolios. One repository, three apps, one Supabase
+The Solvimere website with team members' portfolios, and its admin panel. Two Vite + React apps, one Supabase
 project.
 
-| App         | Folder       | Stack                                 | Dev URL                      |
-| ----------- | ------------ | ------------------------------------- | ---------------------------- |
-| Public site | `src/`       | Vite + React                          | http://localhost:5173        |
-| Admin panel | `admin/`     | Vite + React                          | http://localhost:5174        |
-| Portfolios  | `portfolio/` | Next.js + Payload CMS (under `/team`) | via the site: `/team/<name>` |
+| App         | Folder   | Dev URL               |
+| ----------- | -------- | --------------------- |
+| Site        | `src/`   | http://localhost:5173 |
+| Admin panel | `admin/` | http://localhost:5174 |
 
 ## How the pieces fit
 
-- **Site** (`src/`): marketing pages, team page, contact form, “Send us a message” and “Book a meeting” widget.
-  Reads page content and the team from Supabase with the public anon key; visitors have no accounts.
-- **Admin** (`admin/`): staff sign in with Supabase. Edits pages, team, messages, appointments, staff and all
-  portfolio content.
-- **Portfolios** (`portfolio/`): each team member's portfolio at `/team/<name>` (e.g. `/team/halong`, the name in
-  lowercase without spaces). Payload CMS stores its data in the same Supabase database (`payload` schema) and files in
-  Supabase Storage (`portfolio` bucket). The admin panel manages it through `/team/api/admin`, which accepts a staff
-  member's Supabase session.
-- `/team` is the site's team page; everything below it (`/team/...`) is the portfolio app. Locally the site's dev
-  server proxies it ([vite.config.js](vite.config.js)); in production [vercel.json](vercel.json) rewrites it.
+- **Site** (`src/`): marketing pages, team page, contact form, and the “Send us a message” / “Book a meeting”
+  widget. Visitors have no accounts; the site reads and writes Supabase with the public anon key, limited by
+  row-level security.
+- **Portfolios** (`src/portfolio/`): each team member's portfolio at `/team/<address>` (the name in lowercase letters
+  and digits, e.g. `/team/halong`) and a generated PDF CV at `/team/<address>/cv`. Loaded on demand; styled with
+  Tailwind scoped to the portfolio pages (`tailwind.config.js`, `src/portfolio/portfolio.css`), so the rest of the
+  site is unaffected. Data comes from `src/portfolio/lib/site.ts`.
+- **Admin** (`admin/`): staff sign in with Supabase and edit pages, the team, messages, appointments, staff, and
+  everything in the portfolios (profiles, works, résumé, media, guest book, settings). Portfolio forms are generated
+  from `admin/src/portfolio/schemas.json`.
 
 ### Data (Supabase)
 
-| Where                      | What                                                                      |
-| -------------------------- | ------------------------------------------------------------------------- |
-| `public.pages`             | Editable page content (merged over defaults in `src/cms/defaults.js`)     |
-| `public.team_members`      | Team page / cards                                                         |
-| `public.profiles`          | Staff accounts and roles (`admin`, `editor`); first sign-up becomes admin |
-| `public.contact_messages`  | Messages from the site's forms                                            |
-| `public.appointments`      | Booked meetings (weekdays 9:00–17:00 New York, 30 min)                    |
-| `payload.*`                | Portfolio profiles, works, résumé, media records, …                       |
-| Storage `media`, `avatars` | Site images · Storage `portfolio`: portfolio media                        |
+| Where                        | What                                                                      |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| `public.pages`               | Editable page content (merged over defaults in `src/cms/defaults.js`)     |
+| `public.team_members`        | Team page / cards                                                         |
+| `public.profiles`            | Staff accounts and roles (`admin`, `editor`); first sign-up becomes admin |
+| `public.contact_messages`    | Messages from every contact form, including portfolios                    |
+| `public.appointments`        | Booked meetings (weekdays 9:00–17:00 New York, 30 min)                    |
+| `public.portfolio_profiles`  | One portfolio per member: address, visibility, content (JSON)             |
+| `public.portfolio_items`     | Works, résumé entries, services, testimonials, … per portfolio            |
+| `public.portfolio_media`     | Portfolio files (public Storage bucket `portfolio`)                       |
+| `public.portfolio_settings`  | Sections shown, theme, maintenance mode                                   |
+| `public.portfolio_guestbook` | Guest-book comments                                                       |
+| Storage `media`, `avatars`   | Site images                                                               |
 
-Schema changes live in [supabase/migrations](supabase/migrations) (site) and
-[portfolio/cms/migrations-postgres](portfolio/cms/migrations-postgres) (portfolio, applied by Payload). Site
-migrations are applied in the Supabase SQL Editor or with `bun x supabase db push`.
+Schema changes live in [supabase/migrations](supabase/migrations); apply them in the Supabase SQL Editor or with
+`bun x supabase db push`.
 
 ## Getting started
 
 ```bash
-bun install && (cd admin && bun install) && (cd portfolio && bun install)
+bun install && (cd admin && bun install)
 
-cp .env-example .env                     # site: Supabase URL + anon key
-cp admin/.env.example admin/.env         # admin: same values
-cp portfolio/.env.example portfolio/.env # portfolio: database, storage, secret, Supabase URL + anon key
+cp .env-example .env               # VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+cp admin/.env.example admin/.env   # same values, plus VITE_SITE_URL in production
 
-bun run portfolio   # portfolio on :3000 (needed for /team/<name> and the admin's Portfolio pages)
-bun run dev         # site on :5173
-bun run admin       # admin on :5174
+bun run dev     # site on :5173
+bun run admin   # admin on :5174
 ```
 
 ## Scripts
 
-| Command                   | What it does                                           |
-| ------------------------- | ------------------------------------------------------ |
-| `bun run dev`             | Site dev server                                        |
-| `bun run build`           | Site production build (`dist/`)                        |
-| `bun run admin`           | Admin dev server                                       |
-| `bun run build:admin`     | Admin production build (`admin/dist/`)                 |
-| `bun run portfolio`       | Portfolio dev server (runs pending Payload migrations) |
-| `bun run build:portfolio` | Portfolio production build                             |
-| `bun run format`          | Format everything with Prettier                        |
-| `bun run format:check`    | Check formatting (CI)                                  |
-
-In `portfolio/`: `bun test tests/`, `bun run seed:team` (create draft portfolios for team members without one),
-`bun run migrate:supabase` (one-time copy from the old SQLite file).
+| Command                | What it does                               |
+| ---------------------- | ------------------------------------------ |
+| `bun run dev`          | Site dev server                            |
+| `bun run build`        | Site production build (`dist/`)            |
+| `bun run typecheck`    | Type-check the portfolio code (TypeScript) |
+| `bun run admin`        | Admin dev server                           |
+| `bun run build:admin`  | Admin production build (`admin/dist/`)     |
+| `bun run format`       | Format everything with Prettier            |
+| `bun run format:check` | Check formatting (CI)                      |
 
 ## Deployment (Vercel)
 
-- **Site**: this repository's root. Env: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
-- **Portfolio**: a second Vercel project with Root Directory `portfolio`. Env as in
-  [portfolio/.env.example](portfolio/.env.example). Update the rewrite destination in [vercel.json](vercel.json)
-  if its URL changes.
-- **Admin**: Root Directory `admin`. Env: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and
-  `VITE_PORTFOLIO_BASE` (e.g. `https://solvimere.com/team`) when it isn't served from the site's domain. Then
-  add the admin's origin to the portfolio's `ADMIN_ORIGINS`.
+- **Site**: this repository's root. Env: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`. `vercel.json` serves the app
+  for every path, including `/team/<address>`.
+- **Admin**: Root Directory `admin`. Env: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_SITE_URL` (the site's
+  address, for “View” links).
 
 ## Code style
 

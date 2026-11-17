@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { call, isImage, portfolioUrl, uploadMedia } from "../lib/portfolio";
+import { isImage, listMedia, uploadMedia } from "../portfolio/api";
 
 /*
- * Renders portfolio (Payload) documents from the field schema the portfolio app sends
- * (portfolio/lib/edit/schema.ts → FieldSchema). Port of portfolio/components/edit/
- * FieldRenderer + formUtils, so values round-trip exactly as they did there.
+ * Renders portfolio documents from their field schemas (admin/src/portfolio/schemas.json):
+ * text, numbers, dates, selects, uploads (portfolio_media), relationships, arrays, groups, tabs.
  */
 
 const idOf = (v) => (v && typeof v === "object" && "id" in v ? v.id : (v ?? null));
@@ -359,7 +358,7 @@ function ArrayField({ field, rows, onChange }) {
 function Thumb({ item }) {
   if (!item || typeof item !== "object") return <span className="sf-thumb is-empty">#{String(item ?? "")}</span>;
   return isImage(item) ? (
-    <img className="sf-thumb" src={portfolioUrl(item.url)} alt={item.alt || ""} />
+    <img className="sf-thumb" src={item.url} alt={item.alt || ""} />
   ) : (
     <span className="sf-thumb is-file">{item.filename || "File"}</span>
   );
@@ -474,7 +473,7 @@ function MediaPicker({ multiple, onPick, onClose }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    call("listMedia", page)
+    listMedia(page)
       .then((res) => {
         setItems((current) => (page === 1 ? res.items : [...current, ...res.items]));
         setMore(res.hasNextPage);

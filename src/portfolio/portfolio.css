@@ -1,0 +1,399 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Geist:wght@300;400;500;600;700&display=swap");
+
+/*
+ * Portfolio pages (/team/<slug>): Tailwind utilities scoped to .pf-root
+ * (tailwind.config.js → important: ".pf-root", preflight off), so nothing here
+ * reaches the rest of the site. This is Tailwind's reset, scoped the same way.
+ */
+.pf-root *,
+.pf-root ::before,
+.pf-root ::after {
+  border: 0 solid #e5e7eb;
+}
+.pf-root {
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  tab-size: 4;
+  font-feature-settings: normal;
+}
+.pf-root :is(h1, h2, h3, h4, h5, h6) {
+  font-size: inherit;
+  font-weight: inherit;
+}
+.pf-root a {
+  color: inherit;
+}
+.pf-root :is(b, strong) {
+  font-weight: bolder;
+}
+.pf-root :is(button, input, optgroup, select, textarea) {
+  font-family: inherit;
+  font-size: 100%;
+  font-weight: inherit;
+  line-height: inherit;
+  color: inherit;
+  background: transparent;
+}
+.pf-root :is(button, [role="button"]) {
+  cursor: pointer;
+}
+.pf-root :is(ol, ul, menu) {
+  list-style: none;
+}
+.pf-root textarea {
+  resize: vertical;
+}
+.pf-root :is(input, textarea)::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+.pf-root :is(img, svg, video, canvas, audio, iframe, embed, object) {
+  display: block;
+  vertical-align: middle;
+}
+.pf-root :is(img, video) {
+  max-width: 100%;
+  height: auto;
+}
+.pf-root [hidden] {
+  display: none;
+}
+
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .pf-root .formStyle {
+    @apply w-full text-2xl bg-transparent border-0 border-b-2 border-gray-800 border-solid rounded-none resize-none placeholder:text-2xl placeholder:text-gray-400 text-main-orange focus:border-main-orange focus:placeholder:text-gray-300;
+  }
+}
+
+.pf-root {
+  --wa: 38 92% 50%;
+}
+
+.pf-root,
+.pf-root * {
+  font-family: var(--site-font, "Poppins"), sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+  border: none;
+  text-decoration: none;
+}
+
+html.pf-html {
+  font-size: 50%;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  scroll-padding-top: 6.5rem;
+  /* background-color: #f5b038; */
+}
+
+/* width */
+.pf-root .myScroll::-webkit-scrollbar {
+  width: 6px;
+  background-color: transparent;
+}
+
+.infinite-scroll-component::-webkit-scrollbar,
+.pf-root .noScroll::-webkit-scrollbar {
+  width: 0;
+  background-color: transparent;
+}
+
+/* Track */
+.myScroll::-webkit-scrollbar-track,
+.pf-root .infinite-scroll-component::-webkit-scrollbar-track {
+  -webkit-box-shadow: none;
+  background-color: transparent;
+}
+
+/* Handle */
+.pf-root .myScroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.25);
+  border-radius: 0.6rem;
+}
+
+.pf-root,
+.pf-root *,
+.pf-root *:hover {
+  scrollbar-color: auto;
+}
+
+.pf-root .customLine::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 0.1rem;
+}
+
+.pf-root .customCircle::first-letter {
+  color: rgb(var(--accent));
+}
+
+.pf-root .customCircle::before {
+  content: "";
+  position: absolute;
+  left: -1rem;
+  top: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(246, 184, 70, 0.4) 0%, rgba(246, 184, 70, 0.01) 100%);
+}
+
+.pf-root .borderRight::before {
+  background: radial-gradient(ellipse at right, rgba(197, 202, 213, 0.15) 0, rgba(255, 255, 255, 0) 70%);
+}
+
+.pf-root .lineLeft {
+  background: radial-gradient(ellipse at left, rgba(197, 202, 213, 0.15) 0, rgba(255, 255, 255, 0) 70%);
+}
+
+.pf-root .vCustomLine::before {
+  content: "";
+  position: absolute;
+  width: 0.2rem;
+  height: 100%;
+  top: 0;
+  background: radial-gradient(ellipse at top, rgba(197, 202, 213, 0.15) 0, rgba(255, 255, 255, 0) 70%);
+}
+
+.pf-root .borderLeft::before {
+  background: radial-gradient(ellipse at left, rgba(197, 202, 213, 0.15) 0, rgba(255, 255, 255, 0) 70%);
+}
+
+.pf-root .profile::after {
+  content: "";
+  position: absolute;
+  left: -1.5rem;
+  top: -1.2rem;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  z-index: -1;
+  background: linear-gradient(135deg, rgba(133, 87, 2, 0.4) 0%, rgba(246, 184, 70, 0.01) 100%);
+}
+
+.pf-root .overlay {
+  background: linear-gradient(135deg, rgba(133, 87, 2, 0.4) 0%, rgba(246, 184, 70, 0.01) 100%);
+}
+
+.pf-root .myShadow {
+  box-shadow: 3px 0 20px -2px rgba(0, 0, 0, 0.3);
+}
+
+.pf-root .swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.pf-root .swiper-pagination .swiper-pagination-bullet {
+  background: transparent !important;
+  border: 0.1rem solid rgb(var(--accent));
+  width: 0.9rem;
+  height: 0.9rem;
+  margin: 0 0.3rem !important;
+}
+
+.pf-root .swiper-pagination .swiper-pagination-bullet-active {
+  background: rgb(var(--accent)) !important;
+}
+
+.pf-root .bgSlider .swiper-fade .swiper-slide img {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(1.1) translateY(2rem);
+  transition: 1400ms ease !important;
+}
+
+.pf-root .bgSlider .swiper-fade .swiper-slide.swiper-slide-active img {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1) translateY(0);
+  transition: 1400ms ease !important;
+}
+
+.pf-root .profilePic::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: -10px;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(246, 184, 70, 0.4) 0%, rgba(246, 184, 70, 0.01) 100%);
+}
+
+.quote::before,
+.pf-root .quote::after {
+  content: "";
+  position: absolute;
+  width: 2rem;
+  height: 2rem;
+  background-color: rgb(107 114 128);
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  opacity: 0.65;
+}
+
+.pf-root .quote::after {
+  bottom: 0;
+  right: 0;
+  -webkit-mask-image: url("/team/images/quoteRight.svg");
+  mask-image: url("/team/images/quoteRight.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.pf-root .quote::before {
+  top: 0;
+  left: 0;
+  -webkit-mask-image: url("/team/images/quoteLeft.svg");
+  mask-image: url("/team/images/quoteLeft.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.pf-root .work::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(246, 184, 70, 0.4) 0%, rgba(246, 184, 70, 0.01) 100%);
+  z-index: 2;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.pf-root .work-wrapper:hover .work::before {
+  opacity: 1;
+  /* color: #d1d5db; */
+}
+
+.tech-func ul li::before,
+.pf-root .prose ul li::before {
+  content: "\2022";
+  color: rgb(var(--accent));
+  font-weight: bold;
+  display: inline-block;
+  width: 1.8rem;
+  min-width: 1.8rem;
+}
+
+.pf-root .loader span:first-child {
+  animation: bubble 0.9s linear infinite alternate forwards;
+}
+
+.pf-root .loader span:last-child {
+  animation: bubbleReverse 0.9s linear infinite alternate forwards;
+}
+
+@keyframes bubble {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0);
+  }
+}
+
+@keyframes bubbleReverse {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+
+@media (min-width: 991px) {
+  html.pf-html {
+    font-size: 55%;
+  }
+}
+
+@media (min-width: 1250px) {
+  html.pf-html {
+    font-size: 62.5%;
+  }
+}
+
+/* The three daisyUI pieces the portfolio used (daisyUI itself would restyle the whole site). */
+.pf-root .tooltip {
+  position: relative;
+  display: inline-block;
+}
+.pf-root .tooltip[data-tip]::before {
+  content: attr(data-tip);
+  position: absolute;
+  z-index: 10;
+  left: 50%;
+  top: calc(100% + 0.6rem);
+  translate: -50% 0;
+  padding: 0.4rem 0.9rem;
+  border-radius: 0.6rem;
+  background: #111827;
+  color: #e5e7eb;
+  font-size: 1.3rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.pf-root .tooltip[data-tip]:hover::before {
+  opacity: 1;
+}
+.pf-root .radial-progress {
+  --value: 0;
+  --size: 5rem;
+  --thickness: calc(var(--size) / 10);
+  position: relative;
+  display: inline-grid;
+  place-content: center;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 9999px;
+  vertical-align: middle;
+}
+.pf-root .radial-progress::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: conic-gradient(currentColor calc(var(--value) * 1%), rgba(255, 255, 255, 0.08) 0);
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--thickness)),
+    #000 calc(100% - var(--thickness) + 1px)
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--thickness)),
+    #000 calc(100% - var(--thickness) + 1px)
+  );
+}
+.pf-root .progress {
+  position: relative;
+  width: 100%;
+  height: 0.6rem;
+  overflow: hidden;
+  border-radius: 9999px;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.pf-root .progress::-webkit-progress-bar {
+  background: transparent;
+}
+.pf-root .progress::-webkit-progress-value {
+  background: rgb(var(--accent));
+  border-radius: 9999px;
+}
+.pf-root .progress::-moz-progress-bar {
+  background: rgb(var(--accent));
+  border-radius: 9999px;
+}

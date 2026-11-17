@@ -1,0 +1,40 @@
+import { Swiper, SwiperSlide } from "swiper/react";
+import { EffectFade, Autoplay } from "swiper/modules";
+import "swiper/css";
+import Img from "@/components/Img";
+import "swiper/css/effect-fade";
+import type { SiteImage } from "@/lib/siteTypes";
+
+interface Props {
+  images: SiteImage[];
+}
+
+export default function Slide({ images }: Props) {
+  return (
+    <div className="bgSlider h-[32rem] overflow-hidden rounded-lg relative before:content-[''] before:absolute before:z-20 before:-left-8 before:-right-8 before:-bottom-[6.72rem] w-auto before:h-40 before:bg-gray-900 before:rounded-tl-[100%] before:rounded-tr-[100%]">
+      <Swiper
+        effect={"fade"}
+        modules={[Autoplay, EffectFade]}
+        autoplay={{
+          delay: 3000,
+          disableOnInteraction: false,
+        }}
+      >
+        {images.map((img, idx) => (
+          <SwiperSlide key={idx}>
+            <div className="w-full h-full relative">
+              <Img
+                src={img.url}
+                alt={img.alt || "background"}
+                fill
+                sizes="(min-width: 1280px) 480px, 420px"
+                style={{ objectFit: "cover" }}
+                priority={idx === 0}
+              />
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </div>
+  );
+}

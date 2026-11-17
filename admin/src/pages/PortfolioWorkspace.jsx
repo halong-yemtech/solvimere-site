@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { call, portfolioUrl } from "../lib/portfolio";
 import { DocEditor, DocEditorModal } from "../components/DocEditor";
+import { SITE_URL, deleteItem, deleteProfile, listItems, listProfiles, reorderItems } from "../portfolio/api";
 
 const TABS = [
   { key: "profile", label: "Profile" },
   { key: "content", label: "Content" },
-  { key: "cv", label: "CV" },
 ];
 
-/** One profile: its fields, its list items (works, résumé, …), CV preview, drafts. */
+/** One profile: its fields and its list items (works, résumé, …). */
 export default function PortfolioWorkspace() {
   const { id: rawId } = useParams();
   const id = Number(rawId);
@@ -17,151 +16,60 @@ export default function PortfolioWorkspace() {
   const [params, setParams] = useSearchParams();
   const tab = TABS.some((t) => t.key === params.get("tab")) ? params.get("tab") : "profile";
   const [summary, setSummary] = useState(null);
-  const [pending, setPending] = useState([]);
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
-  const [busy, setBusy] = useState(false);
 
   const refresh = useCallback(() => {
-    call("listProfiles")
-      .then((all) => setSummary(all.find((p) => p.id === id) || null))
+    listProfiles()
+      .then((all) => {
+        const found = all.find((p) => p.id === id);
+        if (!found) setError("This profile doesn't exist.");
+        setSummary(found || null);
+      })
       .catch((err) => setError(err.message));
-    call("getPendingChanges", id)
-      .then(setPending)
-      .catch(() => setPending([]));
   }, [id]);
-
   useEffect(refresh, [refresh]);
 
-  async function run(fn, done) {
-    setBusy(true);
-    setError("");
-    setMessage("");
+  async function remove() {
+    if (!window.confirm(`Delete ${summary.name} and all of its content? This can't be undone.`)) return;
     try {
-      const res = await fn();
-      done?.(res);
-      refresh();
+      await deleteProfile(id);
+      navigate("/portfolio");
     } catch (err) {
-      setError(err.message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function openPreview(which) {
-    const win = window.open("about:blank", "_blank");
-    try {
-      const links = await call("previewLinks", id);
-      if (win) win.location.href = portfolioUrl(links[which]);
-    } catch (err) {
-      win?.close();
       setError(err.message);
     }
   }
 
-  const name = summary?.name || "Profile";
+  const live = summary?.visibility === "public";
 
   return (
     <>
       <header className="top row">
         <div>
           <p className="eyebrow">
-            <Link to="/portfolio">Portfolio</Link> / {summary?.slug ? `/team/${summary.slug}` : "…"}
+            <Link to="/portfolio">Portfolio</Link> / {summary ? `/team/${summary.slug}` : "…"}
           </p>
-          <h1>{name}</h1>
-          {summary ? (
-            <div className="pf-pills">
-              <em className={`pill is-${summary.visibility}`}>
-                {summary.visibility === "private" ? "Private" : "Public"}
-              </em>
-              {summary.isActive ? <em className="pill is-active">Active</em> : null}
-            </div>
-          ) : null}
+          <h1>{summary?.name || "Profile"}</h1>
         </div>
-        <div className="actions">
-          <button type="button" className="ghost" onClick={() => openPreview("page")}>
-            Preview drafts
-          </button>
-          {summary ? (
-            <a
-              className="ghost"
-              href={portfolioUrl(`/team/${summary.slug}`)}
-              target="_blank"
-              rel="noreferrer"
-              title="The published version visitors see"
-            >
-              View live
-            </a>
-          ) : null}
-          <button
-            type="button"
-            className="danger"
-            disabled={busy || summary?.isActive}
-            title={summary?.isActive ? "Make another profile active first" : undefined}
-            onClick={() => {
-              if (!window.confirm(`Delete ${name} and all of its content (works, résumé, …)? This can't be undone.`))
-                return;
-              run(
-                () => call("deleteItem", "profiles", id),
-                () => navigate("/portfolio"),
-              );
-            }}
-          >
-            Delete
-          </button>
-        </div>
-      </header>
-
-      {pending.length ? (
-        <div className="pf-pending panel">
-          <span>
-            <strong>
-              {pending.length} unpublished change{pending.length === 1 ? "" : "s"}
-            </strong>
-            <span>
-              {pending
-                .slice(0, 4)
-                .map((p) => `${p.group}: ${p.label}`)
-                .join(" · ")}
-              {pending.length > 4 ? " …" : ""}
-            </span>
-          </span>
+        {summary ? (
           <div className="actions">
-            <button
-              type="button"
-              className="ghost"
-              disabled={busy}
-              onClick={() => {
-                if (window.confirm("Throw away all unpublished changes to this profile?")) {
-                  run(
-                    () => call("discard", undefined, id),
-                    (r) => setMessage(`Discarded ${r.discarded} change(s).`),
-                  );
-                }
-              }}
-            >
-              Discard
-            </button>
-            <button
-              type="button"
-              className="primary"
-              disabled={busy}
-              onClick={() =>
-                run(
-                  () => call("publish", undefined, id),
-                  (r) => setMessage(`Published ${r.published} change(s).`),
-                )
-              }
-            >
-              {busy ? "Working…" : "Publish all"}
+            <em className={`pill is-${summary.visibility}`}>{live ? "Public" : "Private"}</em>
+            {live ? (
+              <>
+                <a className="ghost" href={`${SITE_URL}/team/${summary.slug}`} target="_blank" rel="noreferrer">
+                  View live
+                </a>
+                <a className="ghost" href={`${SITE_URL}/team/${summary.slug}/cv`} target="_blank" rel="noreferrer">
+                  CV
+                </a>
+              </>
+            ) : null}
+            <button type="button" className="danger" onClick={remove}>
+              Delete
             </button>
           </div>
-        </div>
-      ) : summary ? (
-        <p className="ok pf-uptodate">Everything is published.</p>
-      ) : null}
+        ) : null}
+      </header>
       {error ? <p className="error">{error}</p> : null}
-      {message ? <p className="ok">{message}</p> : null}
 
       <nav className="doc-tabs pf-tabs" aria-label="Profile sections">
         {TABS.map((t) => (
@@ -178,53 +86,52 @@ export default function PortfolioWorkspace() {
       </nav>
 
       {tab === "profile" ? (
-        <DocEditor key={id} target={{ kind: "collection", slug: "profiles", id }} onSaved={refresh} />
+        <DocEditor
+          key={id}
+          target={{ kind: "profile", id }}
+          onSaved={refresh}
+          savedNotice={
+            live ? "Saved. Changes are live." : "Saved. The profile is private: set it to Public to show it."
+          }
+        />
       ) : null}
-      {tab === "content" ? <ProfileContent profileId={id} onChange={refresh} /> : null}
-      {tab === "cv" ? <CvPreview profileId={id} pending={pending.length} onOpen={() => openPreview("cv")} /> : null}
+      {tab === "content" ? <ProfileContent profileId={id} /> : null}
     </>
   );
 }
 
 /** Works, résumé entries, services, … that belong to this profile. */
-function ProfileContent({ profileId, onChange }) {
+function ProfileContent({ profileId }) {
   const [groups, setGroups] = useState(null);
   const [editing, setEditing] = useState(null);
   const [error, setError] = useState("");
 
   const load = useCallback(() => {
-    call("listProfileItems", profileId)
+    listItems(profileId)
       .then(setGroups)
       .catch((err) => setError(err.message));
   }, [profileId]);
-
   useEffect(load, [load]);
-
-  const changed = () => {
-    load();
-    onChange();
-  };
 
   async function move(group, index, dir) {
     const ids = group.items.map((i) => i.id);
     [ids[index], ids[index + dir]] = [ids[index + dir], ids[index]];
     setGroups((gs) =>
-      gs.map((g) => (g.slug === group.slug ? { ...g, items: ids.map((x) => g.items.find((i) => i.id === x)) } : g)),
+      gs.map((g) => (g.kind === group.kind ? { ...g, items: ids.map((x) => g.items.find((i) => i.id === x)) } : g)),
     );
     try {
-      await call("reorderItems", group.slug, ids);
-      onChange();
+      await reorderItems(ids);
     } catch (err) {
       setError(err.message);
       load();
     }
   }
 
-  async function remove(group, item) {
+  async function remove(item) {
     if (!window.confirm(`Delete “${item.label}”? This can't be undone.`)) return;
     try {
-      await call("deleteItem", group.slug, item.id);
-      changed();
+      await deleteItem(item.id);
+      load();
     } catch (err) {
       setError(err.message);
     }
@@ -237,7 +144,7 @@ function ProfileContent({ profileId, onChange }) {
     <div className="pf-content">
       {error ? <p className="error">{error}</p> : null}
       {groups.map((group) => (
-        <section key={group.slug} className="panel">
+        <section key={group.kind} className="panel">
           <header className="pf-group-head">
             <h2>
               {group.label} <span>{group.items.length}</span>
@@ -246,7 +153,10 @@ function ProfileContent({ profileId, onChange }) {
               type="button"
               className="ghost"
               onClick={() =>
-                setEditing({ kind: "new", slug: group.slug, profileId, title: `New ${group.singular.toLowerCase()}` })
+                setEditing({
+                  target: { kind: "item", itemKind: group.kind, profileId },
+                  title: `New ${group.singular.toLowerCase()}`,
+                })
               }
             >
               + Add
@@ -259,10 +169,14 @@ function ProfileContent({ profileId, onChange }) {
                 <button
                   type="button"
                   className="pf-item-hit"
-                  onClick={() => setEditing({ kind: "collection", slug: group.slug, id: item.id, title: item.label })}
+                  onClick={() =>
+                    setEditing({
+                      target: { kind: "item", itemKind: group.kind, profileId, id: item.id },
+                      title: item.label,
+                    })
+                  }
                 >
                   {item.label}
-                  {item.status === "draft" ? <em className="pill is-draft">Draft</em> : null}
                 </button>
                 <span className="pf-item-tools">
                   <button
@@ -284,7 +198,7 @@ function ProfileContent({ profileId, onChange }) {
                   <button
                     type="button"
                     className="is-danger"
-                    onClick={() => remove(group, item)}
+                    onClick={() => remove(item)}
                     aria-label={`Delete ${item.label}`}
                   >
                     ✕
@@ -298,53 +212,18 @@ function ProfileContent({ profileId, onChange }) {
       {editing ? (
         <DocEditorModal
           title={editing.title}
-          target={
-            editing.kind === "new"
-              ? { kind: "new", slug: editing.slug, profileId: editing.profileId }
-              : { kind: "collection", slug: editing.slug, id: editing.id }
-          }
+          target={editing.target}
           onClose={() => {
             setEditing(null);
-            changed();
+            load();
           }}
           onSaved={(newId) => {
-            if (editing.kind === "new")
-              setEditing({
-                kind: "collection",
-                slug: editing.slug,
-                id: newId,
-                title: editing.title.replace(/^New /, ""),
-              });
-            changed();
+            // A new item becomes an existing one, so further saves update it.
+            if (editing.target.id == null) setEditing({ ...editing, target: { ...editing.target, id: newId } });
+            load();
           }}
         />
       ) : null}
-    </div>
-  );
-}
-
-/** The PDF résumé generated from this profile (draft version), via a signed preview link. */
-function CvPreview({ profileId, pending, onOpen }) {
-  const [src, setSrc] = useState("");
-  const [error, setError] = useState("");
-  useEffect(() => {
-    call("previewLinks", profileId)
-      .then((links) => setSrc(`${portfolioUrl(links.cv)}&v=${Date.now()}`))
-      .catch((err) => setError(err.message));
-  }, [profileId, pending]);
-  return (
-    <div className="pf-cv">
-      <p className="sf-help">
-        Generated from this profile&apos;s résumé entries and skills, including unpublished drafts. CV wording and the
-        option to use an uploaded PDF instead are in <b>Profile → CV</b>.
-      </p>
-      <div className="actions">
-        <button type="button" className="ghost" onClick={onOpen}>
-          Open in a new tab
-        </button>
-      </div>
-      {error ? <p className="error">{error}</p> : null}
-      {src ? <iframe title="CV preview" src={src} /> : <p className="empty">Loading…</p>}
     </div>
   );
 }

@@ -1,0 +1,3060 @@
+{
+  "profiles": {
+    "label": "Profiles",
+    "singular": "Profile",
+    "titleField": "internalName",
+    "fields": [
+      {
+        "type": "tabs",
+        "tabs": [
+          {
+            "label": "Profile",
+            "description": "How this profile is identified and shared.",
+            "fields": [
+              {
+                "name": "internalName",
+                "label": "Internal Name",
+                "required": true,
+                "description": "Only shown in the CMS, e.g. \u201cBackend focus\u201d or \u201cAI consultant\u201d.",
+                "type": "text"
+              }
+            ]
+          },
+          {
+            "label": "Profile card",
+            "fields": [
+              {
+                "name": "name",
+                "label": "Name",
+                "required": true,
+                "type": "text"
+              },
+              {
+                "name": "jobTitle",
+                "label": "Job Title",
+                "required": true,
+                "description": "Used in the browser tab title and under the quote.",
+                "type": "text"
+              },
+              {
+                "name": "typingTitles",
+                "label": "Typing Titles",
+                "description": "Animated titles typed under your name.",
+                "type": "array",
+                "fields": [
+                  {
+                    "name": "title",
+                    "label": "Title",
+                    "required": true,
+                    "type": "text"
+                  }
+                ],
+                "labels": {
+                  "singular": "Title",
+                  "plural": "Titles"
+                }
+              },
+              {
+                "name": "avatar",
+                "label": "Avatar",
+                "required": true,
+                "type": "upload"
+              },
+              {
+                "name": "backgroundImages",
+                "label": "Background Images",
+                "description": "Slideshow behind the profile photo.",
+                "type": "upload",
+                "hasMany": true
+              },
+              {
+                "name": "cv",
+                "label": "CV / Resume file",
+                "description": "PDF opened by the \u201cDownload CV\u201d buttons.",
+                "type": "upload"
+              },
+              {
+                "name": "hireLink",
+                "label": "Hire button",
+                "description": "The second button on the profile card, e.g. \u201cmy upwork\u201d.",
+                "type": "group",
+                "fields": [
+                  {
+                    "type": "row",
+                    "fields": [
+                      {
+                        "name": "account",
+                        "label": "Account",
+                        "description": "Which of this profile's Links & accounts to link to.",
+                        "width": "60%",
+                        "type": "select",
+                        "options": [
+                          {
+                            "label": "No link",
+                            "value": "none"
+                          },
+                          {
+                            "label": "Upwork account",
+                            "value": "upwork"
+                          },
+                          {
+                            "label": "GitHub account",
+                            "value": "github"
+                          },
+                          {
+                            "label": "LinkedIn account",
+                            "value": "linkedin"
+                          },
+                          {
+                            "label": "WhatsApp account",
+                            "value": "whatsapp"
+                          },
+                          {
+                            "label": "Fiverr account",
+                            "value": "fiverr"
+                          },
+                          {
+                            "label": "X / Twitter account",
+                            "value": "x"
+                          },
+                          {
+                            "label": "Facebook account",
+                            "value": "facebook"
+                          },
+                          {
+                            "label": "Instagram account",
+                            "value": "instagram"
+                          },
+                          {
+                            "label": "YouTube account",
+                            "value": "youtube"
+                          },
+                          {
+                            "label": "Telegram account",
+                            "value": "telegram"
+                          },
+                          {
+                            "label": "Medium account",
+                            "value": "medium"
+                          },
+                          {
+                            "label": "Stack Overflow account",
+                            "value": "stackoverflow"
+                          },
+                          {
+                            "label": "DEV account",
+                            "value": "devto"
+                          },
+                          {
+                            "label": "Website account",
+                            "value": "website"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "label",
+                        "label": "Label",
+                        "width": "40%",
+                        "defaultValue": "my upwork",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "copyright",
+                "label": "Copyright",
+                "description": "Shown at the bottom of the mobile menu.",
+                "type": "text"
+              }
+            ]
+          },
+          {
+            "label": "Links & accounts",
+            "description": "Every external link of this profile, stored once. Buttons, pricing plans, stats and blog posts point to these accounts.",
+            "fields": [
+              {
+                "name": "links",
+                "label": "Links",
+                "type": "array",
+                "fields": [
+                  {
+                    "type": "row",
+                    "fields": [
+                      {
+                        "name": "platform",
+                        "label": "Platform",
+                        "required": true,
+                        "width": "35%",
+                        "defaultValue": "website",
+                        "type": "select",
+                        "options": [
+                          {
+                            "label": "Upwork",
+                            "value": "upwork"
+                          },
+                          {
+                            "label": "GitHub",
+                            "value": "github"
+                          },
+                          {
+                            "label": "LinkedIn",
+                            "value": "linkedin"
+                          },
+                          {
+                            "label": "WhatsApp",
+                            "value": "whatsapp"
+                          },
+                          {
+                            "label": "Fiverr",
+                            "value": "fiverr"
+                          },
+                          {
+                            "label": "X / Twitter",
+                            "value": "x"
+                          },
+                          {
+                            "label": "Facebook",
+                            "value": "facebook"
+                          },
+                          {
+                            "label": "Instagram",
+                            "value": "instagram"
+                          },
+                          {
+                            "label": "YouTube",
+                            "value": "youtube"
+                          },
+                          {
+                            "label": "Telegram",
+                            "value": "telegram"
+                          },
+                          {
+                            "label": "Medium",
+                            "value": "medium"
+                          },
+                          {
+                            "label": "Stack Overflow",
+                            "value": "stackoverflow"
+                          },
+                          {
+                            "label": "DEV",
+                            "value": "devto"
+                          },
+                          {
+                            "label": "Website",
+                            "value": "website"
+                          },
+                          {
+                            "label": "Other",
+                            "value": "other"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "url",
+                        "label": "Url",
+                        "required": true,
+                        "width": "65%",
+                        "type": "url"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "row",
+                    "fields": [
+                      {
+                        "name": "label",
+                        "label": "Label",
+                        "description": "Default: the platform name.",
+                        "width": "35%",
+                        "type": "text"
+                      },
+                      {
+                        "name": "info",
+                        "label": "Info",
+                        "description": "Subtitle on the Stats page.",
+                        "width": "65%",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "row",
+                    "fields": [
+                      {
+                        "name": "showInIcons",
+                        "label": "Show In Icons",
+                        "description": "Show as an icon under the name, in the menu and in Stats \u2192 Links.",
+                        "width": "35%",
+                        "defaultValue": true,
+                        "type": "checkbox"
+                      },
+                      {
+                        "name": "icon",
+                        "label": "Icon",
+                        "description": "Default: the platform's icon.",
+                        "width": "35%",
+                        "type": "select",
+                        "options": [
+                          {
+                            "label": "AWS (FaAws)",
+                            "value": "FaAws"
+                          },
+                          {
+                            "label": "Github (FaGithub)",
+                            "value": "FaGithub"
+                          },
+                          {
+                            "label": "Gitlab (FaGitlab)",
+                            "value": "FaGitlab"
+                          },
+                          {
+                            "label": "Linkedin (FaLinkedin)",
+                            "value": "FaLinkedin"
+                          },
+                          {
+                            "label": "ID Card (FaIdCard)",
+                            "value": "FaIdCard"
+                          },
+                          {
+                            "label": "Whatsapp (FaWhatsapp)",
+                            "value": "FaWhatsapp"
+                          },
+                          {
+                            "label": "Twitter (FaTwitter)",
+                            "value": "FaTwitter"
+                          },
+                          {
+                            "label": "Facebook (FaFacebook)",
+                            "value": "FaFacebook"
+                          },
+                          {
+                            "label": "Instagram (FaInstagram)",
+                            "value": "FaInstagram"
+                          },
+                          {
+                            "label": "Youtube (FaYoutube)",
+                            "value": "FaYoutube"
+                          },
+                          {
+                            "label": "Telegram (FaTelegram)",
+                            "value": "FaTelegram"
+                          },
+                          {
+                            "label": "Discord (FaDiscord)",
+                            "value": "FaDiscord"
+                          },
+                          {
+                            "label": "Medium (FaMedium)",
+                            "value": "FaMedium"
+                          },
+                          {
+                            "label": "Stack Overflow (FaStackOverflow)",
+                            "value": "FaStackOverflow"
+                          },
+                          {
+                            "label": "DEV.to (FaDev)",
+                            "value": "FaDev"
+                          },
+                          {
+                            "label": "Envelope (FaEnvelope)",
+                            "value": "FaEnvelope"
+                          },
+                          {
+                            "label": "Phone (FaPhone)",
+                            "value": "FaPhone"
+                          },
+                          {
+                            "label": "Globe (FaGlobe)",
+                            "value": "FaGlobe"
+                          },
+                          {
+                            "label": "Link (FaLink)",
+                            "value": "FaLink"
+                          },
+                          {
+                            "label": "Code (FaCode)",
+                            "value": "FaCode"
+                          },
+                          {
+                            "label": "Server (FaServer)",
+                            "value": "FaServer"
+                          },
+                          {
+                            "label": "Database (FaDatabase)",
+                            "value": "FaDatabase"
+                          },
+                          {
+                            "label": "Cloud (FaCloud)",
+                            "value": "FaCloud"
+                          },
+                          {
+                            "label": "Mobile Alt (FaMobileAlt)",
+                            "value": "FaMobileAlt"
+                          },
+                          {
+                            "label": "Paint Brush (FaPaintBrush)",
+                            "value": "FaPaintBrush"
+                          },
+                          {
+                            "label": "Chart Line (FaChartLine)",
+                            "value": "FaChartLine"
+                          },
+                          {
+                            "label": "Lightbulb (FaLightbulb)",
+                            "value": "FaLightbulb"
+                          },
+                          {
+                            "label": "Rocket (FaRocket)",
+                            "value": "FaRocket"
+                          },
+                          {
+                            "label": "Users (FaUsers)",
+                            "value": "FaUsers"
+                          },
+                          {
+                            "label": "Award (FaAward)",
+                            "value": "FaAward"
+                          },
+                          {
+                            "label": "Briefcase (FaBriefcase)",
+                            "value": "FaBriefcase"
+                          },
+                          {
+                            "label": "Graduation Cap (FaGraduationCap)",
+                            "value": "FaGraduationCap"
+                          },
+                          {
+                            "label": "Heart (FaHeart)",
+                            "value": "FaHeart"
+                          },
+                          {
+                            "label": "Coffee (FaCoffee)",
+                            "value": "FaCoffee"
+                          },
+                          {
+                            "label": "Star (FaStar)",
+                            "value": "FaStar"
+                          },
+                          {
+                            "label": "Check Circle (FaCheckCircle)",
+                            "value": "FaCheckCircle"
+                          },
+                          {
+                            "label": "Clock (FaRegClock)",
+                            "value": "FaRegClock"
+                          },
+                          {
+                            "label": "Shield Alt (FaShieldAlt)",
+                            "value": "FaShieldAlt"
+                          },
+                          {
+                            "label": "Cogs (FaCogs)",
+                            "value": "FaCogs"
+                          },
+                          {
+                            "label": "Laptop Code (FaLaptopCode)",
+                            "value": "FaLaptopCode"
+                          },
+                          {
+                            "label": "Upwork (SiUpwork)",
+                            "value": "SiUpwork"
+                          },
+                          {
+                            "label": "Fiverr (SiFiverr)",
+                            "value": "SiFiverr"
+                          },
+                          {
+                            "label": "Go (SiGo)",
+                            "value": "SiGo"
+                          },
+                          {
+                            "label": "Python (SiPython)",
+                            "value": "SiPython"
+                          },
+                          {
+                            "label": "Typescript (SiTypescript)",
+                            "value": "SiTypescript"
+                          },
+                          {
+                            "label": "Javascript (SiJavascript)",
+                            "value": "SiJavascript"
+                          },
+                          {
+                            "label": "React (SiReact)",
+                            "value": "SiReact"
+                          },
+                          {
+                            "label": "Next.js (SiNextdotjs)",
+                            "value": "SiNextdotjs"
+                          },
+                          {
+                            "label": "Node.js (SiNodedotjs)",
+                            "value": "SiNodedotjs"
+                          },
+                          {
+                            "label": "Docker (SiDocker)",
+                            "value": "SiDocker"
+                          },
+                          {
+                            "label": "Kubernetes (SiKubernetes)",
+                            "value": "SiKubernetes"
+                          },
+                          {
+                            "label": "Terraform (SiTerraform)",
+                            "value": "SiTerraform"
+                          },
+                          {
+                            "label": "PostgreSQL (SiPostgresql)",
+                            "value": "SiPostgresql"
+                          },
+                          {
+                            "label": "MongoDB (SiMongodb)",
+                            "value": "SiMongodb"
+                          },
+                          {
+                            "label": "Redis (SiRedis)",
+                            "value": "SiRedis"
+                          },
+                          {
+                            "label": "Apache Kafka (SiApachekafka)",
+                            "value": "SiApachekafka"
+                          },
+                          {
+                            "label": "Google Cloud (SiGooglecloud)",
+                            "value": "SiGooglecloud"
+                          },
+                          {
+                            "label": "Rust (SiRust)",
+                            "value": "SiRust"
+                          },
+                          {
+                            "label": "PHP (SiPhp)",
+                            "value": "SiPhp"
+                          },
+                          {
+                            "label": "Laravel (SiLaravel)",
+                            "value": "SiLaravel"
+                          },
+                          {
+                            "label": "Vue.js (SiVuedotjs)",
+                            "value": "SiVuedotjs"
+                          },
+                          {
+                            "label": "Angular (SiAngular)",
+                            "value": "SiAngular"
+                          },
+                          {
+                            "label": "Flutter (SiFlutter)",
+                            "value": "SiFlutter"
+                          },
+                          {
+                            "label": "X (Twitter) (SiX)",
+                            "value": "SiX"
+                          },
+                          {
+                            "label": "Robot / AI (RiRobot2Line)",
+                            "value": "RiRobot2Line"
+                          },
+                          {
+                            "label": "Emblem (CodeIgniter) (DiCodeigniter)",
+                            "value": "DiCodeigniter"
+                          },
+                          {
+                            "label": "Emblem (Condor) (GiCondorEmblem)",
+                            "value": "GiCondorEmblem"
+                          },
+                          {
+                            "label": "Dashboard (MdDashboard)",
+                            "value": "MdDashboard"
+                          },
+                          {
+                            "label": "Design Services (MdDesignServices)",
+                            "value": "MdDesignServices"
+                          },
+                          {
+                            "label": "Support Agent (MdOutlineSupportAgent)",
+                            "value": "MdOutlineSupportAgent"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "color",
+                        "label": "Color",
+                        "description": "Default: brand color.",
+                        "width": "30%",
+                        "type": "color"
+                      }
+                    ]
+                  }
+                ],
+                "labels": {
+                  "singular": "Account",
+                  "plural": "Accounts"
+                }
+              }
+            ]
+          },
+          {
+            "label": "About me",
+            "fields": [
+              {
+                "name": "bio",
+                "label": "Bio",
+                "required": true,
+                "description": "Supports Markdown: **bold**, *italic*, lists, links.",
+                "type": "markdown"
+              },
+              {
+                "type": "row",
+                "fields": [
+                  {
+                    "name": "age",
+                    "label": "Age",
+                    "width": "25%",
+                    "type": "text"
+                  },
+                  {
+                    "name": "residence",
+                    "label": "Residence",
+                    "width": "25%",
+                    "type": "text"
+                  },
+                  {
+                    "name": "status",
+                    "label": "Status",
+                    "width": "25%",
+                    "type": "text"
+                  },
+                  {
+                    "name": "hourlyRate",
+                    "label": "Hourly Rate",
+                    "width": "25%",
+                    "type": "number"
+                  }
+                ]
+              },
+              {
+                "name": "address",
+                "label": "Address",
+                "type": "text"
+              }
+            ]
+          },
+          {
+            "label": "Contact",
+            "fields": [
+              {
+                "name": "email",
+                "label": "Email",
+                "type": "email"
+              },
+              {
+                "name": "phone",
+                "label": "Phone",
+                "description": "Shown as written; links to WhatsApp when the profile has a WhatsApp account, else calls.",
+                "type": "text"
+              },
+              {
+                "name": "mapEmbedUrl",
+                "label": "Custom map (optional)",
+                "description": "Leave empty to pin the profile\u2019s address (About tab) on the map. Only to override: Google Maps \u2192 Share \u2192 Embed a map \u2192 copy the src=\"\u2026\" URL.",
+                "type": "url"
+              }
+            ]
+          },
+          {
+            "label": "Quote",
+            "description": "The quote at the bottom of the Resume section.",
+            "fields": [
+              {
+                "name": "quote",
+                "label": "Quote",
+                "type": "group",
+                "fields": [
+                  {
+                    "name": "text",
+                    "label": "Text",
+                    "type": "textarea"
+                  },
+                  {
+                    "type": "row",
+                    "fields": [
+                      {
+                        "name": "author",
+                        "label": "Author",
+                        "description": "Defaults to your name.",
+                        "width": "50%",
+                        "type": "text"
+                      },
+                      {
+                        "name": "role",
+                        "label": "Role",
+                        "description": "Defaults to your job title.",
+                        "width": "50%",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "image",
+                    "label": "Image",
+                    "description": "Defaults to your avatar.",
+                    "type": "upload"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Blog section",
+            "fields": [
+              {
+                "name": "blog",
+                "label": "Blog",
+                "type": "group",
+                "fields": [
+                  {
+                    "name": "intro",
+                    "label": "Intro",
+                    "type": "textarea"
+                  },
+                  {
+                    "type": "row",
+                    "fields": [
+                      {
+                        "name": "account",
+                        "label": "Account",
+                        "description": "Button under the intro (shown when there are no posts).",
+                        "width": "60%",
+                        "type": "select",
+                        "options": [
+                          {
+                            "label": "No link",
+                            "value": "none"
+                          },
+                          {
+                            "label": "Upwork account",
+                            "value": "upwork"
+                          },
+                          {
+                            "label": "GitHub account",
+                            "value": "github"
+                          },
+                          {
+                            "label": "LinkedIn account",
+                            "value": "linkedin"
+                          },
+                          {
+                            "label": "WhatsApp account",
+                            "value": "whatsapp"
+                          },
+                          {
+                            "label": "Fiverr account",
+                            "value": "fiverr"
+                          },
+                          {
+                            "label": "X / Twitter account",
+                            "value": "x"
+                          },
+                          {
+                            "label": "Facebook account",
+                            "value": "facebook"
+                          },
+                          {
+                            "label": "Instagram account",
+                            "value": "instagram"
+                          },
+                          {
+                            "label": "YouTube account",
+                            "value": "youtube"
+                          },
+                          {
+                            "label": "Telegram account",
+                            "value": "telegram"
+                          },
+                          {
+                            "label": "Medium account",
+                            "value": "medium"
+                          },
+                          {
+                            "label": "Stack Overflow account",
+                            "value": "stackoverflow"
+                          },
+                          {
+                            "label": "DEV account",
+                            "value": "devto"
+                          },
+                          {
+                            "label": "Website account",
+                            "value": "website"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "buttonLabel",
+                        "label": "Button Label",
+                        "width": "40%",
+                        "defaultValue": "view upwork profile",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "SEO",
+            "fields": [
+              {
+                "name": "metaDescription",
+                "label": "Meta Description",
+                "description": "Shown by search engines under your site title.",
+                "type": "textarea"
+              }
+            ]
+          },
+          {
+            "label": "Skills",
+            "fields": [
+              {
+                "name": "coding",
+                "label": "Coding (circles)",
+                "description": "Shown as circular progress meters.",
+                "type": "array",
+                "fields": [
+                  {
+                    "type": "row",
+                    "fields": [
+                      {
+                        "name": "name",
+                        "label": "Name",
+                        "required": true,
+                        "width": "60%",
+                        "type": "text"
+                      },
+                      {
+                        "name": "percent",
+                        "label": "Percent",
+                        "required": true,
+                        "width": "40%",
+                        "type": "number",
+                        "min": 0,
+                        "max": 100
+                      }
+                    ]
+                  }
+                ],
+                "labels": {
+                  "singular": "Coding",
+                  "plural": "Codings"
+                }
+              },
+              {
+                "name": "knowledge",
+                "label": "Knowledge",
+                "description": "Shown as a checklist.",
+                "type": "array",
+                "fields": [
+                  {
+                    "name": "item",
+                    "label": "Item",
+                    "required": true,
+                    "type": "text"
+                  }
+                ],
+                "labels": {
+                  "singular": "Knowledge",
+                  "plural": "Knowledges"
+                }
+              },
+              {
+                "name": "development",
+                "label": "AI & Cloud (bars)",
+                "description": "Shown as progress bars.",
+                "type": "array",
+                "fields": [
+                  {
+                    "type": "row",
+                    "fields": [
+                      {
+                        "name": "name",
+                        "label": "Name",
+                        "required": true,
+                        "width": "60%",
+                        "type": "text"
+                      },
+                      {
+                        "name": "percent",
+                        "label": "Percent",
+                        "required": true,
+                        "width": "40%",
+                        "type": "number",
+                        "min": 0,
+                        "max": 100
+                      }
+                    ]
+                  }
+                ],
+                "labels": {
+                  "singular": "Development",
+                  "plural": "Developments"
+                }
+              },
+              {
+                "name": "languages",
+                "label": "Languages",
+                "description": "Spoken languages, rated 1\u201310 (dots).",
+                "type": "array",
+                "fields": [
+                  {
+                    "type": "row",
+                    "fields": [
+                      {
+                        "name": "name",
+                        "label": "Name",
+                        "required": true,
+                        "width": "60%",
+                        "type": "text"
+                      },
+                      {
+                        "name": "level",
+                        "label": "Level",
+                        "required": true,
+                        "width": "40%",
+                        "type": "number",
+                        "min": 1,
+                        "max": 10
+                      }
+                    ]
+                  }
+                ],
+                "labels": {
+                  "singular": "Language",
+                  "plural": "Languages"
+                }
+              }
+            ]
+          },
+          {
+            "label": "CV",
+            "description": "The PDF r\u00e9sum\u00e9 generated from this profile (Resume entries + Skills). Leave a field empty to use the profile's own content.",
+            "fields": [
+              {
+                "name": "cvSettings",
+                "label": "CV / r\u00e9sum\u00e9",
+                "type": "group",
+                "fields": [
+                  {
+                    "name": "mode",
+                    "label": "Mode",
+                    "description": "What the \u201cDownload CV\u201d buttons open.",
+                    "defaultValue": "generated",
+                    "type": "select",
+                    "options": [
+                      {
+                        "label": "Generate the PDF from this profile",
+                        "value": "generated"
+                      },
+                      {
+                        "label": "Use the uploaded file (Profile card \u2192 CV / Resume file)",
+                        "value": "uploaded"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "row",
+                    "fields": [
+                      {
+                        "name": "headline",
+                        "label": "Headline",
+                        "description": "Under your name. Default: job title.",
+                        "width": "50%",
+                        "type": "text"
+                      },
+                      {
+                        "name": "location",
+                        "label": "Location",
+                        "description": "Default: address, or residence.",
+                        "width": "50%",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "summary",
+                    "label": "Summary",
+                    "description": "\u201cProfile\u201d paragraph. Default: your bio without formatting or emoji.",
+                    "type": "textarea"
+                  },
+                  {
+                    "name": "skills",
+                    "label": "Skills",
+                    "description": "Comma-separated. Default: all skills from the Skills tab.",
+                    "type": "textarea"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "services": {
+    "label": "Services",
+    "singular": "Service",
+    "titleField": "title",
+    "fields": [
+      {
+        "name": "title",
+        "label": "Title",
+        "required": true,
+        "type": "text"
+      },
+      {
+        "name": "icon",
+        "label": "Icon",
+        "required": true,
+        "description": "Icon shown on the website.",
+        "type": "select",
+        "options": [
+          {
+            "label": "AWS (FaAws)",
+            "value": "FaAws"
+          },
+          {
+            "label": "Github (FaGithub)",
+            "value": "FaGithub"
+          },
+          {
+            "label": "Gitlab (FaGitlab)",
+            "value": "FaGitlab"
+          },
+          {
+            "label": "Linkedin (FaLinkedin)",
+            "value": "FaLinkedin"
+          },
+          {
+            "label": "ID Card (FaIdCard)",
+            "value": "FaIdCard"
+          },
+          {
+            "label": "Whatsapp (FaWhatsapp)",
+            "value": "FaWhatsapp"
+          },
+          {
+            "label": "Twitter (FaTwitter)",
+            "value": "FaTwitter"
+          },
+          {
+            "label": "Facebook (FaFacebook)",
+            "value": "FaFacebook"
+          },
+          {
+            "label": "Instagram (FaInstagram)",
+            "value": "FaInstagram"
+          },
+          {
+            "label": "Youtube (FaYoutube)",
+            "value": "FaYoutube"
+          },
+          {
+            "label": "Telegram (FaTelegram)",
+            "value": "FaTelegram"
+          },
+          {
+            "label": "Discord (FaDiscord)",
+            "value": "FaDiscord"
+          },
+          {
+            "label": "Medium (FaMedium)",
+            "value": "FaMedium"
+          },
+          {
+            "label": "Stack Overflow (FaStackOverflow)",
+            "value": "FaStackOverflow"
+          },
+          {
+            "label": "DEV.to (FaDev)",
+            "value": "FaDev"
+          },
+          {
+            "label": "Envelope (FaEnvelope)",
+            "value": "FaEnvelope"
+          },
+          {
+            "label": "Phone (FaPhone)",
+            "value": "FaPhone"
+          },
+          {
+            "label": "Globe (FaGlobe)",
+            "value": "FaGlobe"
+          },
+          {
+            "label": "Link (FaLink)",
+            "value": "FaLink"
+          },
+          {
+            "label": "Code (FaCode)",
+            "value": "FaCode"
+          },
+          {
+            "label": "Server (FaServer)",
+            "value": "FaServer"
+          },
+          {
+            "label": "Database (FaDatabase)",
+            "value": "FaDatabase"
+          },
+          {
+            "label": "Cloud (FaCloud)",
+            "value": "FaCloud"
+          },
+          {
+            "label": "Mobile Alt (FaMobileAlt)",
+            "value": "FaMobileAlt"
+          },
+          {
+            "label": "Paint Brush (FaPaintBrush)",
+            "value": "FaPaintBrush"
+          },
+          {
+            "label": "Chart Line (FaChartLine)",
+            "value": "FaChartLine"
+          },
+          {
+            "label": "Lightbulb (FaLightbulb)",
+            "value": "FaLightbulb"
+          },
+          {
+            "label": "Rocket (FaRocket)",
+            "value": "FaRocket"
+          },
+          {
+            "label": "Users (FaUsers)",
+            "value": "FaUsers"
+          },
+          {
+            "label": "Award (FaAward)",
+            "value": "FaAward"
+          },
+          {
+            "label": "Briefcase (FaBriefcase)",
+            "value": "FaBriefcase"
+          },
+          {
+            "label": "Graduation Cap (FaGraduationCap)",
+            "value": "FaGraduationCap"
+          },
+          {
+            "label": "Heart (FaHeart)",
+            "value": "FaHeart"
+          },
+          {
+            "label": "Coffee (FaCoffee)",
+            "value": "FaCoffee"
+          },
+          {
+            "label": "Star (FaStar)",
+            "value": "FaStar"
+          },
+          {
+            "label": "Check Circle (FaCheckCircle)",
+            "value": "FaCheckCircle"
+          },
+          {
+            "label": "Clock (FaRegClock)",
+            "value": "FaRegClock"
+          },
+          {
+            "label": "Shield Alt (FaShieldAlt)",
+            "value": "FaShieldAlt"
+          },
+          {
+            "label": "Cogs (FaCogs)",
+            "value": "FaCogs"
+          },
+          {
+            "label": "Laptop Code (FaLaptopCode)",
+            "value": "FaLaptopCode"
+          },
+          {
+            "label": "Upwork (SiUpwork)",
+            "value": "SiUpwork"
+          },
+          {
+            "label": "Fiverr (SiFiverr)",
+            "value": "SiFiverr"
+          },
+          {
+            "label": "Go (SiGo)",
+            "value": "SiGo"
+          },
+          {
+            "label": "Python (SiPython)",
+            "value": "SiPython"
+          },
+          {
+            "label": "Typescript (SiTypescript)",
+            "value": "SiTypescript"
+          },
+          {
+            "label": "Javascript (SiJavascript)",
+            "value": "SiJavascript"
+          },
+          {
+            "label": "React (SiReact)",
+            "value": "SiReact"
+          },
+          {
+            "label": "Next.js (SiNextdotjs)",
+            "value": "SiNextdotjs"
+          },
+          {
+            "label": "Node.js (SiNodedotjs)",
+            "value": "SiNodedotjs"
+          },
+          {
+            "label": "Docker (SiDocker)",
+            "value": "SiDocker"
+          },
+          {
+            "label": "Kubernetes (SiKubernetes)",
+            "value": "SiKubernetes"
+          },
+          {
+            "label": "Terraform (SiTerraform)",
+            "value": "SiTerraform"
+          },
+          {
+            "label": "PostgreSQL (SiPostgresql)",
+            "value": "SiPostgresql"
+          },
+          {
+            "label": "MongoDB (SiMongodb)",
+            "value": "SiMongodb"
+          },
+          {
+            "label": "Redis (SiRedis)",
+            "value": "SiRedis"
+          },
+          {
+            "label": "Apache Kafka (SiApachekafka)",
+            "value": "SiApachekafka"
+          },
+          {
+            "label": "Google Cloud (SiGooglecloud)",
+            "value": "SiGooglecloud"
+          },
+          {
+            "label": "Rust (SiRust)",
+            "value": "SiRust"
+          },
+          {
+            "label": "PHP (SiPhp)",
+            "value": "SiPhp"
+          },
+          {
+            "label": "Laravel (SiLaravel)",
+            "value": "SiLaravel"
+          },
+          {
+            "label": "Vue.js (SiVuedotjs)",
+            "value": "SiVuedotjs"
+          },
+          {
+            "label": "Angular (SiAngular)",
+            "value": "SiAngular"
+          },
+          {
+            "label": "Flutter (SiFlutter)",
+            "value": "SiFlutter"
+          },
+          {
+            "label": "X (Twitter) (SiX)",
+            "value": "SiX"
+          },
+          {
+            "label": "Robot / AI (RiRobot2Line)",
+            "value": "RiRobot2Line"
+          },
+          {
+            "label": "Emblem (CodeIgniter) (DiCodeigniter)",
+            "value": "DiCodeigniter"
+          },
+          {
+            "label": "Emblem (Condor) (GiCondorEmblem)",
+            "value": "GiCondorEmblem"
+          },
+          {
+            "label": "Dashboard (MdDashboard)",
+            "value": "MdDashboard"
+          },
+          {
+            "label": "Design Services (MdDesignServices)",
+            "value": "MdDesignServices"
+          },
+          {
+            "label": "Support Agent (MdOutlineSupportAgent)",
+            "value": "MdOutlineSupportAgent"
+          }
+        ]
+      },
+      {
+        "name": "description",
+        "label": "Description",
+        "required": true,
+        "type": "textarea"
+      }
+    ]
+  },
+  "pricing-plans": {
+    "label": "Pricing plans",
+    "singular": "Pricing plan",
+    "titleField": "name",
+    "fields": [
+      {
+        "name": "name",
+        "label": "Name",
+        "required": true,
+        "type": "text"
+      },
+      {
+        "name": "icon",
+        "label": "Icon",
+        "required": true,
+        "description": "Icon shown on the website.",
+        "defaultValue": "DiCodeigniter",
+        "type": "select",
+        "options": [
+          {
+            "label": "AWS (FaAws)",
+            "value": "FaAws"
+          },
+          {
+            "label": "Github (FaGithub)",
+            "value": "FaGithub"
+          },
+          {
+            "label": "Gitlab (FaGitlab)",
+            "value": "FaGitlab"
+          },
+          {
+            "label": "Linkedin (FaLinkedin)",
+            "value": "FaLinkedin"
+          },
+          {
+            "label": "ID Card (FaIdCard)",
+            "value": "FaIdCard"
+          },
+          {
+            "label": "Whatsapp (FaWhatsapp)",
+            "value": "FaWhatsapp"
+          },
+          {
+            "label": "Twitter (FaTwitter)",
+            "value": "FaTwitter"
+          },
+          {
+            "label": "Facebook (FaFacebook)",
+            "value": "FaFacebook"
+          },
+          {
+            "label": "Instagram (FaInstagram)",
+            "value": "FaInstagram"
+          },
+          {
+            "label": "Youtube (FaYoutube)",
+            "value": "FaYoutube"
+          },
+          {
+            "label": "Telegram (FaTelegram)",
+            "value": "FaTelegram"
+          },
+          {
+            "label": "Discord (FaDiscord)",
+            "value": "FaDiscord"
+          },
+          {
+            "label": "Medium (FaMedium)",
+            "value": "FaMedium"
+          },
+          {
+            "label": "Stack Overflow (FaStackOverflow)",
+            "value": "FaStackOverflow"
+          },
+          {
+            "label": "DEV.to (FaDev)",
+            "value": "FaDev"
+          },
+          {
+            "label": "Envelope (FaEnvelope)",
+            "value": "FaEnvelope"
+          },
+          {
+            "label": "Phone (FaPhone)",
+            "value": "FaPhone"
+          },
+          {
+            "label": "Globe (FaGlobe)",
+            "value": "FaGlobe"
+          },
+          {
+            "label": "Link (FaLink)",
+            "value": "FaLink"
+          },
+          {
+            "label": "Code (FaCode)",
+            "value": "FaCode"
+          },
+          {
+            "label": "Server (FaServer)",
+            "value": "FaServer"
+          },
+          {
+            "label": "Database (FaDatabase)",
+            "value": "FaDatabase"
+          },
+          {
+            "label": "Cloud (FaCloud)",
+            "value": "FaCloud"
+          },
+          {
+            "label": "Mobile Alt (FaMobileAlt)",
+            "value": "FaMobileAlt"
+          },
+          {
+            "label": "Paint Brush (FaPaintBrush)",
+            "value": "FaPaintBrush"
+          },
+          {
+            "label": "Chart Line (FaChartLine)",
+            "value": "FaChartLine"
+          },
+          {
+            "label": "Lightbulb (FaLightbulb)",
+            "value": "FaLightbulb"
+          },
+          {
+            "label": "Rocket (FaRocket)",
+            "value": "FaRocket"
+          },
+          {
+            "label": "Users (FaUsers)",
+            "value": "FaUsers"
+          },
+          {
+            "label": "Award (FaAward)",
+            "value": "FaAward"
+          },
+          {
+            "label": "Briefcase (FaBriefcase)",
+            "value": "FaBriefcase"
+          },
+          {
+            "label": "Graduation Cap (FaGraduationCap)",
+            "value": "FaGraduationCap"
+          },
+          {
+            "label": "Heart (FaHeart)",
+            "value": "FaHeart"
+          },
+          {
+            "label": "Coffee (FaCoffee)",
+            "value": "FaCoffee"
+          },
+          {
+            "label": "Star (FaStar)",
+            "value": "FaStar"
+          },
+          {
+            "label": "Check Circle (FaCheckCircle)",
+            "value": "FaCheckCircle"
+          },
+          {
+            "label": "Clock (FaRegClock)",
+            "value": "FaRegClock"
+          },
+          {
+            "label": "Shield Alt (FaShieldAlt)",
+            "value": "FaShieldAlt"
+          },
+          {
+            "label": "Cogs (FaCogs)",
+            "value": "FaCogs"
+          },
+          {
+            "label": "Laptop Code (FaLaptopCode)",
+            "value": "FaLaptopCode"
+          },
+          {
+            "label": "Upwork (SiUpwork)",
+            "value": "SiUpwork"
+          },
+          {
+            "label": "Fiverr (SiFiverr)",
+            "value": "SiFiverr"
+          },
+          {
+            "label": "Go (SiGo)",
+            "value": "SiGo"
+          },
+          {
+            "label": "Python (SiPython)",
+            "value": "SiPython"
+          },
+          {
+            "label": "Typescript (SiTypescript)",
+            "value": "SiTypescript"
+          },
+          {
+            "label": "Javascript (SiJavascript)",
+            "value": "SiJavascript"
+          },
+          {
+            "label": "React (SiReact)",
+            "value": "SiReact"
+          },
+          {
+            "label": "Next.js (SiNextdotjs)",
+            "value": "SiNextdotjs"
+          },
+          {
+            "label": "Node.js (SiNodedotjs)",
+            "value": "SiNodedotjs"
+          },
+          {
+            "label": "Docker (SiDocker)",
+            "value": "SiDocker"
+          },
+          {
+            "label": "Kubernetes (SiKubernetes)",
+            "value": "SiKubernetes"
+          },
+          {
+            "label": "Terraform (SiTerraform)",
+            "value": "SiTerraform"
+          },
+          {
+            "label": "PostgreSQL (SiPostgresql)",
+            "value": "SiPostgresql"
+          },
+          {
+            "label": "MongoDB (SiMongodb)",
+            "value": "SiMongodb"
+          },
+          {
+            "label": "Redis (SiRedis)",
+            "value": "SiRedis"
+          },
+          {
+            "label": "Apache Kafka (SiApachekafka)",
+            "value": "SiApachekafka"
+          },
+          {
+            "label": "Google Cloud (SiGooglecloud)",
+            "value": "SiGooglecloud"
+          },
+          {
+            "label": "Rust (SiRust)",
+            "value": "SiRust"
+          },
+          {
+            "label": "PHP (SiPhp)",
+            "value": "SiPhp"
+          },
+          {
+            "label": "Laravel (SiLaravel)",
+            "value": "SiLaravel"
+          },
+          {
+            "label": "Vue.js (SiVuedotjs)",
+            "value": "SiVuedotjs"
+          },
+          {
+            "label": "Angular (SiAngular)",
+            "value": "SiAngular"
+          },
+          {
+            "label": "Flutter (SiFlutter)",
+            "value": "SiFlutter"
+          },
+          {
+            "label": "X (Twitter) (SiX)",
+            "value": "SiX"
+          },
+          {
+            "label": "Robot / AI (RiRobot2Line)",
+            "value": "RiRobot2Line"
+          },
+          {
+            "label": "Emblem (CodeIgniter) (DiCodeigniter)",
+            "value": "DiCodeigniter"
+          },
+          {
+            "label": "Emblem (Condor) (GiCondorEmblem)",
+            "value": "GiCondorEmblem"
+          },
+          {
+            "label": "Dashboard (MdDashboard)",
+            "value": "MdDashboard"
+          },
+          {
+            "label": "Design Services (MdDesignServices)",
+            "value": "MdDesignServices"
+          },
+          {
+            "label": "Support Agent (MdOutlineSupportAgent)",
+            "value": "MdOutlineSupportAgent"
+          }
+        ]
+      },
+      {
+        "type": "row",
+        "fields": [
+          {
+            "name": "price",
+            "label": "Price",
+            "required": true,
+            "width": "50%",
+            "type": "number"
+          },
+          {
+            "name": "period",
+            "label": "Period",
+            "description": "e.g. hour, month, project",
+            "width": "50%",
+            "defaultValue": "hour",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "name": "orderLink",
+        "label": "\u201cOrder now\u201d link",
+        "type": "group",
+        "fields": [
+          {
+            "type": "row",
+            "fields": [
+              {
+                "name": "account",
+                "label": "Account",
+                "description": "One of the profile's accounts, or a custom URL.",
+                "width": "40%",
+                "type": "select",
+                "options": [
+                  {
+                    "label": "Upwork account",
+                    "value": "upwork"
+                  },
+                  {
+                    "label": "GitHub account",
+                    "value": "github"
+                  },
+                  {
+                    "label": "LinkedIn account",
+                    "value": "linkedin"
+                  },
+                  {
+                    "label": "WhatsApp account",
+                    "value": "whatsapp"
+                  },
+                  {
+                    "label": "Fiverr account",
+                    "value": "fiverr"
+                  },
+                  {
+                    "label": "X / Twitter account",
+                    "value": "x"
+                  },
+                  {
+                    "label": "Facebook account",
+                    "value": "facebook"
+                  },
+                  {
+                    "label": "Instagram account",
+                    "value": "instagram"
+                  },
+                  {
+                    "label": "YouTube account",
+                    "value": "youtube"
+                  },
+                  {
+                    "label": "Telegram account",
+                    "value": "telegram"
+                  },
+                  {
+                    "label": "Medium account",
+                    "value": "medium"
+                  },
+                  {
+                    "label": "Stack Overflow account",
+                    "value": "stackoverflow"
+                  },
+                  {
+                    "label": "DEV account",
+                    "value": "devto"
+                  },
+                  {
+                    "label": "Website account",
+                    "value": "website"
+                  },
+                  {
+                    "label": "Custom URL\u2026",
+                    "value": "custom"
+                  }
+                ]
+              },
+              {
+                "name": "customUrl",
+                "label": "Custom Url",
+                "description": "Only for \u201cCustom URL\u201d.",
+                "width": "60%",
+                "type": "url"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "features",
+        "label": "Features",
+        "type": "array",
+        "fields": [
+          {
+            "type": "row",
+            "fields": [
+              {
+                "name": "feature",
+                "label": "Feature",
+                "required": true,
+                "width": "75%",
+                "type": "text"
+              },
+              {
+                "name": "included",
+                "label": "Included",
+                "width": "25%",
+                "defaultValue": true,
+                "type": "checkbox"
+              }
+            ]
+          }
+        ],
+        "labels": {
+          "singular": "Feature",
+          "plural": "Features"
+        }
+      }
+    ]
+  },
+  "clients": {
+    "label": "Clients",
+    "singular": "Client",
+    "titleField": "name",
+    "fields": [
+      {
+        "name": "name",
+        "label": "Name",
+        "required": true,
+        "type": "text"
+      },
+      {
+        "name": "url",
+        "label": "Url",
+        "required": true,
+        "type": "url"
+      },
+      {
+        "name": "icon",
+        "label": "Icon",
+        "description": "Used when no logo image is uploaded.",
+        "type": "select",
+        "options": [
+          {
+            "label": "AWS (FaAws)",
+            "value": "FaAws"
+          },
+          {
+            "label": "Github (FaGithub)",
+            "value": "FaGithub"
+          },
+          {
+            "label": "Gitlab (FaGitlab)",
+            "value": "FaGitlab"
+          },
+          {
+            "label": "Linkedin (FaLinkedin)",
+            "value": "FaLinkedin"
+          },
+          {
+            "label": "ID Card (FaIdCard)",
+            "value": "FaIdCard"
+          },
+          {
+            "label": "Whatsapp (FaWhatsapp)",
+            "value": "FaWhatsapp"
+          },
+          {
+            "label": "Twitter (FaTwitter)",
+            "value": "FaTwitter"
+          },
+          {
+            "label": "Facebook (FaFacebook)",
+            "value": "FaFacebook"
+          },
+          {
+            "label": "Instagram (FaInstagram)",
+            "value": "FaInstagram"
+          },
+          {
+            "label": "Youtube (FaYoutube)",
+            "value": "FaYoutube"
+          },
+          {
+            "label": "Telegram (FaTelegram)",
+            "value": "FaTelegram"
+          },
+          {
+            "label": "Discord (FaDiscord)",
+            "value": "FaDiscord"
+          },
+          {
+            "label": "Medium (FaMedium)",
+            "value": "FaMedium"
+          },
+          {
+            "label": "Stack Overflow (FaStackOverflow)",
+            "value": "FaStackOverflow"
+          },
+          {
+            "label": "DEV.to (FaDev)",
+            "value": "FaDev"
+          },
+          {
+            "label": "Envelope (FaEnvelope)",
+            "value": "FaEnvelope"
+          },
+          {
+            "label": "Phone (FaPhone)",
+            "value": "FaPhone"
+          },
+          {
+            "label": "Globe (FaGlobe)",
+            "value": "FaGlobe"
+          },
+          {
+            "label": "Link (FaLink)",
+            "value": "FaLink"
+          },
+          {
+            "label": "Code (FaCode)",
+            "value": "FaCode"
+          },
+          {
+            "label": "Server (FaServer)",
+            "value": "FaServer"
+          },
+          {
+            "label": "Database (FaDatabase)",
+            "value": "FaDatabase"
+          },
+          {
+            "label": "Cloud (FaCloud)",
+            "value": "FaCloud"
+          },
+          {
+            "label": "Mobile Alt (FaMobileAlt)",
+            "value": "FaMobileAlt"
+          },
+          {
+            "label": "Paint Brush (FaPaintBrush)",
+            "value": "FaPaintBrush"
+          },
+          {
+            "label": "Chart Line (FaChartLine)",
+            "value": "FaChartLine"
+          },
+          {
+            "label": "Lightbulb (FaLightbulb)",
+            "value": "FaLightbulb"
+          },
+          {
+            "label": "Rocket (FaRocket)",
+            "value": "FaRocket"
+          },
+          {
+            "label": "Users (FaUsers)",
+            "value": "FaUsers"
+          },
+          {
+            "label": "Award (FaAward)",
+            "value": "FaAward"
+          },
+          {
+            "label": "Briefcase (FaBriefcase)",
+            "value": "FaBriefcase"
+          },
+          {
+            "label": "Graduation Cap (FaGraduationCap)",
+            "value": "FaGraduationCap"
+          },
+          {
+            "label": "Heart (FaHeart)",
+            "value": "FaHeart"
+          },
+          {
+            "label": "Coffee (FaCoffee)",
+            "value": "FaCoffee"
+          },
+          {
+            "label": "Star (FaStar)",
+            "value": "FaStar"
+          },
+          {
+            "label": "Check Circle (FaCheckCircle)",
+            "value": "FaCheckCircle"
+          },
+          {
+            "label": "Clock (FaRegClock)",
+            "value": "FaRegClock"
+          },
+          {
+            "label": "Shield Alt (FaShieldAlt)",
+            "value": "FaShieldAlt"
+          },
+          {
+            "label": "Cogs (FaCogs)",
+            "value": "FaCogs"
+          },
+          {
+            "label": "Laptop Code (FaLaptopCode)",
+            "value": "FaLaptopCode"
+          },
+          {
+            "label": "Upwork (SiUpwork)",
+            "value": "SiUpwork"
+          },
+          {
+            "label": "Fiverr (SiFiverr)",
+            "value": "SiFiverr"
+          },
+          {
+            "label": "Go (SiGo)",
+            "value": "SiGo"
+          },
+          {
+            "label": "Python (SiPython)",
+            "value": "SiPython"
+          },
+          {
+            "label": "Typescript (SiTypescript)",
+            "value": "SiTypescript"
+          },
+          {
+            "label": "Javascript (SiJavascript)",
+            "value": "SiJavascript"
+          },
+          {
+            "label": "React (SiReact)",
+            "value": "SiReact"
+          },
+          {
+            "label": "Next.js (SiNextdotjs)",
+            "value": "SiNextdotjs"
+          },
+          {
+            "label": "Node.js (SiNodedotjs)",
+            "value": "SiNodedotjs"
+          },
+          {
+            "label": "Docker (SiDocker)",
+            "value": "SiDocker"
+          },
+          {
+            "label": "Kubernetes (SiKubernetes)",
+            "value": "SiKubernetes"
+          },
+          {
+            "label": "Terraform (SiTerraform)",
+            "value": "SiTerraform"
+          },
+          {
+            "label": "PostgreSQL (SiPostgresql)",
+            "value": "SiPostgresql"
+          },
+          {
+            "label": "MongoDB (SiMongodb)",
+            "value": "SiMongodb"
+          },
+          {
+            "label": "Redis (SiRedis)",
+            "value": "SiRedis"
+          },
+          {
+            "label": "Apache Kafka (SiApachekafka)",
+            "value": "SiApachekafka"
+          },
+          {
+            "label": "Google Cloud (SiGooglecloud)",
+            "value": "SiGooglecloud"
+          },
+          {
+            "label": "Rust (SiRust)",
+            "value": "SiRust"
+          },
+          {
+            "label": "PHP (SiPhp)",
+            "value": "SiPhp"
+          },
+          {
+            "label": "Laravel (SiLaravel)",
+            "value": "SiLaravel"
+          },
+          {
+            "label": "Vue.js (SiVuedotjs)",
+            "value": "SiVuedotjs"
+          },
+          {
+            "label": "Angular (SiAngular)",
+            "value": "SiAngular"
+          },
+          {
+            "label": "Flutter (SiFlutter)",
+            "value": "SiFlutter"
+          },
+          {
+            "label": "X (Twitter) (SiX)",
+            "value": "SiX"
+          },
+          {
+            "label": "Robot / AI (RiRobot2Line)",
+            "value": "RiRobot2Line"
+          },
+          {
+            "label": "Emblem (CodeIgniter) (DiCodeigniter)",
+            "value": "DiCodeigniter"
+          },
+          {
+            "label": "Emblem (Condor) (GiCondorEmblem)",
+            "value": "GiCondorEmblem"
+          },
+          {
+            "label": "Dashboard (MdDashboard)",
+            "value": "MdDashboard"
+          },
+          {
+            "label": "Design Services (MdDesignServices)",
+            "value": "MdDesignServices"
+          },
+          {
+            "label": "Support Agent (MdOutlineSupportAgent)",
+            "value": "MdOutlineSupportAgent"
+          }
+        ]
+      },
+      {
+        "name": "logo",
+        "label": "Logo",
+        "description": "Optional logo (overrides the icon).",
+        "type": "upload"
+      }
+    ]
+  },
+  "testimonials": {
+    "label": "Testimonials",
+    "singular": "Testimonial",
+    "titleField": "name",
+    "fields": [
+      {
+        "name": "quote",
+        "label": "Quote",
+        "required": true,
+        "type": "textarea"
+      },
+      {
+        "type": "row",
+        "fields": [
+          {
+            "name": "name",
+            "label": "Name",
+            "required": true,
+            "width": "50%",
+            "type": "text"
+          },
+          {
+            "name": "role",
+            "label": "Role",
+            "width": "50%",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "name": "photo",
+        "label": "Photo",
+        "type": "upload"
+      }
+    ]
+  },
+  "facts": {
+    "label": "Fun facts",
+    "singular": "Fun fact",
+    "titleField": "description",
+    "fields": [
+      {
+        "name": "icon",
+        "label": "Icon",
+        "required": true,
+        "description": "Icon shown on the website.",
+        "type": "select",
+        "options": [
+          {
+            "label": "AWS (FaAws)",
+            "value": "FaAws"
+          },
+          {
+            "label": "Github (FaGithub)",
+            "value": "FaGithub"
+          },
+          {
+            "label": "Gitlab (FaGitlab)",
+            "value": "FaGitlab"
+          },
+          {
+            "label": "Linkedin (FaLinkedin)",
+            "value": "FaLinkedin"
+          },
+          {
+            "label": "ID Card (FaIdCard)",
+            "value": "FaIdCard"
+          },
+          {
+            "label": "Whatsapp (FaWhatsapp)",
+            "value": "FaWhatsapp"
+          },
+          {
+            "label": "Twitter (FaTwitter)",
+            "value": "FaTwitter"
+          },
+          {
+            "label": "Facebook (FaFacebook)",
+            "value": "FaFacebook"
+          },
+          {
+            "label": "Instagram (FaInstagram)",
+            "value": "FaInstagram"
+          },
+          {
+            "label": "Youtube (FaYoutube)",
+            "value": "FaYoutube"
+          },
+          {
+            "label": "Telegram (FaTelegram)",
+            "value": "FaTelegram"
+          },
+          {
+            "label": "Discord (FaDiscord)",
+            "value": "FaDiscord"
+          },
+          {
+            "label": "Medium (FaMedium)",
+            "value": "FaMedium"
+          },
+          {
+            "label": "Stack Overflow (FaStackOverflow)",
+            "value": "FaStackOverflow"
+          },
+          {
+            "label": "DEV.to (FaDev)",
+            "value": "FaDev"
+          },
+          {
+            "label": "Envelope (FaEnvelope)",
+            "value": "FaEnvelope"
+          },
+          {
+            "label": "Phone (FaPhone)",
+            "value": "FaPhone"
+          },
+          {
+            "label": "Globe (FaGlobe)",
+            "value": "FaGlobe"
+          },
+          {
+            "label": "Link (FaLink)",
+            "value": "FaLink"
+          },
+          {
+            "label": "Code (FaCode)",
+            "value": "FaCode"
+          },
+          {
+            "label": "Server (FaServer)",
+            "value": "FaServer"
+          },
+          {
+            "label": "Database (FaDatabase)",
+            "value": "FaDatabase"
+          },
+          {
+            "label": "Cloud (FaCloud)",
+            "value": "FaCloud"
+          },
+          {
+            "label": "Mobile Alt (FaMobileAlt)",
+            "value": "FaMobileAlt"
+          },
+          {
+            "label": "Paint Brush (FaPaintBrush)",
+            "value": "FaPaintBrush"
+          },
+          {
+            "label": "Chart Line (FaChartLine)",
+            "value": "FaChartLine"
+          },
+          {
+            "label": "Lightbulb (FaLightbulb)",
+            "value": "FaLightbulb"
+          },
+          {
+            "label": "Rocket (FaRocket)",
+            "value": "FaRocket"
+          },
+          {
+            "label": "Users (FaUsers)",
+            "value": "FaUsers"
+          },
+          {
+            "label": "Award (FaAward)",
+            "value": "FaAward"
+          },
+          {
+            "label": "Briefcase (FaBriefcase)",
+            "value": "FaBriefcase"
+          },
+          {
+            "label": "Graduation Cap (FaGraduationCap)",
+            "value": "FaGraduationCap"
+          },
+          {
+            "label": "Heart (FaHeart)",
+            "value": "FaHeart"
+          },
+          {
+            "label": "Coffee (FaCoffee)",
+            "value": "FaCoffee"
+          },
+          {
+            "label": "Star (FaStar)",
+            "value": "FaStar"
+          },
+          {
+            "label": "Check Circle (FaCheckCircle)",
+            "value": "FaCheckCircle"
+          },
+          {
+            "label": "Clock (FaRegClock)",
+            "value": "FaRegClock"
+          },
+          {
+            "label": "Shield Alt (FaShieldAlt)",
+            "value": "FaShieldAlt"
+          },
+          {
+            "label": "Cogs (FaCogs)",
+            "value": "FaCogs"
+          },
+          {
+            "label": "Laptop Code (FaLaptopCode)",
+            "value": "FaLaptopCode"
+          },
+          {
+            "label": "Upwork (SiUpwork)",
+            "value": "SiUpwork"
+          },
+          {
+            "label": "Fiverr (SiFiverr)",
+            "value": "SiFiverr"
+          },
+          {
+            "label": "Go (SiGo)",
+            "value": "SiGo"
+          },
+          {
+            "label": "Python (SiPython)",
+            "value": "SiPython"
+          },
+          {
+            "label": "Typescript (SiTypescript)",
+            "value": "SiTypescript"
+          },
+          {
+            "label": "Javascript (SiJavascript)",
+            "value": "SiJavascript"
+          },
+          {
+            "label": "React (SiReact)",
+            "value": "SiReact"
+          },
+          {
+            "label": "Next.js (SiNextdotjs)",
+            "value": "SiNextdotjs"
+          },
+          {
+            "label": "Node.js (SiNodedotjs)",
+            "value": "SiNodedotjs"
+          },
+          {
+            "label": "Docker (SiDocker)",
+            "value": "SiDocker"
+          },
+          {
+            "label": "Kubernetes (SiKubernetes)",
+            "value": "SiKubernetes"
+          },
+          {
+            "label": "Terraform (SiTerraform)",
+            "value": "SiTerraform"
+          },
+          {
+            "label": "PostgreSQL (SiPostgresql)",
+            "value": "SiPostgresql"
+          },
+          {
+            "label": "MongoDB (SiMongodb)",
+            "value": "SiMongodb"
+          },
+          {
+            "label": "Redis (SiRedis)",
+            "value": "SiRedis"
+          },
+          {
+            "label": "Apache Kafka (SiApachekafka)",
+            "value": "SiApachekafka"
+          },
+          {
+            "label": "Google Cloud (SiGooglecloud)",
+            "value": "SiGooglecloud"
+          },
+          {
+            "label": "Rust (SiRust)",
+            "value": "SiRust"
+          },
+          {
+            "label": "PHP (SiPhp)",
+            "value": "SiPhp"
+          },
+          {
+            "label": "Laravel (SiLaravel)",
+            "value": "SiLaravel"
+          },
+          {
+            "label": "Vue.js (SiVuedotjs)",
+            "value": "SiVuedotjs"
+          },
+          {
+            "label": "Angular (SiAngular)",
+            "value": "SiAngular"
+          },
+          {
+            "label": "Flutter (SiFlutter)",
+            "value": "SiFlutter"
+          },
+          {
+            "label": "X (Twitter) (SiX)",
+            "value": "SiX"
+          },
+          {
+            "label": "Robot / AI (RiRobot2Line)",
+            "value": "RiRobot2Line"
+          },
+          {
+            "label": "Emblem (CodeIgniter) (DiCodeigniter)",
+            "value": "DiCodeigniter"
+          },
+          {
+            "label": "Emblem (Condor) (GiCondorEmblem)",
+            "value": "GiCondorEmblem"
+          },
+          {
+            "label": "Dashboard (MdDashboard)",
+            "value": "MdDashboard"
+          },
+          {
+            "label": "Design Services (MdDesignServices)",
+            "value": "MdDesignServices"
+          },
+          {
+            "label": "Support Agent (MdOutlineSupportAgent)",
+            "value": "MdOutlineSupportAgent"
+          }
+        ]
+      },
+      {
+        "name": "description",
+        "label": "Description",
+        "required": true,
+        "type": "text"
+      }
+    ]
+  },
+  "statistics": {
+    "label": "Statistics",
+    "singular": "Statistic",
+    "titleField": "title",
+    "fields": [
+      {
+        "type": "row",
+        "fields": [
+          {
+            "name": "title",
+            "label": "Title",
+            "required": true,
+            "width": "50%",
+            "type": "text"
+          },
+          {
+            "name": "value",
+            "label": "Value",
+            "required": true,
+            "width": "50%",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "name": "link",
+        "label": "Link",
+        "type": "group",
+        "fields": [
+          {
+            "type": "row",
+            "fields": [
+              {
+                "name": "account",
+                "label": "Account",
+                "description": "Which of this profile's Links & accounts to link to.",
+                "width": "40%",
+                "type": "select",
+                "options": [
+                  {
+                    "label": "No link",
+                    "value": "none"
+                  },
+                  {
+                    "label": "Upwork account",
+                    "value": "upwork"
+                  },
+                  {
+                    "label": "GitHub account",
+                    "value": "github"
+                  },
+                  {
+                    "label": "LinkedIn account",
+                    "value": "linkedin"
+                  },
+                  {
+                    "label": "WhatsApp account",
+                    "value": "whatsapp"
+                  },
+                  {
+                    "label": "Fiverr account",
+                    "value": "fiverr"
+                  },
+                  {
+                    "label": "X / Twitter account",
+                    "value": "x"
+                  },
+                  {
+                    "label": "Facebook account",
+                    "value": "facebook"
+                  },
+                  {
+                    "label": "Instagram account",
+                    "value": "instagram"
+                  },
+                  {
+                    "label": "YouTube account",
+                    "value": "youtube"
+                  },
+                  {
+                    "label": "Telegram account",
+                    "value": "telegram"
+                  },
+                  {
+                    "label": "Medium account",
+                    "value": "medium"
+                  },
+                  {
+                    "label": "Stack Overflow account",
+                    "value": "stackoverflow"
+                  },
+                  {
+                    "label": "DEV account",
+                    "value": "devto"
+                  },
+                  {
+                    "label": "Website account",
+                    "value": "website"
+                  },
+                  {
+                    "label": "Custom URL\u2026",
+                    "value": "custom"
+                  }
+                ]
+              },
+              {
+                "name": "customUrl",
+                "label": "Custom Url",
+                "description": "Only for \u201cCustom URL\u201d.",
+                "width": "60%",
+                "type": "url"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "resume-entries": {
+    "label": "Resume entries",
+    "singular": "Resume entry",
+    "titleField": "title",
+    "fields": [
+      {
+        "name": "type",
+        "label": "Type",
+        "required": true,
+        "defaultValue": "experience",
+        "type": "radio",
+        "options": [
+          {
+            "label": "Experience",
+            "value": "experience"
+          },
+          {
+            "label": "Education",
+            "value": "education"
+          }
+        ]
+      },
+      {
+        "name": "period",
+        "label": "Period",
+        "required": true,
+        "description": "e.g. 2019 - Present (entries ending in \u201cPresent\u201d are highlighted).",
+        "type": "text"
+      },
+      {
+        "name": "title",
+        "label": "Title",
+        "required": true,
+        "description": "Experience: job title / role. Education: school.",
+        "type": "text"
+      },
+      {
+        "type": "row",
+        "fields": [
+          {
+            "name": "subtitle",
+            "label": "Subtitle",
+            "description": "Experience: company. Education: degree / field.",
+            "width": "60%",
+            "type": "text"
+          },
+          {
+            "name": "location",
+            "label": "Location",
+            "description": "Shown on the CV, e.g. \u201cBoston, MA, USA\u201d.",
+            "width": "40%",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "name": "description",
+        "label": "Description",
+        "description": "One achievement per line \u2014 each line becomes a bullet point on the CV.",
+        "type": "textarea"
+      }
+    ]
+  },
+  "works": {
+    "label": "Works",
+    "singular": "Work",
+    "titleField": "title",
+    "fields": [
+      {
+        "name": "title",
+        "label": "Title",
+        "required": true,
+        "type": "text"
+      },
+      {
+        "name": "images",
+        "label": "Images",
+        "required": true,
+        "description": "The first image is the thumbnail and the header in the details popup.",
+        "type": "upload",
+        "hasMany": true
+      },
+      {
+        "name": "categories",
+        "label": "Categories",
+        "type": "relationship",
+        "hasMany": true,
+        "relationTo": "work-categories",
+        "options": []
+      },
+      {
+        "name": "description",
+        "label": "Description",
+        "required": true,
+        "description": "Supports Markdown: **bold**, lists, links.",
+        "type": "markdown"
+      },
+      {
+        "type": "row",
+        "fields": [
+          {
+            "name": "client",
+            "label": "Client",
+            "width": "33%",
+            "type": "text"
+          },
+          {
+            "name": "owner",
+            "label": "Owner",
+            "width": "33%",
+            "type": "text"
+          },
+          {
+            "name": "date",
+            "label": "Date",
+            "width": "33%",
+            "type": "date",
+            "monthOnly": true
+          }
+        ]
+      },
+      {
+        "type": "row",
+        "fields": [
+          {
+            "name": "projectUrl",
+            "label": "Project URL",
+            "width": "50%",
+            "type": "url"
+          },
+          {
+            "name": "githubUrl",
+            "label": "GitHub URL",
+            "width": "50%",
+            "type": "url"
+          }
+        ]
+      },
+      {
+        "name": "techStack",
+        "label": "Tech Stack",
+        "type": "array",
+        "fields": [
+          {
+            "name": "name",
+            "label": "Name",
+            "required": true,
+            "type": "text"
+          }
+        ],
+        "labels": {
+          "singular": "Tech Stack",
+          "plural": "Tech Stacks"
+        }
+      },
+      {
+        "name": "highlights",
+        "label": "Highlights",
+        "description": "Bullet list at the bottom of the details popup.",
+        "type": "array",
+        "fields": [
+          {
+            "name": "item",
+            "label": "Item",
+            "required": true,
+            "type": "text"
+          }
+        ],
+        "labels": {
+          "singular": "Highlight",
+          "plural": "Highlights"
+        }
+      }
+    ]
+  },
+  "work-categories": {
+    "label": "Work categories",
+    "singular": "Work category",
+    "titleField": "name",
+    "fields": [
+      {
+        "name": "name",
+        "label": "Name",
+        "required": true,
+        "type": "text"
+      }
+    ]
+  },
+  "blog-posts": {
+    "label": "Blog posts",
+    "singular": "Blog post",
+    "titleField": "title",
+    "fields": [
+      {
+        "type": "row",
+        "fields": [
+          {
+            "name": "platform",
+            "label": "Platform",
+            "required": true,
+            "description": "Sets the card's icon, color and button link (from Links & accounts).",
+            "width": "35%",
+            "defaultValue": "other",
+            "type": "select",
+            "options": [
+              {
+                "label": "Upwork",
+                "value": "upwork"
+              },
+              {
+                "label": "GitHub",
+                "value": "github"
+              },
+              {
+                "label": "LinkedIn",
+                "value": "linkedin"
+              },
+              {
+                "label": "Other",
+                "value": "other"
+              }
+            ]
+          },
+          {
+            "name": "title",
+            "label": "Title",
+            "required": true,
+            "width": "65%",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "name": "headline",
+        "label": "Headline",
+        "description": "e.g. your title on that platform.",
+        "type": "text"
+      },
+      {
+        "name": "badges",
+        "label": "Badges",
+        "description": "Small pills, e.g. \u201cTop Rated Plus\u201d.",
+        "type": "array",
+        "fields": [
+          {
+            "name": "label",
+            "label": "Label",
+            "required": true,
+            "type": "text"
+          }
+        ],
+        "labels": {
+          "singular": "Badge",
+          "plural": "Badges"
+        }
+      },
+      {
+        "name": "stats",
+        "label": "Stats",
+        "description": "Big numbers, e.g. 36 / Jobs done.",
+        "type": "array",
+        "fields": [
+          {
+            "type": "row",
+            "fields": [
+              {
+                "name": "value",
+                "label": "Value",
+                "required": true,
+                "width": "40%",
+                "type": "text"
+              },
+              {
+                "name": "label",
+                "label": "Label",
+                "required": true,
+                "width": "60%",
+                "type": "text"
+              }
+            ]
+          }
+        ],
+        "labels": {
+          "singular": "Stat",
+          "plural": "Stats"
+        }
+      },
+      {
+        "name": "githubUsername",
+        "label": "Github Username",
+        "description": "Shows your live GitHub contribution graph on this post (updated every few hours).",
+        "type": "text"
+      },
+      {
+        "name": "image",
+        "label": "Image",
+        "description": "Optional picture under the stats, e.g. a screenshot of your contribution graph.",
+        "type": "upload"
+      },
+      {
+        "name": "imageCaption",
+        "label": "Image Caption",
+        "description": "Small caption under the picture.",
+        "type": "text"
+      },
+      {
+        "name": "body",
+        "label": "Body",
+        "required": true,
+        "description": "The write-up. Markdown supported (**bold**, *italic*, lists, links).",
+        "type": "markdown"
+      },
+      {
+        "name": "tags",
+        "label": "Tags",
+        "description": "Skills, tools or services shown as chips.",
+        "type": "array",
+        "fields": [
+          {
+            "name": "tag",
+            "label": "Tag",
+            "required": true,
+            "type": "text"
+          }
+        ],
+        "labels": {
+          "singular": "Tag",
+          "plural": "Tags"
+        }
+      },
+      {
+        "name": "buttonLabel",
+        "label": "Button Label",
+        "description": "The button links to this profile's account for the platform above. Default: \u201cVisit profile\u201d.",
+        "type": "text"
+      }
+    ]
+  },
+  "site-settings": {
+    "label": "Portfolio settings",
+    "singular": "Portfolio settings",
+    "titleField": "id",
+    "fields": [
+      {
+        "type": "tabs",
+        "tabs": [
+          {
+            "label": "Sections",
+            "description": "Menu sections of the site, in order. Use the arrows to reorder; untick Visible to hide one.",
+            "fields": [
+              {
+                "name": "sections",
+                "label": "Sections",
+                "defaultValue": [
+                  {
+                    "key": "about",
+                    "label": "about",
+                    "visible": true
+                  },
+                  {
+                    "key": "resume",
+                    "label": "resume",
+                    "visible": true
+                  },
+                  {
+                    "key": "works",
+                    "label": "works",
+                    "visible": true
+                  },
+                  {
+                    "key": "blog",
+                    "label": "blog",
+                    "visible": true
+                  },
+                  {
+                    "key": "stats",
+                    "label": "stats",
+                    "visible": true
+                  },
+                  {
+                    "key": "contact",
+                    "label": "contact",
+                    "visible": true
+                  },
+                  {
+                    "key": "guestbook",
+                    "label": "guest book",
+                    "visible": true
+                  }
+                ],
+                "type": "array",
+                "fields": [
+                  {
+                    "type": "row",
+                    "fields": [
+                      {
+                        "name": "key",
+                        "label": "Key",
+                        "required": true,
+                        "width": "35%",
+                        "type": "select",
+                        "options": [
+                          {
+                            "label": "about",
+                            "value": "about"
+                          },
+                          {
+                            "label": "resume",
+                            "value": "resume"
+                          },
+                          {
+                            "label": "works",
+                            "value": "works"
+                          },
+                          {
+                            "label": "blog",
+                            "value": "blog"
+                          },
+                          {
+                            "label": "stats",
+                            "value": "stats"
+                          },
+                          {
+                            "label": "contact",
+                            "value": "contact"
+                          },
+                          {
+                            "label": "guestbook",
+                            "value": "guestbook"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "label",
+                        "label": "Label",
+                        "required": true,
+                        "width": "40%",
+                        "type": "text"
+                      },
+                      {
+                        "name": "visible",
+                        "label": "Visible",
+                        "width": "25%",
+                        "defaultValue": true,
+                        "type": "checkbox"
+                      }
+                    ]
+                  }
+                ],
+                "labels": {
+                  "singular": "Section",
+                  "plural": "Sections"
+                }
+              }
+            ]
+          },
+          {
+            "label": "Appearance",
+            "fields": [
+              {
+                "name": "theme",
+                "label": "Theme",
+                "type": "group",
+                "fields": [
+                  {
+                    "type": "row",
+                    "fields": [
+                      {
+                        "name": "accent",
+                        "label": "Accent",
+                        "description": "Highlight color used across the site.",
+                        "width": "50%",
+                        "defaultValue": "#f59e0b",
+                        "type": "color"
+                      },
+                      {
+                        "name": "font",
+                        "label": "Font",
+                        "width": "50%",
+                        "defaultValue": "poppins",
+                        "type": "select",
+                        "options": [
+                          {
+                            "label": "Poppins",
+                            "value": "poppins"
+                          },
+                          {
+                            "label": "Rubik",
+                            "value": "rubik"
+                          },
+                          {
+                            "label": "Geist",
+                            "value": "geist"
+                          },
+                          {
+                            "label": "Inter",
+                            "value": "inter"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Maintenance",
+            "fields": [
+              {
+                "name": "maintenance",
+                "label": "Maintenance",
+                "type": "group",
+                "fields": [
+                  {
+                    "name": "enabled",
+                    "label": "Enabled",
+                    "description": "Visitors see a maintenance page. Logged-in editors still see the site.",
+                    "defaultValue": false,
+                    "type": "checkbox"
+                  },
+                  {
+                    "name": "message",
+                    "label": "Message",
+                    "defaultValue": "The site is being updated. Please check back soon.",
+                    "type": "textarea"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

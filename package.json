@@ -7,23 +7,43 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "typecheck": "tsc -p .",
     "admin": "bun --cwd admin run dev",
-    "portfolio": "bun --cwd portfolio run dev",
     "build:admin": "bun --cwd admin run build",
-    "build:portfolio": "bun --cwd portfolio run build",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@react-pdf/renderer": "4.9.0",
     "@supabase/postgrest-js": "2.119.0",
+    "@tsparticles/engine": "^3.9.1",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.9.1",
+    "framer-motion": "^12.23.24",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router-dom": "^7.6.2"
+    "react-hook-form": "^7.66.0",
+    "react-hot-toast": "^2.6.0",
+    "react-icons": "^5.5.0",
+    "react-infinite-scroll-component": "^6.1.0",
+    "react-loading-skeleton": "^3.5.0",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^7.6.2",
+    "remark-gfm": "^4.0.1",
+    "swiper": "^12.0.2",
+    "typewriter-effect": "^2.22.0"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "^4.5.2",
+    "autoprefixer": "^10",
+    "postcss": "^8",
     "prettier": "3.3.3",
     "supabase": "^2.121.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5",
     "vite": "^6.3.5"
   }
 }

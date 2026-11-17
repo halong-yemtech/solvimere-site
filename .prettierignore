@@ -1,25 +1,12 @@
 # Dependencies and build output
 node_modules
 dist
-.next
 .vercel
-
-# Generated
-portfolio/payload-types.ts
-portfolio/cms/migrations
-portfolio/cms/migrations-postgres
-portfolio/app/(payload)
-portfolio/next-env.d.ts
 
 # Data and assets
 public
-portfolio/public
-portfolio/media
 supabase
 *.sql
 *.lock
 bun.lock
 
-# Written by `next dev`
-portfolio/AGENTS.md
-portfolio/CLAUDE.md
