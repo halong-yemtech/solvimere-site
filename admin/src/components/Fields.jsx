@@ -6,9 +6,7 @@ const IMAGE = /(image|photo|avatar|src|logo)$/i;
 
 function labelFor(key) {
   if (key === "href") return "Link";
-  return key
-    .replace(/([A-Z])/g, " $1")
-    .replace(/^./, (char) => char.toUpperCase());
+  return key.replace(/([A-Z])/g, " $1").replace(/^./, (char) => char.toUpperCase());
 }
 
 function blankLike(sample) {
@@ -25,7 +23,11 @@ function blankLike(sample) {
 }
 
 function isPairList(value) {
-  return Array.isArray(value) && value.length > 0 && value.every((item) => Array.isArray(item) && item.length === 2 && item.every((part) => typeof part === "string"));
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.every((item) => Array.isArray(item) && item.length === 2 && item.every((part) => typeof part === "string"))
+  );
 }
 
 function imageAspect(path) {
@@ -67,7 +69,9 @@ function ImageField({ label, value, path, onChange, onUpload }) {
     setPending(true);
     try {
       const extension = format === "png" ? "png" : "jpg";
-      const file = new File([blob], `image.${extension}`, { type: blob.type || `image/${extension === "png" ? "png" : "jpeg"}` });
+      const file = new File([blob], `image.${extension}`, {
+        type: blob.type || `image/${extension === "png" ? "png" : "jpeg"}`,
+      });
       const url = await onUpload(file, path);
       onChange(url);
       closeEditor();
@@ -152,7 +156,11 @@ export function Fields({ value, onChange, onUpload, path = "" }) {
                   onChange(next);
                 }}
               />
-              <button type="button" className="text-btn" onClick={() => onChange(rows.filter((_, rowIndex) => rowIndex !== index))}>
+              <button
+                type="button"
+                className="text-btn"
+                onClick={() => onChange(rows.filter((_, rowIndex) => rowIndex !== index))}
+              >
                 Remove
               </button>
             </div>
@@ -167,14 +175,20 @@ export function Fields({ value, onChange, onUpload, path = "" }) {
       <div className="stack">
         {value.map((item, index) => (
           <fieldset key={index} className="card">
-            <legend>{labelFor(path.split(".").pop() || "Item")} {index + 1}</legend>
+            <legend>
+              {labelFor(path.split(".").pop() || "Item")} {index + 1}
+            </legend>
             <Fields
               value={item}
               path={`${path}.${index}`}
               onUpload={onUpload}
               onChange={(next) => onChange(value.map((row, rowIndex) => (rowIndex === index ? next : row)))}
             />
-            <button type="button" className="text-btn" onClick={() => onChange(value.filter((_, rowIndex) => rowIndex !== index))}>
+            <button
+              type="button"
+              className="text-btn"
+              onClick={() => onChange(value.filter((_, rowIndex) => rowIndex !== index))}
+            >
               Remove
             </button>
           </fieldset>
@@ -211,15 +225,7 @@ export function Fields({ value, onChange, onUpload, path = "" }) {
   const key = path.split(".").pop() || "";
   const imageField = typeof value === "string" && (IMAGE.test(key) || /(^|\.)photos\./.test(path));
   if (imageField) {
-    return (
-      <ImageField
-        label={labelFor(key)}
-        value={value}
-        path={path}
-        onChange={onChange}
-        onUpload={onUpload}
-      />
-    );
+    return <ImageField label={labelFor(key)} value={value} path={path} onChange={onChange} onUpload={onUpload} />;
   }
 
   return (

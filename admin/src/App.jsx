@@ -8,6 +8,12 @@ import PageEditor from "./pages/PageEditor";
 import Profiles from "./pages/Profiles";
 import Team from "./pages/Team";
 import Appointments from "./pages/Appointments";
+import Messages from "./pages/Messages";
+import Portfolios from "./pages/Portfolios";
+import PortfolioWorkspace from "./pages/PortfolioWorkspace";
+import PortfolioMedia from "./pages/PortfolioMedia";
+import PortfolioInbox from "./pages/PortfolioInbox";
+import PortfolioSettings from "./pages/PortfolioSettings";
 import Account from "./pages/Account";
 
 function Guard({ children, admin = false }) {
@@ -25,14 +31,118 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={ready && session && configured ? <Navigate to="/" replace /> : <Login />} />
-      <Route path="/" element={<Guard><Dashboard /></Guard>} />
-      <Route path="/pages" element={<Guard><PageList /></Guard>} />
-      <Route path="/pages/:slug" element={<Guard><PageEditor /></Guard>} />
-      <Route path="/team" element={<Guard><Team /></Guard>} />
-      <Route path="/appointments" element={<Guard><Appointments /></Guard>} />
-      <Route path="/profiles" element={<Guard admin><Profiles /></Guard>} />
-      <Route path="/profiles/:id" element={<Guard admin><Account /></Guard>} />
-      <Route path="/account" element={<Guard><Account /></Guard>} />
+      <Route
+        path="/"
+        element={
+          <Guard>
+            <Dashboard />
+          </Guard>
+        }
+      />
+      <Route
+        path="/pages"
+        element={
+          <Guard>
+            <PageList />
+          </Guard>
+        }
+      />
+      <Route
+        path="/pages/:slug"
+        element={
+          <Guard>
+            <PageEditor />
+          </Guard>
+        }
+      />
+      <Route
+        path="/team"
+        element={
+          <Guard>
+            <Team />
+          </Guard>
+        }
+      />
+      <Route
+        path="/appointments"
+        element={
+          <Guard>
+            <Appointments />
+          </Guard>
+        }
+      />
+      <Route
+        path="/messages"
+        element={
+          <Guard>
+            <Messages />
+          </Guard>
+        }
+      />
+      <Route
+        path="/portfolio"
+        element={
+          <Guard>
+            <Portfolios />
+          </Guard>
+        }
+      />
+      <Route
+        path="/portfolio/media"
+        element={
+          <Guard>
+            <PortfolioMedia />
+          </Guard>
+        }
+      />
+      <Route
+        path="/portfolio/inbox"
+        element={
+          <Guard>
+            <PortfolioInbox />
+          </Guard>
+        }
+      />
+      <Route
+        path="/portfolio/settings"
+        element={
+          <Guard>
+            <PortfolioSettings />
+          </Guard>
+        }
+      />
+      <Route
+        path="/portfolio/:id"
+        element={
+          <Guard>
+            <PortfolioWorkspace />
+          </Guard>
+        }
+      />
+      <Route
+        path="/profiles"
+        element={
+          <Guard admin>
+            <Profiles />
+          </Guard>
+        }
+      />
+      <Route
+        path="/profiles/:id"
+        element={
+          <Guard admin>
+            <Account />
+          </Guard>
+        }
+      />
+      <Route
+        path="/account"
+        element={
+          <Guard>
+            <Account />
+          </Guard>
+        }
+      />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

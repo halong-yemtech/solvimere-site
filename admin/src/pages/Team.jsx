@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ImageEditor } from "../components/ImageEditor";
 import { supabase, uploadImage } from "../lib/supabase";
+import { portfolioSlug } from "../../../src/lib/slug.js";
 
 const SCALE_MIN = 0.5;
 const SCALE_MAX = 2.5;
@@ -28,16 +29,6 @@ const emptyMember = {
 
 function clean(value) {
   return String(value || "").trim();
-}
-
-/** Same rule as the site's team cards and the portfolio app: "Ha Long" → "halong". */
-function portfolioSlug(name) {
-  return String(name || "")
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "")
-    .slice(0, 60);
 }
 
 export default function Team() {
@@ -196,7 +187,15 @@ export default function Team() {
           <h1>Team</h1>
           <p>Add, edit, and reorder the people shown on the team page.</p>
         </div>
-        <button className="primary" type="button" onClick={() => { setDraft({ ...emptyMember }); setMessage(""); setError(""); }}>
+        <button
+          className="primary"
+          type="button"
+          onClick={() => {
+            setDraft({ ...emptyMember });
+            setMessage("");
+            setError("");
+          }}
+        >
           Add member
         </button>
       </header>
@@ -207,12 +206,22 @@ export default function Team() {
           {members.length === 0 ? <p className="empty">No team members yet.</p> : null}
           {members.map((person, index) => (
             <article key={person.id} className={draft?.id === person.id ? "is-selected" : ""}>
-              <button type="button" className="roster-hit" onClick={() => { setDraft(person); setMessage(""); setError(""); }}>
+              <button
+                type="button"
+                className="roster-hit"
+                onClick={() => {
+                  setDraft(person);
+                  setMessage("");
+                  setError("");
+                }}
+              >
                 {person.avatar_url ? (
                   <span className="avatar-frame" style={{ "--avatar-scale": person.avatar_scale || 1 }}>
                     <img src={person.avatar_url} alt="" />
                   </span>
-                ) : <span className="ph" />}
+                ) : (
+                  <span className="ph" />
+                )}
                 <span>
                   <strong>{person.name}</strong>
                   <span>{person.role}</span>
@@ -220,10 +229,20 @@ export default function Team() {
                 </span>
               </button>
               <div className="reorder">
-                <button type="button" aria-label={`Move ${person.name} up`} disabled={index === 0} onClick={() => move(index, -1)}>
+                <button
+                  type="button"
+                  aria-label={`Move ${person.name} up`}
+                  disabled={index === 0}
+                  onClick={() => move(index, -1)}
+                >
                   Up
                 </button>
-                <button type="button" aria-label={`Move ${person.name} down`} disabled={index === members.length - 1} onClick={() => move(index, 1)}>
+                <button
+                  type="button"
+                  aria-label={`Move ${person.name} down`}
+                  disabled={index === members.length - 1}
+                  onClick={() => move(index, 1)}
+                >
                   Down
                 </button>
               </div>
@@ -238,14 +257,20 @@ export default function Team() {
                 <span className="avatar-frame" style={{ "--avatar-scale": clampScale(draft.avatar_scale) }}>
                   <img src={draft.avatar_url} alt="" />
                 </span>
-              ) : <span className="ph lg" />}
+              ) : (
+                <span className="ph lg" />
+              )}
               <div className="avatar-fields">
                 <label className="field">
                   <span>Avatar</span>
                   <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onFile} />
                 </label>
                 {draft.avatar_url ? (
-                  <button className="ghost" type="button" onClick={() => setEditor({ src: draft.avatar_url, revoke: false })}>
+                  <button
+                    className="ghost"
+                    type="button"
+                    onClick={() => setEditor({ src: draft.avatar_url, revoke: false })}
+                  >
                     Edit image
                   </button>
                 ) : (
@@ -258,8 +283,8 @@ export default function Team() {
               <input value={draft.name} onChange={(event) => update("name", event.target.value)} required />
               {portfolioSlug(draft.name) ? (
                 <small>
-                  Portfolio: /team/{portfolioSlug(draft.name)} (the portfolio app&apos;s profile slug must be{" "}
-                  &ldquo;{portfolioSlug(draft.name)}&rdquo;)
+                  Portfolio: /team/{portfolioSlug(draft.name)} (the portfolio app&apos;s profile slug must be &ldquo;
+                  {portfolioSlug(draft.name)}&rdquo;)
                 </small>
               ) : null}
             </label>
@@ -283,20 +308,34 @@ export default function Team() {
             <div className="form-grid">
               <label className="field">
                 <span>Highlight label</span>
-                <input value={draft.highlight_label} onChange={(event) => update("highlight_label", event.target.value)} />
+                <input
+                  value={draft.highlight_label}
+                  onChange={(event) => update("highlight_label", event.target.value)}
+                />
               </label>
               <label className="field">
                 <span>Expertise label</span>
-                <input value={draft.expertise_label} onChange={(event) => update("expertise_label", event.target.value)} />
+                <input
+                  value={draft.expertise_label}
+                  onChange={(event) => update("expertise_label", event.target.value)}
+                />
               </label>
             </div>
             <label className="field">
               <span>Highlight</span>
-              <textarea rows="3" value={draft.highlight_text} onChange={(event) => update("highlight_text", event.target.value)} />
+              <textarea
+                rows="3"
+                value={draft.highlight_text}
+                onChange={(event) => update("highlight_text", event.target.value)}
+              />
             </label>
             <label className="field">
               <span>Expertise</span>
-              <textarea rows="3" value={draft.expertise_text} onChange={(event) => update("expertise_text", event.target.value)} />
+              <textarea
+                rows="3"
+                value={draft.expertise_text}
+                onChange={(event) => update("expertise_text", event.target.value)}
+              />
             </label>
             <label className="field">
               <span>Personal quote</span>
@@ -324,14 +363,7 @@ export default function Team() {
           </section>
         )}
       </div>
-      {editor ? (
-        <ImageEditor
-          src={editor.src}
-          pending={pending}
-          onCancel={closeEditor}
-          onApply={applyImage}
-        />
-      ) : null}
+      {editor ? <ImageEditor src={editor.src} pending={pending} onCancel={closeEditor} onApply={applyImage} /> : null}
     </>
   );
 }

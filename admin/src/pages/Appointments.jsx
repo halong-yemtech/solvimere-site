@@ -27,16 +27,17 @@ export default function Appointments() {
     setLoading(true);
     const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
     let query = supabase.from("appointments").select("*");
-    query = view === "upcoming"
-      ? query.gte("starts_at", since).order("starts_at", { ascending: true })
-      : query.lt("starts_at", since).order("starts_at", { ascending: false }).limit(200);
+    query =
+      view === "upcoming"
+        ? query.gte("starts_at", since).order("starts_at", { ascending: true })
+        : query.lt("starts_at", since).order("starts_at", { ascending: false }).limit(200);
     query.then(({ data, error: queryError }) => {
       setLoading(false);
       if (queryError) {
         setError(
           /appointments/.test(queryError.message) && /exist|schema cache/.test(queryError.message)
             ? "The appointments table isn't set up yet. Apply supabase/migrations/20261117140000_appointments.sql."
-            : queryError.message
+            : queryError.message,
         );
         return;
       }
@@ -84,7 +85,11 @@ export default function Appointments() {
           <p>Meetings visitors booked from the site&apos;s assistant. Confirm them and email the meeting link.</p>
         </div>
         <div className="appt-tabs">
-          <button type="button" className={`ghost ${view === "upcoming" ? "is-on" : ""}`} onClick={() => setView("upcoming")}>
+          <button
+            type="button"
+            className={`ghost ${view === "upcoming" ? "is-on" : ""}`}
+            onClick={() => setView("upcoming")}
+          >
             Upcoming
           </button>
           <button type="button" className={`ghost ${view === "past" ? "is-on" : ""}`} onClick={() => setView("past")}>
@@ -110,7 +115,9 @@ export default function Appointments() {
             </div>
             <div className="appt-who">
               <strong>{row.name}</strong>
-              <a href={`mailto:${row.email}?subject=${encodeURIComponent("Your meeting with Solvimere")}`}>{row.email}</a>
+              <a href={`mailto:${row.email}?subject=${encodeURIComponent("Your meeting with Solvimere")}`}>
+                {row.email}
+              </a>
               {row.company ? <span>{row.company}</span> : null}
             </div>
             {row.topic ? <p className="appt-topic">{row.topic}</p> : null}

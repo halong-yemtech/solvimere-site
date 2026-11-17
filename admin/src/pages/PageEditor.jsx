@@ -1,26 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { pageDefaults } from "../../../src/cms/defaults.js";
+import { mergeContent } from "../../../src/cms/merge.js";
 import { supabase, uploadImage } from "../lib/supabase";
 import { useAuth } from "../auth";
 import { Fields } from "../components/Fields";
 
-function mergeContent(fallback, remote) {
-  if (remote == null) return fallback;
-  if (Array.isArray(fallback)) return Array.isArray(remote) ? remote : fallback;
-  if (!fallback || typeof fallback !== "object" || Array.isArray(fallback)) return remote;
-  if (typeof remote !== "object" || Array.isArray(remote)) return remote;
-  const next = { ...fallback };
-  Object.keys(remote).forEach((key) => {
-    next[key] = key in fallback ? mergeContent(fallback[key], remote[key]) : remote[key];
-  });
-  return next;
-}
-
 // Content keys a page no longer uses. They're hidden in the editor and dropped from the
 // stored content on the next save.
 const OBSOLETE_KEYS = {
-  home: ["logos"], // the "Trusted by" logo strip, replaced by the Reviews section
+  home: ["logos", "works"], // "Trusted by" logo strip (now Reviews) and "Recent Work" carousel
 };
 
 export default function PageEditor() {
@@ -98,7 +87,9 @@ export default function PageEditor() {
       <Fields value={content} onChange={setContent} onUpload={onUpload} />
       {error ? <p className="error">{error}</p> : null}
       {message ? <p className="ok">{message}</p> : null}
-      <button className="primary" type="submit">Save page</button>
+      <button className="primary" type="submit">
+        Save page
+      </button>
     </form>
   );
 }

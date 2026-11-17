@@ -13,9 +13,8 @@ export default function Login() {
           <p className="eyebrow">Solvimere admin</p>
           <h1>Connect Supabase</h1>
           <p>
-            Copy <code>admin/.env.example</code> to <code>admin/.env</code> and add the project URL and
-            publishable key. Use the same values in the public site <code>.env</code> so published pages
-            show on the marketing site.
+            Copy <code>admin/.env.example</code> to <code>admin/.env</code> and add the project URL and publishable key.
+            Use the same values in the public site <code>.env</code> so published pages show on the marketing site.
           </p>
         </form>
       </main>

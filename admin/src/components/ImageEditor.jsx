@@ -126,7 +126,13 @@ export function ImageEditor({ src, onCancel, onApply, pending, aspect = "portrai
       const outWidth = ratio >= 1 ? outLong : Math.round(outLong * ratio);
       const outHeight = ratio >= 1 ? Math.round(outLong / ratio) : outLong;
       const pixelRatio = outWidth / stage.clientWidth;
-      const cover = rotatedCover(image.naturalWidth, image.naturalHeight, edit.rotation, stage.clientWidth, stage.clientHeight);
+      const cover = rotatedCover(
+        image.naturalWidth,
+        image.naturalHeight,
+        edit.rotation,
+        stage.clientWidth,
+        stage.clientHeight,
+      );
       const canvas = document.createElement("canvas");
       canvas.width = outWidth;
       canvas.height = outHeight;
@@ -165,7 +171,9 @@ export function ImageEditor({ src, onCancel, onApply, pending, aspect = "portrai
             <p className="eyebrow">Image tools</p>
             <h2 id="image-editor-title">Crop photo</h2>
           </div>
-          <button className="ghost" type="button" onClick={onCancel}>Close</button>
+          <button className="ghost" type="button" onClick={onCancel}>
+            Close
+          </button>
         </header>
         <div className="editor-layout">
           <div
@@ -213,10 +221,20 @@ export function ImageEditor({ src, onCancel, onApply, pending, aspect = "portrai
             <div className="tool-group">
               <span>Scale {Math.round(edit.scale * 100)}%</span>
               <div className="tool-row">
-                <button className="ghost" type="button" onClick={() => patch({ scale: Math.max(1, Math.round((edit.scale - 0.05) * 100) / 100) })} disabled={edit.scale <= 1}>
+                <button
+                  className="ghost"
+                  type="button"
+                  onClick={() => patch({ scale: Math.max(1, Math.round((edit.scale - 0.05) * 100) / 100) })}
+                  disabled={edit.scale <= 1}
+                >
                   Scale down
                 </button>
-                <button className="ghost" type="button" onClick={() => patch({ scale: Math.min(4, Math.round((edit.scale + 0.05) * 100) / 100) })} disabled={edit.scale >= 4}>
+                <button
+                  className="ghost"
+                  type="button"
+                  onClick={() => patch({ scale: Math.min(4, Math.round((edit.scale + 0.05) * 100) / 100) })}
+                  disabled={edit.scale >= 4}
+                >
                   Scale up
                 </button>
               </div>
@@ -233,8 +251,12 @@ export function ImageEditor({ src, onCancel, onApply, pending, aspect = "portrai
             <div className="tool-group">
               <span>Rotate {edit.rotation}°</span>
               <div className="tool-row">
-                <button className="ghost" type="button" onClick={() => patch({ rotation: edit.rotation - 90 })}>Left</button>
-                <button className="ghost" type="button" onClick={() => patch({ rotation: edit.rotation + 90 })}>Right</button>
+                <button className="ghost" type="button" onClick={() => patch({ rotation: edit.rotation - 90 })}>
+                  Left
+                </button>
+                <button className="ghost" type="button" onClick={() => patch({ rotation: edit.rotation + 90 })}>
+                  Right
+                </button>
               </div>
               <input
                 type="range"
@@ -243,29 +265,65 @@ export function ImageEditor({ src, onCancel, onApply, pending, aspect = "portrai
                 step="1"
                 value={fineRotation(edit.rotation)}
                 aria-label="Straighten"
-                onChange={(event) => patch({ rotation: Math.round(edit.rotation / 90) * 90 + Number(event.target.value) })}
+                onChange={(event) =>
+                  patch({ rotation: Math.round(edit.rotation / 90) * 90 + Number(event.target.value) })
+                }
               />
             </div>
             <div className="tool-group">
               <span>Flip</span>
               <div className="tool-row">
-                <button className={edit.flipX ? "ghost is-on" : "ghost"} type="button" onClick={() => patch({ flipX: !edit.flipX })}>Horizontal</button>
-                <button className={edit.flipY ? "ghost is-on" : "ghost"} type="button" onClick={() => patch({ flipY: !edit.flipY })}>Vertical</button>
+                <button
+                  className={edit.flipX ? "ghost is-on" : "ghost"}
+                  type="button"
+                  onClick={() => patch({ flipX: !edit.flipX })}
+                >
+                  Horizontal
+                </button>
+                <button
+                  className={edit.flipY ? "ghost is-on" : "ghost"}
+                  type="button"
+                  onClick={() => patch({ flipY: !edit.flipY })}
+                >
+                  Vertical
+                </button>
               </div>
             </div>
             <label className="tool-group">
               <span>Brightness {edit.brightness}%</span>
-              <input type="range" min="40" max="160" step="1" value={edit.brightness} aria-label="Brightness" onChange={(event) => patch({ brightness: Number(event.target.value) })} />
+              <input
+                type="range"
+                min="40"
+                max="160"
+                step="1"
+                value={edit.brightness}
+                aria-label="Brightness"
+                onChange={(event) => patch({ brightness: Number(event.target.value) })}
+              />
             </label>
             <label className="tool-group">
               <span>Contrast {edit.contrast}%</span>
-              <input type="range" min="40" max="160" step="1" value={edit.contrast} aria-label="Contrast" onChange={(event) => patch({ contrast: Number(event.target.value) })} />
+              <input
+                type="range"
+                min="40"
+                max="160"
+                step="1"
+                value={edit.contrast}
+                aria-label="Contrast"
+                onChange={(event) => patch({ contrast: Number(event.target.value) })}
+              />
             </label>
-            <p className="tool-note">Drag the photo inside the frame. Apply saves this crop as the image used on the site.</p>
+            <p className="tool-note">
+              Drag the photo inside the frame. Apply saves this crop as the image used on the site.
+            </p>
             {error ? <p className="error">{error}</p> : null}
             <div className="tool-row">
-              <button className="ghost" type="button" onClick={() => setEdit({ ...INITIAL, aspect })}>Reset</button>
-              <button className="ghost" type="button" onClick={onCancel}>Cancel</button>
+              <button className="ghost" type="button" onClick={() => setEdit({ ...INITIAL, aspect })}>
+                Reset
+              </button>
+              <button className="ghost" type="button" onClick={onCancel}>
+                Cancel
+              </button>
               <button className="primary" type="button" onClick={apply} disabled={pending || !natural.width}>
                 {pending ? "Saving…" : "Apply crop"}
               </button>

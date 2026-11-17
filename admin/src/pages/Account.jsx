@@ -79,7 +79,9 @@ export default function Account() {
       </label>
       {error ? <p className="error">{error}</p> : null}
       {message ? <p className="ok">{message}</p> : null}
-      <button className="primary" type="submit">Save profile</button>
+      <button className="primary" type="submit">
+        Save profile
+      </button>
     </form>
   );
 }

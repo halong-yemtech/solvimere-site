@@ -39,7 +39,9 @@ export default function Profiles() {
     setError("");
     setMessage("");
     const data = new FormData(event.currentTarget);
-    const email = String(data.get("email") || "").trim().toLowerCase();
+    const email = String(data.get("email") || "")
+      .trim()
+      .toLowerCase();
     const password = String(data.get("password"));
     const fullName = String(data.get("full_name") || "");
     const role = String(data.get("role"));
@@ -64,7 +66,11 @@ export default function Profiles() {
       return;
     }
     event.currentTarget.reset();
-    setMessage(created.session ? "Account created. They can sign in now." : "Account created. Confirm the email before they can sign in.");
+    setMessage(
+      created.session
+        ? "Account created. They can sign in now."
+        : "Account created. Confirm the email before they can sign in.",
+    );
     load();
   }
 
@@ -117,7 +123,9 @@ export default function Profiles() {
             <option value="admin">Admin</option>
           </select>
         </label>
-        <button className="primary" type="submit">Create account</button>
+        <button className="primary" type="submit">
+          Create account
+        </button>
       </form>
     </>
   );

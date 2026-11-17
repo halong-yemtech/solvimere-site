@@ -5,9 +5,7 @@ const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabaseConfigured = Boolean(url && key);
 
-export const supabase = supabaseConfigured
-  ? createClient(url, key)
-  : null;
+export const supabase = supabaseConfigured ? createClient(url, key) : null;
 
 const memoryStorage = {
   getItem: () => null,
