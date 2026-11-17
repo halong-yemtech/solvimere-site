@@ -76,7 +76,7 @@ export function Orbit({ text, href = "#services" }) {
 }
 
 /**
- * "Start a project" → the contact form on the home page (/#contact), from any page.
+ * "Start a project" -> the contact form on the home page (/#contact), from any page.
  * Elsewhere the link navigates and App scrolls to #contact once Home renders; on the
  * home page we scroll directly, so it also works when the URL already ends in #contact.
  */

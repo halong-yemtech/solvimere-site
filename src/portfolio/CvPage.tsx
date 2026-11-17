@@ -4,7 +4,7 @@ import { getSiteData } from "./lib/site";
 import { buildCvData, cvFileName } from "./lib/cv/data";
 
 /**
- * /team/:slug/cv — the PDF résumé generated from the profile, rendered in the browser.
+ * /team/:slug/cv - the PDF résumé generated from the profile, rendered in the browser.
  * The PDF library is loaded only here.
  */
 export default function CvPage() {
@@ -26,7 +26,7 @@ export default function CvPage() {
       url = URL.createObjectURL(blob);
       if (!cancelled) {
         setPdf({ url, name: cvFileName(site.profile.name) });
-        document.title = `${site.profile.name} — CV`;
+        document.title = `${site.profile.name} - CV`;
       }
     })().catch((err) => !cancelled && setError(err.message || "The CV couldn't be created."));
     return () => {

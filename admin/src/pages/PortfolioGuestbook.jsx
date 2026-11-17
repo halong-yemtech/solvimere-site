@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
+import { BookOpen, Eye, EyeOff, Trash2 } from "lucide-react";
 import { deleteComment, listGuestbook, setCommentApproved } from "../portfolio/api";
+import { Spinner } from "../components/Spinner";
+import { Empty } from "../components/Empty";
+import { toast } from "../components/Toast";
 
 const fmt = (iso) =>
   new Date(iso).toLocaleString(undefined, {
@@ -17,20 +21,28 @@ export default function PortfolioGuestbook() {
 
   function load() {
     listGuestbook()
-      .then(setRows)
-      .catch((err) => setError(err.message));
+      .then((list) => {
+        setError("");
+        setRows(list);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setRows((current) => current || []);
+      });
   }
   useEffect(load, []);
 
-  async function run(fn) {
-    setError("");
+  async function run(fn, done) {
     try {
       await fn();
+      toast.success(done);
       load();
     } catch (err) {
-      setError(err.message);
+      toast.error(err);
     }
   }
+
+  if (!rows) return <Spinner label="Loading comments…" />;
 
   return (
     <>
@@ -42,10 +54,13 @@ export default function PortfolioGuestbook() {
         </div>
       </header>
       {error ? <p className="error">{error}</p> : null}
-      {!rows && !error ? <p className="empty">Loading…</p> : null}
-      {rows && rows.length === 0 ? <p className="empty">No comments yet.</p> : null}
+      {rows.length === 0 && !error ? (
+        <Empty icon={BookOpen} title="No comments yet">
+          Comments visitors leave in a portfolio&apos;s guest book will appear here.
+        </Empty>
+      ) : null}
       <div className="appt-list">
-        {(rows || []).map((c) => (
+        {rows.map((c) => (
           <article key={c.id} className={`panel appt msg ${c.approved ? "" : "is-cancelled"}`}>
             <div className="appt-who">
               <strong>{c.name}</strong>
@@ -56,15 +71,31 @@ export default function PortfolioGuestbook() {
             </div>
             <p className="appt-topic">{c.comment}</p>
             <div className="appt-actions">
-              <button type="button" className="ghost" onClick={() => run(() => setCommentApproved(c.id, !c.approved))}>
-                {c.approved ? "Hide" : "Show"}
+              <button
+                type="button"
+                className="ghost icon-btn"
+                aria-label={`${c.approved ? "Hide" : "Show"} the comment from ${c.name}`}
+                title={c.approved ? "Hide from portfolios" : "Show on portfolios"}
+                onClick={() =>
+                  run(
+                    () => setCommentApproved(c.id, !c.approved),
+                    c.approved ? `Comment from ${c.name} hidden.` : `Comment from ${c.name} shown.`,
+                  )
+                }
+              >
+                {c.approved ? <EyeOff /> : <Eye />}
               </button>
               <button
                 type="button"
-                className="danger"
-                onClick={() => window.confirm(`Delete the comment from ${c.name}?`) && run(() => deleteComment(c.id))}
+                className="danger icon-btn"
+                aria-label={`Delete the comment from ${c.name}`}
+                title="Delete"
+                onClick={() =>
+                  window.confirm(`Delete the comment from ${c.name}?`) &&
+                  run(() => deleteComment(c.id), `Comment from ${c.name} deleted.`)
+                }
               >
-                Delete
+                <Trash2 />
               </button>
             </div>
           </article>

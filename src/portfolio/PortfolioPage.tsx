@@ -40,7 +40,7 @@ export function themeStyle(site: SiteData | null): React.CSSProperties {
   } as React.CSSProperties;
 }
 
-/** /team/:slug — a team member's portfolio. */
+/** /team/:slug - a team member's portfolio. */
 export default function PortfolioPage() {
   const { slug = "" } = useParams();
   const [state, setState] = useState<State>({ status: "loading" });
@@ -78,7 +78,7 @@ export default function PortfolioPage() {
             <h1 className="text-4xl font-semibold text-main-orange">Portfolio coming soon</h1>
             <p>This team member&apos;s portfolio isn&apos;t published yet.</p>
             <Link to="/team" className="inline-block underline hover:text-main-orange">
-              ← Back to the team
+              Back to the team
             </Link>
           </div>
         </div>

@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { ImageUp, Pencil, Plus, Trash2 } from "lucide-react";
 import { ImageEditor } from "./ImageEditor";
+import { toast } from "./Toast";
 
 const LONG = /bio|lede|description|summary|body|mission|vision|tagline|message/i;
 const IMAGE = /(image|photo|avatar|src|logo)$/i;
@@ -43,7 +45,6 @@ function imageFormat(path, value) {
 function ImageField({ label, value, path, onChange, onUpload }) {
   const [editor, setEditor] = useState(null);
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState("");
   const format = imageFormat(path, editor?.fileType === "image/png" ? "x.png" : value);
 
   function closeEditor() {
@@ -57,7 +58,6 @@ function ImageField({ label, value, path, onChange, onUpload }) {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
-    setError("");
     setEditor((current) => {
       if (current?.revoke) URL.revokeObjectURL(current.src);
       return { src: URL.createObjectURL(file), revoke: true, fileType: file.type };
@@ -65,7 +65,6 @@ function ImageField({ label, value, path, onChange, onUpload }) {
   }
 
   async function applyImage(blob) {
-    setError("");
     setPending(true);
     try {
       const extension = format === "png" ? "png" : "jpg";
@@ -75,8 +74,9 @@ function ImageField({ label, value, path, onChange, onUpload }) {
       const url = await onUpload(file, path);
       onChange(url);
       closeEditor();
+      toast.success("Image updated. Save the page to publish it.");
     } catch (err) {
-      setError(err.message || "The image could not be saved.");
+      toast.error(err.message || "The image could not be saved.");
     } finally {
       setPending(false);
     }
@@ -91,15 +91,16 @@ function ImageField({ label, value, path, onChange, onUpload }) {
       <div className="tool-row">
         {value ? (
           <button className="ghost" type="button" onClick={() => setEditor({ src: value, revoke: false })}>
+            <Pencil />
             Edit image
           </button>
         ) : null}
         <label className="ghost file-btn">
+          <ImageUp />
           Replace
           <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={openFile} />
         </label>
       </div>
-      {error ? <p className="error">{error}</p> : null}
       {editor ? (
         <ImageEditor
           src={editor.src}
@@ -161,11 +162,13 @@ export function Fields({ value, onChange, onUpload, path = "" }) {
                 className="text-btn"
                 onClick={() => onChange(rows.filter((_, rowIndex) => rowIndex !== index))}
               >
+                <Trash2 />
                 Remove
               </button>
             </div>
           ))}
           <button type="button" className="text-btn" onClick={() => onChange([...rows, ["", ""]])}>
+            <Plus />
             Add row
           </button>
         </div>
@@ -189,6 +192,7 @@ export function Fields({ value, onChange, onUpload, path = "" }) {
               className="text-btn"
               onClick={() => onChange(value.filter((_, rowIndex) => rowIndex !== index))}
             >
+              <Trash2 />
               Remove
             </button>
           </fieldset>
@@ -198,6 +202,7 @@ export function Fields({ value, onChange, onUpload, path = "" }) {
           className="text-btn"
           onClick={() => onChange([...value, value[0] ? blankLike(value[0]) : ""])}
         >
+          <Plus />
           Add item
         </button>
       </div>

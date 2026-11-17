@@ -37,7 +37,7 @@ export function cleanText(s: string | null | undefined): string {
     .trim();
 }
 
-/** Markdown → plain text (keeps link text, drops emphasis, headings, list markers). */
+/** Markdown -> plain text (keeps link text, drops emphasis, headings, list markers). */
 export function stripMarkdown(md: string): string {
   return md
     .replace(/```[\s\S]*?```/g, "")
@@ -137,7 +137,7 @@ export function buildCvData(site: SiteData): CvData {
   };
 }
 
-/** "Anthony Scott" → "Anthony Scott - CV.pdf" (safe for Content-Disposition). */
+/** "Anthony Scott" -> "Anthony Scott - CV.pdf" (safe for Content-Disposition). */
 export function cvFileName(name: string) {
   return `${cleanText(name).replace(/[\\/:*?"<>|]+/g, "") || "CV"} - CV.pdf`;
 }

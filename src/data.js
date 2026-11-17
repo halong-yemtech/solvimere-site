@@ -621,7 +621,7 @@ export const terms = [
   },
 ];
 
-// Home page "ratings & recognition" section (editable in Admin → Pages → Home → Reviews).
+// Home page "ratings & recognition" section (editable in Admin -> Pages -> Home -> Reviews).
 // `platform` picks the built-in logo (Google, Trustpilot, GoodFirms, Sortlist, Meta;
 // anything else shows its initial). Leave `url` empty to show a card without a link.
 export const reviews = {

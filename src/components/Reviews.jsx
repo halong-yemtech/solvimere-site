@@ -84,7 +84,7 @@ function PlatformMark({ platform }) {
   }
 }
 
-/** Five stars, filled in proportion to the score (e.g. 4.9 → 98%). */
+/** Five stars, filled in proportion to the score (e.g. 4.9 -> 98%). */
 function Stars({ score }) {
   const value = Math.max(0, Math.min(5, Number.parseFloat(score) || 0));
   const row = (

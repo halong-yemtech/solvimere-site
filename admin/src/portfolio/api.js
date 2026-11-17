@@ -233,8 +233,8 @@ function profileSchema() {
         description: "Private profiles aren't shown on the site.",
         width: "50%",
         options: [
-          { label: "Public — anyone with the link", value: "public" },
-          { label: "Private — hidden", value: "private" },
+          { label: "Public - anyone with the link", value: "public" },
+          { label: "Private - hidden", value: "private" },
         ],
       },
     ],
@@ -257,6 +257,7 @@ export async function listProfiles() {
     visibility: r.visibility,
     name: r.data?.name || r.data?.internalName || r.slug,
     internalName: r.data?.internalName || "",
+    role: r.data?.jobTitle || "",
     avatarUrl: media.get(r.data?.avatar)?.url || null,
     items: r.portfolio_items?.[0]?.count ?? 0,
     updatedAt: r.updated_at,

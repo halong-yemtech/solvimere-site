@@ -2,7 +2,7 @@
 
 /*
  * Portfolio pages (/team/<slug>): Tailwind utilities scoped to .pf-root
- * (tailwind.config.js → important: ".pf-root", preflight off), so nothing here
+ * (tailwind.config.js -> important: ".pf-root", preflight off), so nothing here
  * reaches the rest of the site. This is Tailwind's reset, scoped the same way.
  */
 .pf-root *,

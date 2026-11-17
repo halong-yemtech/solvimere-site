@@ -11,7 +11,7 @@ const PAGE_SIZE = 10;
 const clean = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const unavailable = { ok: false as const, error: "This isn't available right now. Try again later." };
 
-/** Sends the message to the same inbox as the rest of the site (Admin → Messages). */
+/** Sends the message to the same inbox as the rest of the site (Admin -> Messages). */
 export async function sendContactMessage(input: {
   fullName: string;
   email: string;

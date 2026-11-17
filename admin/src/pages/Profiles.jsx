@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react";
+import { Loader2, Pencil, UserPlus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { signupClient, supabase } from "../lib/supabase";
 import { useAuth } from "../auth";
+import { Spinner } from "../components/Spinner";
+import { Empty } from "../components/Empty";
+import { ShieldCheck } from "lucide-react";
+import { toast } from "../components/Toast";
 
 export default function Profiles() {
   const { profile } = useAuth();
-  const [people, setPeople] = useState([]);
+  const [people, setPeople] = useState(null);
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+  const [creating, setCreating] = useState(false);
 
   function load() {
     supabase
@@ -15,7 +20,7 @@ export default function Profiles() {
       .select("id, email, full_name, role, avatar_url")
       .order("email")
       .then(({ data, error: queryError }) => {
-        if (queryError) setError(queryError.message);
+        setError(queryError ? queryError.message : "");
         setPeople(data || []);
       });
   }
@@ -24,20 +29,20 @@ export default function Profiles() {
     load();
   }, []);
 
-  async function changeRole(id, role) {
-    setError("");
-    const { error: saveError } = await supabase.from("profiles").update({ role }).eq("id", id);
+  async function changeRole(person, role) {
+    const { error: saveError } = await supabase.from("profiles").update({ role }).eq("id", person.id);
     if (saveError) {
-      setError(saveError.message);
+      toast.error(saveError);
       return;
     }
+    toast.success(`${person.full_name || person.email} is now ${role === "admin" ? "an admin" : "an editor"}.`);
     load();
   }
 
   async function createUser(event) {
     event.preventDefault();
-    setError("");
-    setMessage("");
+    const form = event.currentTarget;
+    setCreating(true);
     const data = new FormData(event.currentTarget);
     const email = String(data.get("email") || "")
       .trim()
@@ -52,7 +57,8 @@ export default function Profiles() {
       invited_by: profile.id,
     });
     if (inviteError) {
-      setError(inviteError.message);
+      setCreating(false);
+      toast.error(inviteError);
       return;
     }
     const client = signupClient();
@@ -61,18 +67,21 @@ export default function Profiles() {
       password,
       options: { data: { full_name: fullName } },
     });
+    setCreating(false);
     if (signError) {
-      setError(signError.message);
+      toast.error(signError);
       return;
     }
-    event.currentTarget.reset();
-    setMessage(
+    form.reset();
+    toast.success(
       created.session
         ? "Account created. They can sign in now."
         : "Account created. Confirm the email before they can sign in.",
     );
     load();
   }
+
+  if (!people) return <Spinner label="Loading staff…" />;
 
   return (
     <>
@@ -81,7 +90,11 @@ export default function Profiles() {
         <p>Staff accounts. Roles live in the database, not in editable user metadata.</p>
       </header>
       {error ? <p className="error">{error}</p> : null}
-      {message ? <p className="ok">{message}</p> : null}
+      {people.length === 0 && !error ? (
+        <Empty icon={ShieldCheck} title="No staff accounts">
+          Add a person below to give them access to the admin.
+        </Empty>
+      ) : null}
       <section className="people">
         {people.map((person) => (
           <article key={person.id}>
@@ -93,12 +106,19 @@ export default function Profiles() {
             <select
               value={person.role}
               disabled={person.id === profile.id}
-              onChange={(event) => changeRole(person.id, event.target.value)}
+              onChange={(event) => changeRole(person, event.target.value)}
             >
               <option value="admin">Admin</option>
               <option value="editor">Editor</option>
             </select>
-            <Link to={`/profiles/${person.id}`}>Edit</Link>
+            <Link
+              className="ghost icon-btn"
+              to={`/profiles/${person.id}`}
+              aria-label={`Edit ${person.full_name || person.email}`}
+              title="Edit"
+            >
+              <Pencil />
+            </Link>
           </article>
         ))}
       </section>
@@ -123,8 +143,9 @@ export default function Profiles() {
             <option value="admin">Admin</option>
           </select>
         </label>
-        <button className="primary" type="submit">
-          Create account
+        <button className="primary" type="submit" disabled={creating}>
+          {creating ? <Loader2 className="spin" /> : <UserPlus />}
+          {creating ? "Creating…" : "Create account"}
         </button>
       </form>
     </>

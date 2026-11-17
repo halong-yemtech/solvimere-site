@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
+import { Loader2, Save } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { pageDefaults } from "../../../src/cms/defaults.js";
 import { mergeContent } from "../../../src/cms/merge.js";
 import { supabase, uploadImage } from "../lib/supabase";
 import { useAuth } from "../auth";
 import { Fields } from "../components/Fields";
+import { Spinner } from "../components/Spinner";
+import { toast } from "../components/Toast";
 
 // Content keys a page no longer uses. They're hidden in the editor and dropped from the
 // stored content on the next save.
@@ -18,11 +21,12 @@ export default function PageEditor() {
   const [page, setPage] = useState(null);
   const [content, setContent] = useState(null);
   const [status, setStatus] = useState("published");
-  const [message, setMessage] = useState("");
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     setPage(null);
+    setError("");
     supabase
       .from("pages")
       .select("slug, title, status, content, updated_at")
@@ -45,8 +49,7 @@ export default function PageEditor() {
 
   async function save(event) {
     event.preventDefault();
-    setMessage("");
-    setError("");
+    setSaving(true);
     const { error: saveError } = await supabase
       .from("pages")
       .update({
@@ -55,11 +58,14 @@ export default function PageEditor() {
         updated_by: profile.id,
       })
       .eq("slug", slug);
+    setSaving(false);
     if (saveError) {
-      setError(saveError.message);
+      toast.error(saveError);
       return;
     }
-    setMessage(status === "published" ? "Published to the public site." : "Saved as a draft.");
+    toast.success(
+      status === "published" ? `${page.title} published to the public site.` : `${page.title} saved as a draft.`,
+    );
   }
 
   async function onUpload(file) {
@@ -67,7 +73,7 @@ export default function PageEditor() {
     return uploadImage("media", `${slug}/${Date.now()}-${safe}`, file);
   }
 
-  if (!page || !content) return <p className="top">{error || "Loading page…"}</p>;
+  if (!page || !content) return error ? <p className="top error">{error}</p> : <Spinner label="Loading page…" />;
 
   return (
     <form onSubmit={save}>
@@ -85,10 +91,9 @@ export default function PageEditor() {
         </label>
       </header>
       <Fields value={content} onChange={setContent} onUpload={onUpload} />
-      {error ? <p className="error">{error}</p> : null}
-      {message ? <p className="ok">{message}</p> : null}
-      <button className="primary" type="submit">
-        Save page
+      <button className="primary" type="submit" disabled={saving}>
+        {saving ? <Loader2 className="spin" /> : <Save />}
+        {saving ? "Saving…" : "Save page"}
       </button>
     </form>
   );

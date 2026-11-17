@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
+import { Copy, ExternalLink, IdCard, Loader2, Pencil, Plus } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { DocEditorModal } from "../components/DocEditor";
+import { Spinner } from "../components/Spinner";
+import { Empty } from "../components/Empty";
+import { toast } from "../components/Toast";
 import { SITE_URL, counts, duplicateProfile, listProfiles } from "../portfolio/api";
 
 /** All portfolio profiles (one per team member), shown on the site at /team/<address>. */
@@ -12,26 +16,36 @@ export default function Portfolios() {
   const [busy, setBusy] = useState(null);
   const [creating, setCreating] = useState(false);
 
-  function load() {
-    listProfiles()
-      .then(setProfiles)
-      .catch((err) => setError(err.message));
-    counts()
-      .then(setStats)
-      .catch(() => {});
-  }
-  useEffect(load, []);
+  // Profiles and stats load together, so the page appears once, complete.
+  useEffect(() => {
+    let alive = true;
+    Promise.allSettled([listProfiles(), counts()]).then(([list, totals]) => {
+      if (!alive) return;
+      if (list.status === "fulfilled") setProfiles(list.value);
+      else {
+        setError(list.reason?.message || "Profiles could not be loaded.");
+        setProfiles([]);
+      }
+      setStats(totals.status === "fulfilled" ? totals.value : null);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
-  async function duplicate(id) {
-    setBusy(id);
-    setError("");
+  async function duplicate(profile) {
+    setBusy(profile.id);
     try {
-      navigate(`/portfolio/${await duplicateProfile(id)}`);
+      const copy = await duplicateProfile(profile.id);
+      toast.success(`${profile.name} duplicated as a private copy.`);
+      navigate(`/portfolio/${copy}`);
     } catch (err) {
-      setError(err.message);
+      toast.error(err);
       setBusy(null);
     }
   }
+
+  if (!profiles) return <Spinner label="Loading profiles…" />;
 
   return (
     <>
@@ -42,6 +56,7 @@ export default function Portfolios() {
           <p>Each team member&apos;s portfolio at /team/&lt;address&gt; on the site. Changes go live when saved.</p>
         </div>
         <button className="primary" type="button" onClick={() => setCreating(true)}>
+          <Plus />
           New profile
         </button>
       </header>
@@ -62,16 +77,31 @@ export default function Portfolios() {
         </div>
       ) : null}
       {error ? <p className="error">{error}</p> : null}
-      {!profiles && !error ? <p className="empty">Loading…</p> : null}
-      {profiles && profiles.length === 0 ? <p className="empty">No profiles yet.</p> : null}
-      {profiles?.length ? (
+      {profiles.length === 0 && !error ? (
+        <Empty
+          icon={IdCard}
+          title="No portfolio profiles yet"
+          action={
+            <button className="primary" type="button" onClick={() => setCreating(true)}>
+              <Plus />
+              New profile
+            </button>
+          }
+        >
+          Create a profile for each team member who should have a portfolio at /team/&lt;address&gt;.
+        </Empty>
+      ) : null}
+      {profiles.length ? (
         <div className="list pf-table">
           {profiles.map((p) => (
             <article key={p.id}>
               <Link to={`/portfolio/${p.id}`} className="pf-row-hit">
                 {p.avatarUrl ? <img src={p.avatarUrl} alt="" /> : <span className="ph" />}
                 <span>
-                  <strong>{p.name}</strong>
+                  <strong>
+                    {p.name}
+                    {p.role ? <em className="pf-role">{p.role}</em> : null}
+                  </strong>
                   <span>/team/{p.slug}</span>
                 </span>
               </Link>
@@ -79,15 +109,29 @@ export default function Portfolios() {
               <span className="pf-count">{p.items} items</span>
               <div className="actions">
                 {p.visibility === "public" ? (
-                  <a className="ghost" href={`${SITE_URL}/team/${p.slug}`} target="_blank" rel="noreferrer">
-                    View
+                  <a
+                    className="ghost icon-btn"
+                    href={`${SITE_URL}/team/${p.slug}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`View ${p.name}'s portfolio`}
+                    title="View on the site"
+                  >
+                    <ExternalLink />
                   </a>
                 ) : null}
-                <button type="button" className="ghost" disabled={busy === p.id} onClick={() => duplicate(p.id)}>
-                  Duplicate
+                <button
+                  type="button"
+                  className="ghost icon-btn"
+                  disabled={busy === p.id}
+                  onClick={() => duplicate(p)}
+                  aria-label={`Duplicate ${p.name}`}
+                  title={busy === p.id ? "Duplicating…" : "Duplicate"}
+                >
+                  {busy === p.id ? <Loader2 className="spin" /> : <Copy />}
                 </button>
-                <Link className="primary" to={`/portfolio/${p.id}`}>
-                  Edit
+                <Link className="primary icon-btn" to={`/portfolio/${p.id}`} aria-label={`Edit ${p.name}`} title="Edit">
+                  <Pencil />
                 </Link>
               </div>
             </article>

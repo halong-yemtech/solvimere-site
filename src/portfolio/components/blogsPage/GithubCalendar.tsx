@@ -20,7 +20,7 @@ function describe(day: ContributionDay) {
   return `${what} on ${date}`;
 }
 
-/** Columns of 7 (Sun→Sat), like github.com. */
+/** Columns of 7 (Sun->Sat), like github.com. */
 function toWeeks(days: ContributionDay[]) {
   const weeks: (ContributionDay | null)[][] = [];
   if (!days.length) return weeks;

@@ -1,5 +1,22 @@
 import { useEffect, useRef, useState } from "react";
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  Check,
+  ChevronsDown,
+  Images,
+  Loader2,
+  Plus,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
 import { isImage, listMedia, uploadMedia } from "../portfolio/api";
+import { Spinner } from "./Spinner";
+import { Empty } from "./Empty";
+import { toast } from "./Toast";
 
 /*
  * Renders portfolio documents from their field schemas (admin/src/portfolio/schemas.json):
@@ -15,7 +32,7 @@ export function flatFields(schema) {
   );
 }
 
-/** Form values → what Payload expects (ids for relations, numbers, ISO dates). */
+/** Form values -> what Payload expects (ids for relations, numbers, ISO dates). */
 export function normalize(schema, values) {
   const out = {};
   for (const f of flatFields(schema)) {
@@ -240,7 +257,7 @@ function Field({ field, values, onChange }) {
     case "radio":
       return wrap(
         <select value={String(value ?? "")} onChange={(e) => set(e.target.value || null)}>
-          {!field.required ? <option value="">—</option> : null}
+          {!field.required ? <option value="">-</option> : null}
           {field.required && !value ? <option value="">Choose…</option> : null}
           {field.options.map((o) => (
             <option key={o.value} value={o.value}>
@@ -277,7 +294,7 @@ function Field({ field, values, onChange }) {
       }
       return wrap(
         <select value={String(idOf(value) ?? "")} onChange={(e) => set(e.target.value ? Number(e.target.value) : null)}>
-          <option value="">—</option>
+          <option value="">-</option>
           {field.options.map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}
@@ -324,7 +341,7 @@ function ArrayField({ field, rows, onChange }) {
             </div>
             <div className="sf-array-tools">
               <button type="button" disabled={i === 0} onClick={() => move(i, -1)} aria-label="Move up" title="Move up">
-                ↑
+                <ArrowUp />
               </button>
               <button
                 type="button"
@@ -333,7 +350,7 @@ function ArrayField({ field, rows, onChange }) {
                 aria-label="Move down"
                 title="Move down"
               >
-                ↓
+                <ArrowDown />
               </button>
               <button
                 type="button"
@@ -342,14 +359,15 @@ function ArrayField({ field, rows, onChange }) {
                 aria-label="Remove"
                 title="Remove"
               >
-                ✕
+                <Trash2 />
               </button>
             </div>
           </li>
         ))}
       </ul>
       <button type="button" className="ghost sf-add" onClick={() => onChange([...rows, defaultsFor(field.fields)])}>
-        + Add {String(singular).toLowerCase()}
+        <Plus />
+        Add {String(singular).toLowerCase()}
       </button>
     </div>
   );
@@ -369,7 +387,6 @@ export function MediaField({ value, hasMany, onChange }) {
   const fileRef = useRef(null);
   const [busy, setBusy] = useState(false);
   const [picking, setPicking] = useState(false);
-  const [error, setError] = useState("");
   const list = hasMany ? (Array.isArray(value) ? value : []) : value ? [value] : [];
 
   const add = (items) => {
@@ -380,17 +397,21 @@ export function MediaField({ value, hasMany, onChange }) {
   async function onFiles(files) {
     if (!files?.length) return;
     setBusy(true);
-    setError("");
     const uploaded = [];
     for (const file of Array.from(hasMany ? files : [files[0]])) {
       try {
         uploaded.push(await uploadMedia(file));
       } catch (err) {
-        setError(`${file.name}: ${err.message}`);
+        toast.error(`${file.name}: ${err.message}`);
       }
     }
     setBusy(false);
     add(uploaded);
+    if (uploaded.length) {
+      toast.success(
+        `Uploaded ${uploaded.length} file${uploaded.length === 1 ? "" : "s"}. Save to publish ${uploaded.length === 1 ? "it" : "them"}.`,
+      );
+    }
     if (fileRef.current) fileRef.current.value = "";
   }
 
@@ -417,17 +438,23 @@ export function MediaField({ value, hasMany, onChange }) {
               <Thumb item={item} />
               <span className="sf-media-tools">
                 {hasMany && i > 0 ? (
-                  <button type="button" onClick={() => move(i, -1)} aria-label="Move left">
-                    ←
+                  <button type="button" onClick={() => move(i, -1)} aria-label="Move left" title="Move left">
+                    <ArrowLeft />
                   </button>
                 ) : null}
                 {hasMany && i < list.length - 1 ? (
-                  <button type="button" onClick={() => move(i, 1)} aria-label="Move right">
-                    →
+                  <button type="button" onClick={() => move(i, 1)} aria-label="Move right" title="Move right">
+                    <ArrowRight />
                   </button>
                 ) : null}
-                <button type="button" className="is-danger" onClick={() => remove(i)} aria-label="Remove">
-                  ✕
+                <button
+                  type="button"
+                  className="is-danger"
+                  onClick={() => remove(i)}
+                  aria-label="Remove"
+                  title="Remove"
+                >
+                  <X />
                 </button>
               </span>
             </li>
@@ -436,9 +463,11 @@ export function MediaField({ value, hasMany, onChange }) {
       ) : null}
       <span className="actions">
         <button type="button" className="ghost" disabled={busy} onClick={() => fileRef.current?.click()}>
+          {busy ? <Loader2 className="spin" /> : <Upload />}
           {busy ? "Uploading…" : hasMany ? "Upload files" : list.length ? "Replace" : "Upload"}
         </button>
         <button type="button" className="ghost" onClick={() => setPicking(true)}>
+          <Images />
           Choose from library
         </button>
       </span>
@@ -450,7 +479,6 @@ export function MediaField({ value, hasMany, onChange }) {
         accept="image/*,application/pdf"
         onChange={(e) => onFiles(e.target.files)}
       />
-      {error ? <p className="error">{error}</p> : null}
       {picking ? (
         <MediaPicker
           multiple={hasMany}
@@ -467,18 +495,21 @@ export function MediaField({ value, hasMany, onChange }) {
 
 function MediaPicker({ multiple, onPick, onClose }) {
   const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [more, setMore] = useState(false);
   const [chosen, setChosen] = useState([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    setLoading(true);
     listMedia(page)
       .then((res) => {
         setItems((current) => (page === 1 ? res.items : [...current, ...res.items]));
         setMore(res.hasNextPage);
       })
-      .catch((err) => setError(err.message));
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
   }, [page]);
 
   const toggle = (item) => {
@@ -491,11 +522,16 @@ function MediaPicker({ multiple, onPick, onClose }) {
       <div className="editor-sheet sf-picker" onClick={(e) => e.stopPropagation()}>
         <header>
           <h2>Media library</h2>
-          <button type="button" className="ghost" onClick={onClose}>
-            Close
+          <button type="button" className="ghost icon-btn" onClick={onClose} aria-label="Close" title="Close">
+            <X />
           </button>
         </header>
         {error ? <p className="error">{error}</p> : null}
+        {!loading && !error && items.length === 0 ? (
+          <Empty icon={Images} title="The library is empty">
+            Close this and use Upload to add the first file.
+          </Empty>
+        ) : null}
         <div className="sf-picker-grid">
           {items.map((item) => (
             <button
@@ -510,13 +546,16 @@ function MediaPicker({ multiple, onPick, onClose }) {
           ))}
         </div>
         <div className="actions">
-          {more ? (
+          {loading ? <Spinner inline size="sm" label="" /> : null}
+          {more && !loading ? (
             <button type="button" className="ghost" onClick={() => setPage((p) => p + 1)}>
+              <ChevronsDown />
               Load more
             </button>
           ) : null}
           {multiple ? (
             <button type="button" className="primary" disabled={!chosen.length} onClick={() => onPick(chosen)}>
+              <Check />
               Add {chosen.length || ""} selected
             </button>
           ) : null}

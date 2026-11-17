@@ -1,4 +1,4 @@
-// Shared between the CMS schema (server) and the site (client) — keep it dependency-free.
+// Shared between the CMS schema (server) and the site (client) - keep it dependency-free.
 
 export const SECTION_KEYS = ["about", "resume", "works", "blog", "stats", "contact", "guestbook"] as const;
 export type SectionKey = (typeof SECTION_KEYS)[number];
@@ -24,7 +24,7 @@ export const FONT_OPTIONS = [
 export const DEFAULT_FONT: FontKey = "poppins";
 export type FontKey = (typeof FONT_OPTIONS)[number]["value"];
 
-/** "#f59e0b" → "245 158 11" (space-separated, for rgb(var(--accent) / α)). */
+/** "#f59e0b" -> "245 158 11" (space-separated, for rgb(var(--accent) / α)). */
 export function hexToRgbChannels(hex: string): string {
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
   const n = parseInt(m ? m[1] : DEFAULT_ACCENT.slice(1), 16);

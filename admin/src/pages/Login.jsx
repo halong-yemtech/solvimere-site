@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { Loader2, LogIn } from "lucide-react";
 import { useAuth } from "../auth";
+import { toast } from "../components/Toast";
 
 export default function Login() {
   const { signIn, configured } = useAuth();
-  const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
 
   if (!configured) {
@@ -23,13 +24,13 @@ export default function Login() {
 
   async function onSubmit(event) {
     event.preventDefault();
-    setError("");
     setPending(true);
     const data = new FormData(event.currentTarget);
     try {
       await signIn(String(data.get("email")), String(data.get("password")));
+      toast.success("Signed in. Welcome back.");
     } catch (err) {
-      setError(err.message || "Sign-in failed");
+      toast.error(err.message || "Sign-in failed.");
     } finally {
       setPending(false);
     }
@@ -50,8 +51,8 @@ export default function Login() {
           Password
           <input name="password" type="password" autoComplete="current-password" required />
         </label>
-        {error ? <p className="error">{error}</p> : null}
         <button className="primary" type="submit" disabled={pending}>
+          {pending ? <Loader2 className="spin" /> : <LogIn />}
           {pending ? "Signing in…" : "Sign in"}
         </button>
       </form>

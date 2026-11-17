@@ -27,7 +27,7 @@ export default function GuestForm({ onCreated }: Props) {
       const saved = localStorage.getItem(GUEST_NAME_KEY);
       if (saved) setValue("name", saved);
     } catch {
-      // storage unavailable (private mode etc.) — just start empty
+      // storage unavailable (private mode etc.) - just start empty
     }
   }, [setValue]);
 

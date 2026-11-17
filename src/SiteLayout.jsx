@@ -4,6 +4,7 @@ import { Assistant } from "./components/Assistant";
 import { CookieConsent } from "./components/CookieConsent";
 import { BackToTop, Footer, Header, useActiveSection } from "./components/Chrome";
 import Home from "./pages/Home";
+import { useContentReady } from "./cms/Content";
 
 // The home page ships with the app; other pages load when first visited.
 const Team = lazy(() => import("./pages/Team"));
@@ -19,8 +20,10 @@ const About = lazy(() => import("./pages/About"));
 export default function SiteLayout() {
   const location = useLocation();
   const active = useActiveSection();
+  const ready = useContentReady();
 
   useEffect(() => {
+    if (!ready) return undefined; // the page isn't rendered yet
     if (!location.hash) {
       window.scrollTo({ top: 0, behavior: "auto" });
       return undefined;
@@ -41,8 +44,7 @@ export default function SiteLayout() {
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "start" });
         // Content above the target can still change height after we start scrolling
-        // (e.g. the team grid swapping its placeholder roster for the real one), which
-        // would leave us past the target. Re-align while the page settles, until the
+        // (e.g. images loading and taking their height), which would leave us past the target. Re-align while the page settles, until the
         // visitor scrolls themselves.
         let first = true; // ResizeObserver reports once immediately; that isn't a change.
         observer = new ResizeObserver(() => {
@@ -64,7 +66,10 @@ export default function SiteLayout() {
       cancelAnimationFrame(raf);
       stop();
     };
-  }, [location.pathname, location.hash]);
+  }, [location.pathname, location.hash, ready]);
+
+  // Nothing renders until the content is loaded, so no built-in copy flashes first.
+  if (!ready) return <SiteLoader />;
 
   return (
     <>
@@ -91,5 +96,14 @@ export default function SiteLayout() {
       <Assistant />
       <BackToTop />
     </>
+  );
+}
+
+function SiteLoader() {
+  return (
+    <main className="site-loader" role="status" aria-live="polite">
+      <img src="/favicon.png" alt="" width="56" height="56" />
+      <span className="sr-only">Loading Solvimere…</span>
+    </main>
   );
 }

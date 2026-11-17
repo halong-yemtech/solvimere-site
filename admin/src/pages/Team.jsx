@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
+import { ChevronDown, ChevronUp, ImageUp, Loader2, Pencil, Save, Trash2, UserPlus, X } from "lucide-react";
 import { ImageEditor } from "../components/ImageEditor";
+import { Spinner } from "../components/Spinner";
+import { Empty } from "../components/Empty";
+import { Users } from "lucide-react";
+import { toast } from "../components/Toast";
 import { supabase, uploadImage } from "../lib/supabase";
 import { portfolioSlug } from "../../../src/lib/slug.js";
 
@@ -32,10 +37,9 @@ function clean(value) {
 }
 
 export default function Team() {
-  const [members, setMembers] = useState([]);
+  const [members, setMembers] = useState(null);
   const [draft, setDraft] = useState(null);
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
   const [pending, setPending] = useState(false);
   const [editor, setEditor] = useState(null);
 
@@ -48,8 +52,10 @@ export default function Team() {
       .then(({ data, error: queryError }) => {
         if (queryError) {
           setError(queryError.message);
+          setMembers((current) => current || []);
           return;
         }
+        setError("");
         const rows = data || [];
         setMembers(rows);
         if (selectId) {
@@ -64,7 +70,6 @@ export default function Team() {
 
   function update(key, value) {
     setDraft((current) => ({ ...current, [key]: value }));
-    setMessage("");
   }
 
   function closeEditor() {
@@ -78,7 +83,6 @@ export default function Team() {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file || !draft) return;
-    setError("");
     setEditor((current) => {
       if (current?.revoke) URL.revokeObjectURL(current.src);
       return { src: URL.createObjectURL(file), revoke: true };
@@ -86,16 +90,15 @@ export default function Team() {
   }
 
   async function applyImage(blob) {
-    setError("");
     setPending(true);
     try {
       const file = new File([blob], "avatar.jpg", { type: "image/jpeg" });
       const avatarUrl = await uploadImage("media", `team/${crypto.randomUUID()}-avatar.jpg`, file);
       setDraft((current) => ({ ...current, avatar_url: avatarUrl, avatar_scale: 1 }));
-      setMessage("Photo updated. Save the member to publish it.");
+      toast.success("Photo updated. Save the member to publish it.");
       closeEditor();
     } catch (err) {
-      setError(err.message || "The photo could not be saved.");
+      toast.error(err.message || "The photo could not be saved.");
     } finally {
       setPending(false);
     }
@@ -108,15 +111,13 @@ export default function Team() {
     const role = clean(draft.role);
     const email = clean(draft.email).toLowerCase();
     if (!name || !role) {
-      setError("Name and role are required.");
+      toast.error("Name and role are required.");
       return;
     }
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Enter a valid email, or leave it blank.");
+      toast.error("Enter a valid email, or leave it blank.");
       return;
     }
-    setError("");
-    setMessage("");
     setPending(true);
     const payload = {
       name,
@@ -135,33 +136,31 @@ export default function Team() {
       ? supabase.from("team_members").update(payload).eq("id", draft.id).select("id").single()
       : supabase
           .from("team_members")
-          .insert({ ...payload, sort_order: members.length })
+          .insert({ ...payload, sort_order: members?.length || 0 })
           .select("id")
           .single();
     const { data, error: saveError } = await query;
     setPending(false);
     if (saveError) {
-      setError(saveError.message);
+      toast.error(saveError);
       return;
     }
-    setMessage(draft.id ? "Member saved." : "Member added.");
+    toast.success(draft.id ? `${name} saved.` : `${name} added to the team.`);
     load(data.id);
   }
 
   async function remove() {
     if (!draft?.id) return;
     if (!window.confirm(`Remove ${draft.name || "this member"} from the team page?`)) return;
-    setError("");
-    setMessage("");
     setPending(true);
     const { error: deleteError } = await supabase.from("team_members").delete().eq("id", draft.id);
     setPending(false);
     if (deleteError) {
-      setError(deleteError.message);
+      toast.error(deleteError);
       return;
     }
+    toast.success(`${draft.name || "Member"} removed from the team.`);
     setDraft(null);
-    setMessage("Member removed.");
     load();
   }
 
@@ -176,8 +175,15 @@ export default function Team() {
       next.map((person, order) => supabase.from("team_members").update({ sort_order: order }).eq("id", person.id)),
     );
     const failed = results.find((result) => result.error);
-    if (failed) setError(failed.error.message);
+    if (failed) {
+      toast.error(failed.error);
+      load();
+      return;
+    }
+    toast.success(`Moved ${item.name} ${direction < 0 ? "up" : "down"}.`);
   }
+
+  if (!members) return <Spinner label="Loading team…" />;
 
   return (
     <>
@@ -192,18 +198,20 @@ export default function Team() {
           type="button"
           onClick={() => {
             setDraft({ ...emptyMember });
-            setMessage("");
-            setError("");
           }}
         >
+          <UserPlus />
           Add member
         </button>
       </header>
       {error ? <p className="error">{error}</p> : null}
-      {message ? <p className="ok">{message}</p> : null}
       <div className="split">
         <section className="roster">
-          {members.length === 0 ? <p className="empty">No team members yet.</p> : null}
+          {members.length === 0 && !error ? (
+            <Empty icon={Users} title="No team members yet">
+              Add the people who should appear on the site&apos;s team page.
+            </Empty>
+          ) : null}
           {members.map((person, index) => (
             <article key={person.id} className={draft?.id === person.id ? "is-selected" : ""}>
               <button
@@ -211,8 +219,6 @@ export default function Team() {
                 className="roster-hit"
                 onClick={() => {
                   setDraft(person);
-                  setMessage("");
-                  setError("");
                 }}
               >
                 {person.avatar_url ? (
@@ -234,16 +240,18 @@ export default function Team() {
                   aria-label={`Move ${person.name} up`}
                   disabled={index === 0}
                   onClick={() => move(index, -1)}
+                  title="Move up"
                 >
-                  Up
+                  <ChevronUp />
                 </button>
                 <button
                   type="button"
                   aria-label={`Move ${person.name} down`}
                   disabled={index === members.length - 1}
                   onClick={() => move(index, 1)}
+                  title="Move down"
                 >
-                  Down
+                  <ChevronDown />
                 </button>
               </div>
             </article>
@@ -261,21 +269,25 @@ export default function Team() {
                 <span className="ph lg" />
               )}
               <div className="avatar-fields">
-                <label className="field">
-                  <span>Avatar</span>
-                  <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onFile} />
-                </label>
-                {draft.avatar_url ? (
-                  <button
-                    className="ghost"
-                    type="button"
-                    onClick={() => setEditor({ src: draft.avatar_url, revoke: false })}
-                  >
-                    Edit image
-                  </button>
-                ) : (
-                  <small>Choose a photo to crop, scale, and adjust it.</small>
-                )}
+                <span className="field-label">Avatar</span>
+                <div className="tool-row">
+                  <label className="ghost file-btn">
+                    <ImageUp />
+                    {draft.avatar_url ? "Replace photo" : "Upload photo"}
+                    <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onFile} />
+                  </label>
+                  {draft.avatar_url ? (
+                    <button
+                      className="ghost"
+                      type="button"
+                      onClick={() => setEditor({ src: draft.avatar_url, revoke: false })}
+                    >
+                      <Pencil />
+                      Edit image
+                    </button>
+                  ) : null}
+                </div>
+                <small>Choose a photo to crop, scale, and adjust it.</small>
               </div>
             </div>
             <label className="field">
@@ -343,14 +355,17 @@ export default function Team() {
             </label>
             <div className="actions">
               <button className="primary" type="submit" disabled={pending}>
+                {pending ? <Loader2 className="spin" /> : draft.id ? <Save /> : <UserPlus />}
                 {pending ? "Saving…" : draft.id ? "Save changes" : "Create member"}
               </button>
               {draft.id ? (
                 <button className="danger" type="button" disabled={pending} onClick={remove}>
+                  <Trash2 />
                   Delete
                 </button>
               ) : (
                 <button className="ghost" type="button" onClick={() => setDraft(null)}>
+                  <X />
                   Cancel
                 </button>
               )}

@@ -1,6 +1,46 @@
 import { useCallback, useEffect, useState } from "react";
+import {
+  CircleDot,
+  Contact,
+  FileText,
+  IdCard,
+  LayoutList,
+  Link2,
+  Loader2,
+  Mail,
+  Newspaper,
+  Palette,
+  Plus,
+  Quote,
+  Save,
+  Search,
+  Sparkles,
+  Undo2,
+  UserRound,
+  Wrench,
+  X,
+} from "lucide-react";
 import { loadDoc, saveDoc } from "../portfolio/api";
 import { Fields, defaultsFor, missingRequired, normalize } from "./SchemaForm";
+import { Spinner } from "./Spinner";
+import { toast } from "./Toast";
+
+/** Icons for the editor tabs (labels come from portfolio/schemas.json). */
+const TAB_ICONS = {
+  "About me": UserRound,
+  Appearance: Palette,
+  "Blog section": Newspaper,
+  CV: FileText,
+  Contact: Mail,
+  "Links & accounts": Link2,
+  Maintenance: Wrench,
+  Profile: IdCard,
+  "Profile card": Contact,
+  Quote: Quote,
+  SEO: Search,
+  Sections: LayoutList,
+  Skills: Sparkles,
+};
 
 /**
  * Edit one portfolio document. `target`:
@@ -9,13 +49,19 @@ import { Fields, defaultsFor, missingRequired, normalize } from "./SchemaForm";
  *   { kind: "settings" }                          portfolio settings
  * Saving publishes immediately.
  */
-export function DocEditor({ target, onSaved, onCancel, compact = false, savedNotice = "Saved. Changes are live." }) {
+export function DocEditor({
+  target,
+  onSaved,
+  onCancel,
+  compact = false,
+  savedNotice = "Saved. Changes are live.",
+  createdNotice,
+}) {
   const [schema, setSchema] = useState(null);
   const [values, setValues] = useState({});
   const [initial, setInitial] = useState("{}");
   const [tab, setTab] = useState(0);
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
   const [saving, setSaving] = useState(false);
   const isNew = target.kind !== "settings" && target.id == null;
   const dirty = schema !== null && JSON.stringify(values) !== initial;
@@ -54,26 +100,24 @@ export function DocEditor({ target, onSaved, onCancel, compact = false, savedNot
     if (!schema || saving) return;
     const missing = missingRequired(schema, values);
     if (missing.length) {
-      setError(`Please fill in: ${missing.slice(0, 5).join(", ")}${missing.length > 5 ? "…" : ""}`);
+      toast.error(`Please fill in: ${missing.slice(0, 5).join(", ")}${missing.length > 5 ? "…" : ""}`);
       return;
     }
     setSaving(true);
-    setError("");
-    setNotice("");
     try {
       const id = await saveDoc(target, normalize(schema, values));
       setInitial(JSON.stringify(values));
-      setNotice(savedNotice);
+      toast.success(isNew ? createdNotice || (target.kind === "profile" ? "Profile created." : "Added.") : savedNotice);
       onSaved?.(id);
     } catch (err) {
-      setError(/duplicate key.*slug/i.test(err.message) ? "Another profile already uses that address." : err.message);
+      toast.error(/duplicate key.*slug/i.test(err.message) ? "Another profile already uses that address." : err);
     } finally {
       setSaving(false);
     }
   }
 
   if (error && !schema) return <p className="error">{error}</p>;
-  if (!schema) return <p className="empty">Loading…</p>;
+  if (!schema) return compact ? <Spinner inline size="sm" /> : <Spinner label="Loading editor…" />;
 
   const tabs = schema.length === 1 && schema[0].type === "tabs" ? schema[0].tabs : null;
   const shown = tabs ? tabs[Math.min(tab, tabs.length - 1)] : { label: "", fields: schema };
@@ -91,6 +135,7 @@ export function DocEditor({ target, onSaved, onCancel, compact = false, savedNot
               className={i === tab ? "is-on" : ""}
               onClick={() => setTab(i)}
             >
+              <TabIcon label={t.label} />
               {t.label}
             </button>
           ))}
@@ -100,29 +145,38 @@ export function DocEditor({ target, onSaved, onCancel, compact = false, savedNot
       <Fields schema={shown.fields} values={values} onChange={setValues} />
 
       <div className={`doc-bar ${dirty ? "is-dirty" : ""}`}>
-        <span>
-          {error ? (
-            <b className="error">{error}</b>
-          ) : (
-            notice || (dirty ? "Unsaved changes" : isNew ? "New" : "No changes")
-          )}
-        </span>
+        <span>{dirty ? "Unsaved changes" : isNew ? "New" : "All changes saved"}</span>
         {dirty && !isNew ? (
-          <button type="button" className="ghost" onClick={() => setValues(JSON.parse(initial))}>
+          <button
+            type="button"
+            className="ghost"
+            onClick={() => {
+              setValues(JSON.parse(initial));
+              toast.info("Changes undone.");
+            }}
+          >
+            <Undo2 />
             Undo
           </button>
         ) : null}
         {onCancel ? (
           <button type="button" className="ghost" onClick={onCancel}>
+            <X />
             {dirty ? "Cancel" : "Close"}
           </button>
         ) : null}
         <button type="submit" className="primary" disabled={saving || (!dirty && !isNew)}>
+          {saving ? <Loader2 className="spin" /> : isNew ? <Plus /> : <Save />}
           {saving ? "Saving…" : isNew ? "Create" : "Save"}
         </button>
       </div>
     </form>
   );
+}
+
+function TabIcon({ label }) {
+  const Icon = TAB_ICONS[label] || CircleDot;
+  return <Icon />;
 }
 
 /** A DocEditor in a modal sheet (list items, new profiles). */

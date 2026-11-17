@@ -1,10 +1,32 @@
 import { useEffect, useRef, useState } from "react";
+import {
+  Crop,
+  FlipHorizontal2,
+  FlipVertical2,
+  Loader2,
+  RectangleHorizontal,
+  RectangleVertical,
+  RefreshCcw,
+  RotateCcw,
+  RotateCw,
+  Square,
+  X,
+  ZoomIn,
+  ZoomOut,
+} from "lucide-react";
+import { toast } from "./Toast";
 
 const ASPECTS = [
   { id: "portrait", label: "Portrait", ratio: 4 / 5 },
   { id: "square", label: "Square", ratio: 1 },
   { id: "wide", label: "Wide", ratio: 3 / 2 },
 ];
+
+const ASPECT_ICONS = { portrait: RectangleVertical, square: Square, wide: RectangleHorizontal };
+function AspectIcon({ id }) {
+  const Icon = ASPECT_ICONS[id] || Square;
+  return <Icon />;
+}
 
 const INITIAL = {
   scale: 1,
@@ -118,7 +140,6 @@ export function ImageEditor({ src, onCancel, onApply, pending, aspect = "portrai
   }
 
   async function apply() {
-    setError("");
     try {
       const image = await loadImage(src);
       const stage = stageRef.current;
@@ -159,7 +180,7 @@ export function ImageEditor({ src, onCancel, onApply, pending, aspect = "portrai
       if (!blob) throw new Error("The image could not be processed.");
       await onApply(blob);
     } catch (err) {
-      setError(err.message || "The image could not be processed.");
+      toast.error(err.message || "The image could not be processed.");
     }
   }
 
@@ -171,8 +192,8 @@ export function ImageEditor({ src, onCancel, onApply, pending, aspect = "portrai
             <p className="eyebrow">Image tools</p>
             <h2 id="image-editor-title">Crop photo</h2>
           </div>
-          <button className="ghost" type="button" onClick={onCancel}>
-            Close
+          <button className="ghost icon-btn" type="button" onClick={onCancel} aria-label="Close" title="Close">
+            <X />
           </button>
         </header>
         <div className="editor-layout">
@@ -213,6 +234,7 @@ export function ImageEditor({ src, onCancel, onApply, pending, aspect = "portrai
                     type="button"
                     onClick={() => patch({ aspect: item.id, scale: 1, x: 0, y: 0 })}
                   >
+                    <AspectIcon id={item.id} />
                     {item.label}
                   </button>
                 ))}
@@ -227,6 +249,7 @@ export function ImageEditor({ src, onCancel, onApply, pending, aspect = "portrai
                   onClick={() => patch({ scale: Math.max(1, Math.round((edit.scale - 0.05) * 100) / 100) })}
                   disabled={edit.scale <= 1}
                 >
+                  <ZoomOut />
                   Scale down
                 </button>
                 <button
@@ -235,6 +258,7 @@ export function ImageEditor({ src, onCancel, onApply, pending, aspect = "portrai
                   onClick={() => patch({ scale: Math.min(4, Math.round((edit.scale + 0.05) * 100) / 100) })}
                   disabled={edit.scale >= 4}
                 >
+                  <ZoomIn />
                   Scale up
                 </button>
               </div>
@@ -252,9 +276,11 @@ export function ImageEditor({ src, onCancel, onApply, pending, aspect = "portrai
               <span>Rotate {edit.rotation}°</span>
               <div className="tool-row">
                 <button className="ghost" type="button" onClick={() => patch({ rotation: edit.rotation - 90 })}>
+                  <RotateCcw />
                   Left
                 </button>
                 <button className="ghost" type="button" onClick={() => patch({ rotation: edit.rotation + 90 })}>
+                  <RotateCw />
                   Right
                 </button>
               </div>
@@ -278,6 +304,7 @@ export function ImageEditor({ src, onCancel, onApply, pending, aspect = "portrai
                   type="button"
                   onClick={() => patch({ flipX: !edit.flipX })}
                 >
+                  <FlipHorizontal2 />
                   Horizontal
                 </button>
                 <button
@@ -285,6 +312,7 @@ export function ImageEditor({ src, onCancel, onApply, pending, aspect = "portrai
                   type="button"
                   onClick={() => patch({ flipY: !edit.flipY })}
                 >
+                  <FlipVertical2 />
                   Vertical
                 </button>
               </div>
@@ -319,12 +347,15 @@ export function ImageEditor({ src, onCancel, onApply, pending, aspect = "portrai
             {error ? <p className="error">{error}</p> : null}
             <div className="tool-row">
               <button className="ghost" type="button" onClick={() => setEdit({ ...INITIAL, aspect })}>
+                <RefreshCcw />
                 Reset
               </button>
               <button className="ghost" type="button" onClick={onCancel}>
+                <X />
                 Cancel
               </button>
               <button className="primary" type="button" onClick={apply} disabled={pending || !natural.width}>
+                {pending ? <Loader2 className="spin" /> : <Crop />}
                 {pending ? "Saving…" : "Apply crop"}
               </button>
             </div>

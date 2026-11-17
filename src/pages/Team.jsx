@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { pageDefaults } from "../cms/defaults";
-import { usePageContent } from "../cms/Content";
+import { usePageContent, useTeamMembers } from "../cms/Content";
 import { Button, Eyebrow } from "../components/Chrome";
 import { RichTitle } from "../components/Story";
 import { TeamActions, portfolioLinkProps } from "../components/TeamPortfolio";
-import { useTeamMembers } from "../lib/team";
 
 const CYCLE = 7200;
 

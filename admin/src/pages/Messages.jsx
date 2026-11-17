@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
+import { Archive, Inbox, Trash2 } from "lucide-react";
 import { supabase } from "../lib/supabase";
+import { Spinner } from "../components/Spinner";
+import { Empty } from "../components/Empty";
+import { toast } from "../components/Toast";
 
 const STATUSES = ["new", "read", "archived"];
 const fmt = (iso) =>
@@ -16,7 +20,6 @@ export default function Messages() {
   const [rows, setRows] = useState([]);
   const [view, setView] = useState("inbox"); // inbox = new + read, archived
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
 
   function load() {
@@ -43,13 +46,22 @@ export default function Messages() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view]);
 
-  async function setStatus(row, status) {
-    setError("");
-    setMessage("");
+  async function setStatus(row, status, { quiet = false } = {}) {
     const { error: saveError } = await supabase.from("contact_messages").update({ status }).eq("id", row.id);
     if (saveError) {
-      setError(saveError.message);
+      toast.error(saveError);
       return;
+    }
+    if (!quiet) {
+      toast.success(
+        status === "archived"
+          ? `Message from ${row.name} archived.`
+          : status === "new"
+            ? `Message from ${row.name} marked unread.`
+            : row.status === "archived"
+              ? `Message from ${row.name} moved to the inbox.`
+              : `Message from ${row.name} marked read.`,
+      );
     }
     const leavesView = (view === "inbox") !== (status !== "archived");
     setRows((current) =>
@@ -61,15 +73,16 @@ export default function Messages() {
 
   async function remove(row) {
     if (!window.confirm(`Delete the message from ${row.name}? This can't be undone.`)) return;
-    setError("");
     const { error: deleteError } = await supabase.from("contact_messages").delete().eq("id", row.id);
     if (deleteError) {
-      setError(deleteError.message);
+      toast.error(deleteError);
       return;
     }
     setRows((current) => current.filter((r) => r.id !== row.id));
-    setMessage("Message deleted.");
+    toast.success(`Message from ${row.name} deleted.`);
   }
+
+  if (loading) return <Spinner label="Loading messages…" />;
 
   const unread = rows.filter((r) => r.status === "new").length;
 
@@ -86,6 +99,7 @@ export default function Messages() {
         </div>
         <div className="appt-tabs">
           <button type="button" className={`ghost ${view === "inbox" ? "is-on" : ""}`} onClick={() => setView("inbox")}>
+            <Inbox />
             Inbox
           </button>
           <button
@@ -93,14 +107,22 @@ export default function Messages() {
             className={`ghost ${view === "archived" ? "is-on" : ""}`}
             onClick={() => setView("archived")}
           >
+            <Archive />
             Archived
           </button>
         </div>
       </header>
       {error ? <p className="error">{error}</p> : null}
-      {message ? <p className="ok">{message}</p> : null}
-      {loading ? <p className="empty">Loading…</p> : null}
-      {!loading && !error && rows.length === 0 ? <p className="empty">No messages here.</p> : null}
+      {!error && rows.length === 0 ? (
+        <Empty
+          icon={view === "inbox" ? Inbox : Archive}
+          title={view === "inbox" ? "Inbox is empty" : "No archived messages"}
+        >
+          {view === "inbox"
+            ? "Messages visitors send from the site and the portfolios will appear here."
+            : "Messages you archive are kept here."}
+        </Empty>
+      ) : null}
       <div className="appt-list">
         {rows.map((row) => (
           <article key={row.id} className={`panel appt msg is-${row.status}`}>
@@ -111,7 +133,7 @@ export default function Messages() {
               </strong>
               <a
                 href={`mailto:${row.email}?subject=${encodeURIComponent("Re: your message to Solvimere")}`}
-                onClick={() => row.status === "new" && setStatus(row, "read")}
+                onClick={() => row.status === "new" && setStatus(row, "read", { quiet: true })}
               >
                 {row.email}
               </a>
@@ -132,8 +154,14 @@ export default function Messages() {
                   ))}
                 </select>
               </label>
-              <button type="button" className="danger" onClick={() => remove(row)}>
-                Delete
+              <button
+                type="button"
+                className="danger icon-btn"
+                onClick={() => remove(row)}
+                aria-label={`Delete the message from ${row.name}`}
+                title="Delete"
+              >
+                <Trash2 />
               </button>
             </div>
           </article>

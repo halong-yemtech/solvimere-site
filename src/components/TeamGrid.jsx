@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { pageDefaults } from "../cms/defaults";
-import { usePageContent } from "../cms/Content";
+import { usePageContent, useTeamMembers } from "../cms/Content";
 import { TeamActions, portfolioLinkProps } from "./TeamPortfolio";
-import { useTeamMembers } from "../lib/team";
 
 export function TeamGrid() {
   const page = usePageContent("team", pageDefaults.team);

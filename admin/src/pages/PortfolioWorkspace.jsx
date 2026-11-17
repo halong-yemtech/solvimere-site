@@ -1,11 +1,27 @@
 import { useCallback, useEffect, useState } from "react";
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowUp,
+  ExternalLink,
+  FileText,
+  Inbox,
+  LayoutList,
+  Plus,
+  SearchX,
+  Trash2,
+  UserRound,
+} from "lucide-react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { DocEditor, DocEditorModal } from "../components/DocEditor";
+import { Spinner } from "../components/Spinner";
+import { Empty } from "../components/Empty";
+import { toast } from "../components/Toast";
 import { SITE_URL, deleteItem, deleteProfile, listItems, listProfiles, reorderItems } from "../portfolio/api";
 
 const TABS = [
-  { key: "profile", label: "Profile" },
-  { key: "content", label: "Content" },
+  { key: "profile", label: "Profile", icon: UserRound },
+  { key: "content", label: "Content", icon: LayoutList },
 ];
 
 /** One profile: its fields and its list items (works, résumé, …). */
@@ -33,13 +49,32 @@ export default function PortfolioWorkspace() {
     if (!window.confirm(`Delete ${summary.name} and all of its content? This can't be undone.`)) return;
     try {
       await deleteProfile(id);
+      toast.success(`${summary.name}'s portfolio deleted.`);
       navigate("/portfolio");
     } catch (err) {
-      setError(err.message);
+      toast.error(err);
     }
   }
 
   const live = summary?.visibility === "public";
+
+  if (!summary && !error) return <Spinner label="Loading profile…" />;
+  if (!summary) {
+    return (
+      <Empty
+        icon={SearchX}
+        title="Profile not found"
+        action={
+          <Link className="ghost" to="/portfolio">
+            <ArrowLeft />
+            Back to profiles
+          </Link>
+        }
+      >
+        {error}
+      </Empty>
+    );
+  }
 
   return (
     <>
@@ -56,14 +91,17 @@ export default function PortfolioWorkspace() {
             {live ? (
               <>
                 <a className="ghost" href={`${SITE_URL}/team/${summary.slug}`} target="_blank" rel="noreferrer">
+                  <ExternalLink />
                   View live
                 </a>
                 <a className="ghost" href={`${SITE_URL}/team/${summary.slug}/cv`} target="_blank" rel="noreferrer">
+                  <FileText />
                   CV
                 </a>
               </>
             ) : null}
             <button type="button" className="danger" onClick={remove}>
+              <Trash2 />
               Delete
             </button>
           </div>
@@ -80,6 +118,7 @@ export default function PortfolioWorkspace() {
             aria-current={t.key === tab ? "page" : undefined}
             onClick={() => setParams({ tab: t.key })}
           >
+            <t.icon />
             {t.label}
           </button>
         ))}
@@ -121,8 +160,9 @@ function ProfileContent({ profileId }) {
     );
     try {
       await reorderItems(ids);
+      toast.success(`Moved “${group.items[index].label}” ${dir < 0 ? "up" : "down"}.`);
     } catch (err) {
-      setError(err.message);
+      toast.error(err);
       load();
     }
   }
@@ -131,18 +171,19 @@ function ProfileContent({ profileId }) {
     if (!window.confirm(`Delete “${item.label}”? This can't be undone.`)) return;
     try {
       await deleteItem(item.id);
+      toast.success(`“${item.label}” deleted.`);
       load();
     } catch (err) {
-      setError(err.message);
+      toast.error(err);
     }
   }
 
   if (error && !groups) return <p className="error">{error}</p>;
-  if (!groups) return <p className="empty">Loading…</p>;
+  if (groups?.length === 0) return <Empty icon={LayoutList} title="No content types" />;
+  if (!groups) return <Spinner label="Loading content…" />;
 
   return (
     <div className="pf-content">
-      {error ? <p className="error">{error}</p> : null}
       {groups.map((group) => (
         <section key={group.kind} className="panel">
           <header className="pf-group-head">
@@ -159,10 +200,15 @@ function ProfileContent({ profileId }) {
                 })
               }
             >
-              + Add
+              <Plus />
+              Add
             </button>
           </header>
-          {group.items.length === 0 ? <p className="empty">None yet.</p> : null}
+          {group.items.length === 0 ? (
+            <Empty compact icon={Inbox} title="Empty">
+              No {group.label.toLowerCase()} yet. Use Add to create one.
+            </Empty>
+          ) : null}
           <ul className="pf-items">
             {group.items.map((item, i) => (
               <li key={item.id}>
@@ -184,24 +230,27 @@ function ProfileContent({ profileId }) {
                     disabled={i === 0}
                     onClick={() => move(group, i, -1)}
                     aria-label={`Move ${item.label} up`}
+                    title="Move up"
                   >
-                    ↑
+                    <ArrowUp />
                   </button>
                   <button
                     type="button"
                     disabled={i === group.items.length - 1}
                     onClick={() => move(group, i, 1)}
                     aria-label={`Move ${item.label} down`}
+                    title="Move down"
                   >
-                    ↓
+                    <ArrowDown />
                   </button>
                   <button
                     type="button"
                     className="is-danger"
                     onClick={() => remove(item)}
                     aria-label={`Delete ${item.label}`}
+                    title="Delete"
                   >
-                    ✕
+                    <Trash2 />
                   </button>
                 </span>
               </li>

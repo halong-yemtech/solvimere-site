@@ -8,8 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc -p .",
-    "admin": "bun --cwd admin run dev",
-    "build:admin": "bun --cwd admin run build",
+    "admin": "bun run --cwd admin dev",
+    "build:admin": "bun run --cwd admin build",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

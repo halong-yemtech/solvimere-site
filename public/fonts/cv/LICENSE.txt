@@ -1,4 +1,4 @@
-Liberation Serif 2.x — Copyright (c) 2012 Red Hat, Inc. Licensed under the SIL Open Font License 1.1 (below).
+Liberation Serif 2.x - Copyright (c) 2012 Red Hat, Inc. Licensed under the SIL Open Font License 1.1 (below).
 
 SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
 

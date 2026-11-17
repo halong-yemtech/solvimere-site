@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { FileText } from "lucide-react";
 import { supabase } from "../lib/supabase";
+import { Spinner } from "../components/Spinner";
+import { Empty } from "../components/Empty";
 
 export default function PageList() {
-  const [pages, setPages] = useState([]);
+  const [pages, setPages] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -17,6 +20,8 @@ export default function PageList() {
       });
   }, []);
 
+  if (!pages) return <Spinner label="Loading pages…" />;
+
   return (
     <>
       <header className="top">
@@ -24,14 +29,20 @@ export default function PageList() {
         <p>Published pages replace the built-in copy on the public site. Drafts stay off the site.</p>
       </header>
       {error ? <p className="error">{error}</p> : null}
-      <section className="list">
-        {pages.map((page) => (
-          <Link key={page.slug} to={`/pages/${page.slug}`}>
-            <strong>{page.title}</strong>
-            <span className={`pill ${page.status}`}>{page.status}</span>
-          </Link>
-        ))}
-      </section>
+      {pages.length === 0 && !error ? (
+        <Empty icon={FileText} title="No pages yet">
+          Pages are created by the database migrations. Apply them to start editing the site.
+        </Empty>
+      ) : (
+        <section className="list">
+          {pages.map((page) => (
+            <Link key={page.slug} to={`/pages/${page.slug}`}>
+              <strong>{page.title}</strong>
+              <span className={`pill ${page.status}`}>{page.status}</span>
+            </Link>
+          ))}
+        </section>
+      )}
     </>
   );
 }

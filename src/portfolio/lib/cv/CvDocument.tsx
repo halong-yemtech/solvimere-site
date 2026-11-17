@@ -2,7 +2,7 @@ import { Document, Font, Link, Page, StyleSheet, Text, View } from "@react-pdf/r
 import type { CvData, CvEntry } from "./data";
 
 // Liberation Serif: metric-compatible with Times New Roman (the template's font),
-// with full Latin coverage incl. Vietnamese. SIL OFL 1.1 — see public/fonts/cv/LICENSE.txt.
+// with full Latin coverage incl. Vietnamese. SIL OFL 1.1 - see public/fonts/cv/LICENSE.txt.
 // Served by the site from public/fonts/cv.
 const fontDir = "/fonts/cv";
 Font.register({
@@ -99,7 +99,7 @@ export default function CvDocument({ data }: { data: CvData }) {
   const contact = [...data.contact];
   return (
     <Document
-      title={`${data.name} — CV`}
+      title={`${data.name} - CV`}
       author={data.name}
       subject="Curriculum vitae"
       creator="Portfolio CMS"

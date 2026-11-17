@@ -15,11 +15,12 @@ import PortfolioMedia from "./pages/PortfolioMedia";
 import PortfolioGuestbook from "./pages/PortfolioGuestbook";
 import PortfolioSettings from "./pages/PortfolioSettings";
 import Account from "./pages/Account";
+import { Spinner } from "./components/Spinner";
 
 function Guard({ children, admin = false }) {
   const { ready, session, profile, configured } = useAuth();
   if (!configured) return <Login />;
-  if (!ready) return <p className="top">Loading…</p>;
+  if (!ready) return <Spinner label="Loading Solvimere admin…" />;
   if (!session) return <Navigate to="/login" replace />;
   if (!profile) return <p className="top">This account has no profile yet.</p>;
   if (admin && profile.role !== "admin") return <Navigate to="/" replace />;

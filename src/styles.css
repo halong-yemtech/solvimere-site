@@ -1545,6 +1545,39 @@ body.has-cookie-bar .to-top {
 .page-loading {
   min-height: 100vh;
 }
+/* Shown until the site's content has loaded from the database (SiteLayout). */
+.site-loader {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  background: var(--bg);
+}
+.site-loader img {
+  width: 56px;
+  height: 56px;
+  animation: site-loader-spin 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes site-loader-spin {
+  50% {
+    transform: rotate(180deg) scale(0.86);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-loader img {
+    animation: none;
+  }
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
 .team-hero {
   position: relative;
 }

@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
+import { CalendarClock, History, Trash2 } from "lucide-react";
 import { supabase } from "../lib/supabase";
+import { Spinner } from "../components/Spinner";
+import { Empty } from "../components/Empty";
+import { toast } from "../components/Toast";
 
 const STATUSES = ["pending", "confirmed", "cancelled"];
 const BUSINESS_TZ = "America/New_York";
@@ -20,7 +24,6 @@ export default function Appointments() {
   const [rows, setRows] = useState([]);
   const [view, setView] = useState("upcoming");
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
 
   function load() {
@@ -52,29 +55,27 @@ export default function Appointments() {
   }, [view]);
 
   async function setStatus(row, status) {
-    setError("");
-    setMessage("");
     const { error: saveError } = await supabase.from("appointments").update({ status }).eq("id", row.id);
     if (saveError) {
-      setError(saveError.code === "23505" ? "Another active booking already holds that time." : saveError.message);
+      toast.error(saveError.code === "23505" ? "Another active booking already holds that time." : saveError);
       return;
     }
     setRows((current) => current.map((r) => (r.id === row.id ? { ...r, status } : r)));
-    setMessage(`Marked ${row.name} as ${status}.`);
+    toast.success(`Booking from ${row.name} marked ${status}.`);
   }
 
   async function remove(row) {
     if (!window.confirm(`Delete the booking from ${row.name}? This can't be undone.`)) return;
-    setError("");
-    setMessage("");
     const { error: deleteError } = await supabase.from("appointments").delete().eq("id", row.id);
     if (deleteError) {
-      setError(deleteError.message);
+      toast.error(deleteError);
       return;
     }
     setRows((current) => current.filter((r) => r.id !== row.id));
-    setMessage("Booking deleted.");
+    toast.success(`Booking from ${row.name} deleted.`);
   }
+
+  if (loading) return <Spinner label="Loading bookings…" />;
 
   return (
     <>
@@ -90,18 +91,25 @@ export default function Appointments() {
             className={`ghost ${view === "upcoming" ? "is-on" : ""}`}
             onClick={() => setView("upcoming")}
           >
+            <CalendarClock />
             Upcoming
           </button>
           <button type="button" className={`ghost ${view === "past" ? "is-on" : ""}`} onClick={() => setView("past")}>
+            <History />
             Past
           </button>
         </div>
       </header>
       {error ? <p className="error">{error}</p> : null}
-      {message ? <p className="ok">{message}</p> : null}
-      {loading ? <p className="empty">Loading…</p> : null}
-      {!loading && !error && rows.length === 0 ? (
-        <p className="empty">{view === "upcoming" ? "No upcoming bookings." : "No past bookings."}</p>
+      {!error && rows.length === 0 ? (
+        <Empty
+          icon={view === "upcoming" ? CalendarClock : History}
+          title={view === "upcoming" ? "No upcoming bookings" : "No past bookings"}
+        >
+          {view === "upcoming"
+            ? "Meetings visitors book from the site's assistant will appear here."
+            : "Bookings move here once their time has passed."}
+        </Empty>
       ) : null}
       <div className="appt-list">
         {rows.map((row) => (
@@ -132,8 +140,14 @@ export default function Appointments() {
                   ))}
                 </select>
               </label>
-              <button type="button" className="danger" onClick={() => remove(row)}>
-                Delete
+              <button
+                type="button"
+                className="danger icon-btn"
+                onClick={() => remove(row)}
+                aria-label={`Delete the booking from ${row.name}`}
+                title="Delete"
+              >
+                <Trash2 />
               </button>
             </div>
           </article>

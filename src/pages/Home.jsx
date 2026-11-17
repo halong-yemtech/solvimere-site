@@ -6,9 +6,8 @@ import { Button, Eyebrow, Orbit } from "../components/Chrome";
 import { TeamGrid } from "../components/TeamGrid";
 import { Reviews } from "../components/Reviews";
 import { pageDefaults } from "../cms/defaults";
-import { usePageContent } from "../cms/Content";
+import { usePageContent, useTeamMembers } from "../cms/Content";
 import { RichTitle } from "../components/Story";
-import { useTeamMembers } from "../lib/team";
 import { supabase, supabaseConfigured } from "../lib/supabase";
 
 function useCount(target, active, decimals = 0) {
@@ -113,7 +112,7 @@ export default function Home() {
     });
   }, [storyPhotos]);
 
-  /** Saved to Supabase `contact_messages`; staff read it in Admin → Messages. */
+  /** Saved to Supabase `contact_messages`; staff read it in Admin -> Messages. */
   async function onSubmit(event) {
     event.preventDefault();
     const formEl = event.currentTarget;

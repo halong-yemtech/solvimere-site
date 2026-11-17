@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { ImageUp, Loader2, Save } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { supabase, uploadImage } from "../lib/supabase";
 import { useAuth } from "../auth";
+import { Spinner } from "../components/Spinner";
+import { toast } from "../components/Toast";
 
 export default function Account() {
   const { id } = useParams();
@@ -10,7 +13,8 @@ export default function Account() {
   const [person, setPerson] = useState(null);
   const [name, setName] = useState("");
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (!targetId) return undefined;
@@ -29,33 +33,38 @@ export default function Account() {
 
   async function save(event) {
     event.preventDefault();
-    setError("");
-    setMessage("");
+    setSaving(true);
     const { error: saveError } = await supabase.from("profiles").update({ full_name: name }).eq("id", targetId);
+    setSaving(false);
     if (saveError) {
-      setError(saveError.message);
+      toast.error(saveError);
       return;
     }
+    setPerson((current) => ({ ...current, full_name: name }));
     if (targetId === profile.id) await refreshProfile();
-    setMessage("Profile saved.");
+    toast.success("Profile saved.");
   }
 
   async function onFile(event) {
     const file = event.target.files?.[0];
+    event.target.value = "";
     if (!file) return;
-    setError("");
+    setUploading(true);
     try {
       const avatarUrl = await uploadImage("avatars", `${targetId}/avatar`, file);
       const { error: saveError } = await supabase.from("profiles").update({ avatar_url: avatarUrl }).eq("id", targetId);
       if (saveError) throw saveError;
       setPerson((current) => ({ ...current, avatar_url: avatarUrl }));
       if (targetId === profile.id) await refreshProfile();
+      toast.success("Photo updated.");
     } catch (err) {
-      setError(err.message);
+      toast.error(err);
+    } finally {
+      setUploading(false);
     }
   }
 
-  if (!person) return <p className="top">{error || "Loading profile…"}</p>;
+  if (!person) return error ? <p className="top error">{error}</p> : <Spinner label="Loading profile…" />;
   const own = person.id === session?.user?.id;
 
   return (
@@ -65,10 +74,14 @@ export default function Account() {
         <p>{person.role}</p>
       </header>
       {person.avatar_url ? <img className="avatar" src={person.avatar_url} alt="" /> : <span className="ph lg" />}
-      <label>
-        Photo
-        <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onFile} />
-      </label>
+      <div className="photo-field">
+        <span>Photo</span>
+        <label className={`ghost file-btn${uploading ? " is-busy" : ""}`}>
+          {uploading ? <Loader2 className="spin" /> : <ImageUp />}
+          {uploading ? "Uploading…" : person.avatar_url ? "Replace photo" : "Upload photo"}
+          <input type="file" accept="image/png,image/jpeg,image/webp" disabled={uploading} onChange={onFile} />
+        </label>
+      </div>
       <label>
         Name
         <input value={name} onChange={(event) => setName(event.target.value)} />
@@ -77,10 +90,9 @@ export default function Account() {
         Email
         <input value={person.email} disabled />
       </label>
-      {error ? <p className="error">{error}</p> : null}
-      {message ? <p className="ok">{message}</p> : null}
-      <button className="primary" type="submit">
-        Save profile
+      <button className="primary" type="submit" disabled={saving || name === (person.full_name || "")}>
+        {saving ? <Loader2 className="spin" /> : <Save />}
+        {saving ? "Saving…" : "Save profile"}
       </button>
     </form>
   );

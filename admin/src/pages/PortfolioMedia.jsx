@@ -1,4 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { ExternalLink, Images, Loader2, Save, Trash2, Upload } from "lucide-react";
+import { Spinner } from "../components/Spinner";
+import { Empty } from "../components/Empty";
+import { toast } from "../components/Toast";
 import { deleteMedia, isImage, listAllMedia, mediaUsage, updateMediaAlt, uploadMedia } from "../portfolio/api";
 
 const size = (n) =>
@@ -13,12 +17,17 @@ export default function PortfolioMedia() {
   const [usage, setUsage] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
 
   function load() {
     listAllMedia()
-      .then(setItems)
-      .catch((err) => setError(err.message));
+      .then((list) => {
+        setError("");
+        setItems(list);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setItems((current) => current || []);
+      });
   }
   useEffect(load, []);
 
@@ -26,7 +35,6 @@ export default function PortfolioMedia() {
     setSelected(item);
     setAlt(item.alt);
     setUsage(null);
-    setMessage("");
     mediaUsage(item.id)
       .then(setUsage)
       .catch(() => setUsage([]));
@@ -35,19 +43,18 @@ export default function PortfolioMedia() {
   async function onFiles(files) {
     if (!files?.length) return;
     setBusy(true);
-    setError("");
     let ok = 0;
     for (const file of Array.from(files)) {
       try {
         await uploadMedia(file);
         ok += 1;
       } catch (err) {
-        setError(`${file.name}: ${err.message}`);
+        toast.error(`${file.name}: ${err.message}`);
       }
     }
     setBusy(false);
     if (fileRef.current) fileRef.current.value = "";
-    if (ok) setMessage(`Uploaded ${ok} file${ok === 1 ? "" : "s"}.`);
+    if (ok) toast.success(`Uploaded ${ok} file${ok === 1 ? "" : "s"}.`);
     load();
   }
 
@@ -57,9 +64,9 @@ export default function PortfolioMedia() {
       await updateMediaAlt(selected.id, alt);
       setItems((all) => all.map((m) => (m.id === selected.id ? { ...m, alt } : m)));
       setSelected((s) => ({ ...s, alt }));
-      setMessage("Description saved.");
+      toast.success("Description saved.");
     } catch (err) {
-      setError(err.message);
+      toast.error(err);
     }
   }
 
@@ -70,11 +77,13 @@ export default function PortfolioMedia() {
       await deleteMedia(selected);
       setItems((all) => all.filter((m) => m.id !== selected.id));
       setSelected(null);
-      setMessage("File deleted.");
+      toast.success(`${selected.filename} deleted.`);
     } catch (err) {
-      setError(err.message);
+      toast.error(err);
     }
   }
+
+  if (!items) return <Spinner label="Loading media…" />;
 
   return (
     <div
@@ -91,6 +100,7 @@ export default function PortfolioMedia() {
           <p>Images and PDFs used in portfolios. Drop files anywhere here to upload.</p>
         </div>
         <button type="button" className="primary" disabled={busy} onClick={() => fileRef.current?.click()}>
+          {busy ? <Loader2 className="spin" /> : <Upload />}
           {busy ? "Uploading…" : "Upload"}
         </button>
         <input
@@ -103,11 +113,23 @@ export default function PortfolioMedia() {
         />
       </header>
       {error ? <p className="error">{error}</p> : null}
-      {message ? <p className="ok">{message}</p> : null}
-      {!items && !error ? <p className="empty">Loading…</p> : null}
-      <div className="split pf-media-split">
+      {items.length === 0 && !error ? (
+        <Empty
+          icon={Images}
+          title="No media yet"
+          action={
+            <button type="button" className="primary" disabled={busy} onClick={() => fileRef.current?.click()}>
+              {busy ? <Loader2 className="spin" /> : <Upload />}
+              {busy ? "Uploading…" : "Upload files"}
+            </button>
+          }
+        >
+          Upload images and PDFs for the portfolios, or drop files anywhere on this page.
+        </Empty>
+      ) : null}
+      <div className="split pf-media-split" hidden={items.length === 0}>
         <div className="pf-media-grid">
-          {(items || []).map((m) => (
+          {items.map((m) => (
             <button
               key={m.id}
               type="button"
@@ -144,12 +166,15 @@ export default function PortfolioMedia() {
             </p>
             <div className="actions">
               <button type="submit" className="primary" disabled={alt === selected.alt}>
+                <Save />
                 Save description
               </button>
               <a className="ghost" href={selected.url} target="_blank" rel="noreferrer">
+                <ExternalLink />
                 Open
               </a>
               <button type="button" className="danger" onClick={remove}>
+                <Trash2 />
                 Delete
               </button>
             </div>
