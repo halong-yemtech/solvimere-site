@@ -231,7 +231,7 @@ export default function Appointments() {
                       <span>{row.duration_minutes || 30} min</span>
                     </div>
                     <div className="appt-person">
-                      <Avatar name={row.name} size={36} />
+                      <Avatar name={row.name} size={30} />
                       <div className="ui-row-main">
                         <strong>
                           {row.name}

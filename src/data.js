@@ -553,6 +553,7 @@ export const terms = [
     title: "Privacy and data",
     paragraphs: [
       "When you contact us through the Website, we collect the information you provide, such as your name, email address, company, and message, and use it to respond to your inquiry and to provide our services. We do not sell your personal information. We share it only with service providers that help us run our business, such as email and hosting providers, or when required by law.",
+      "When you open a team member's portfolio page, we record the visit: the date and time, the page viewed, your IP address, your approximate country, your browser and device type, the website that referred you, and what you do on the page, such as the sections and projects you open, the links and buttons you click, how far you scroll, how long you stay, and whether you start or send a form. We do not record what you type into forms for this purpose. We use this to understand how the pages are used and to protect them from abuse. Only our administrators can see IP addresses, and we delete the IP address, browser details, and referring website after 90 days.",
       "When we process personal data on your behalf as part of an engagement, we do so only on your instructions and as set out in the Engagement Agreement. To ask about or delete the information we hold about you, email hello@solvimere.com.",
     ],
   },

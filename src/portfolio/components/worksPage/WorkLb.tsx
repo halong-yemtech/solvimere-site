@@ -6,6 +6,7 @@ import { FiArrowUpRight, FiChevronLeft, FiChevronRight, FiX } from "react-icons/
 import { BsGithub } from "react-icons/bs";
 import Img from "@/components/Img";
 import type { ReactiveVar } from "@/lib/state";
+import { track } from "@/lib/tracker";
 import MyInfo from "../MyInfo";
 import { useSite } from "../SiteProvider";
 
@@ -39,10 +40,24 @@ export default function WorkLb({ workId, reactiveVar }: Props) {
     };
   }, [reactiveVar]);
 
+  // How long each project stays open.
+  const title = work?.title;
+  useEffect(() => {
+    if (!title) return undefined;
+    const opened = Date.now();
+    track("work_open", { label: title, section: "works" });
+    return () =>
+      track("work_close", { label: title, section: "works", value: Math.round((Date.now() - opened) / 1000) });
+  }, [title]);
+
   if (!work) return null;
   const images = work.images;
   const image = images[shown] ?? images[0];
-  const step = (d: number) => setShown((i) => (i + d + images.length) % images.length);
+  const show = (index: number) => {
+    setShown(index);
+    track("work_image", { label: work.title, section: "works", value: index + 1 });
+  };
+  const step = (d: number) => show((shown + d + images.length) % images.length);
 
   return (
     <motion.div
@@ -54,6 +69,7 @@ export default function WorkLb({ workId, reactiveVar }: Props) {
       className="fixed inset-0 z-50 flex items-start sm:items-center justify-center overflow-y-auto bg-black/75 backdrop-blur-sm p-3 sm:p-8"
     >
       <motion.article
+        data-track-area="Project details"
         role="dialog"
         aria-modal="true"
         aria-labelledby="work-title"
@@ -65,6 +81,7 @@ export default function WorkLb({ workId, reactiveVar }: Props) {
       >
         <button
           ref={closeBtn}
+          data-track-ignore
           type="button"
           onClick={close}
           aria-label="Close"
@@ -89,6 +106,7 @@ export default function WorkLb({ workId, reactiveVar }: Props) {
                   className="pf-icon-btn absolute left-4 top-1/2 -translate-y-1/2 !rounded-full !bg-black/60"
                   onClick={() => step(-1)}
                   aria-label="Previous image"
+                  data-track-ignore
                 >
                   <FiChevronLeft aria-hidden />
                 </button>
@@ -97,6 +115,7 @@ export default function WorkLb({ workId, reactiveVar }: Props) {
                   className="pf-icon-btn absolute right-4 top-1/2 -translate-y-1/2 !rounded-full !bg-black/60"
                   onClick={() => step(1)}
                   aria-label="Next image"
+                  data-track-ignore
                 >
                   <FiChevronRight aria-hidden />
                 </button>
@@ -120,7 +139,13 @@ export default function WorkLb({ workId, reactiveVar }: Props) {
             </h2>
             <div className="flex flex-wrap gap-3">
               {work.projectUrl && (
-                <a href={work.projectUrl} rel="noreferrer" target="_blank" className="pf-btn pf-btn-sm">
+                <a
+                  data-track-label={`View project: ${work.title}`}
+                  href={work.projectUrl}
+                  rel="noreferrer"
+                  target="_blank"
+                  className="pf-btn pf-btn-sm"
+                >
                   View project
                   <span className="pf-btn-ico">
                     <FiArrowUpRight aria-hidden />
@@ -128,7 +153,13 @@ export default function WorkLb({ workId, reactiveVar }: Props) {
                 </a>
               )}
               {work.githubUrl && (
-                <a href={work.githubUrl} rel="noreferrer" target="_blank" className="pf-btn pf-btn-ghost pf-btn-sm">
+                <a
+                  data-track-label={`GitHub: ${work.title}`}
+                  href={work.githubUrl}
+                  rel="noreferrer"
+                  target="_blank"
+                  className="pf-btn pf-btn-ghost pf-btn-sm"
+                >
                   GitHub
                   <span className="pf-btn-ico">
                     <BsGithub aria-hidden />
@@ -187,8 +218,9 @@ export default function WorkLb({ workId, reactiveVar }: Props) {
                 <button
                   key={img.url + i}
                   type="button"
-                  onClick={() => setShown(i)}
+                  onClick={() => show(i)}
                   aria-label={`Show image ${i + 1}`}
+                  data-track-ignore
                   aria-pressed={i === shown}
                   className={`relative h-[7rem] w-[11rem] shrink-0 overflow-hidden rounded-xl border-2 border-solid transition-colors ${
                     i === shown ? "border-main-orange" : "border-transparent opacity-60 hover:opacity-100"

@@ -180,7 +180,7 @@ export default function Dashboard() {
               {data.messages.map((m) => (
                 <li key={m.id}>
                   <Link className="ui-row" to="/messages">
-                    <Avatar name={m.name} size={34} />
+                    <Avatar name={m.name} size={28} />
                     <span className="ui-row-main">
                       <strong>
                         {m.name}

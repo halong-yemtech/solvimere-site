@@ -156,7 +156,7 @@ export default function Profiles() {
               const name = person.full_name || person.email;
               return (
                 <li key={person.id}>
-                  <Avatar src={person.avatar_url} name={name} size={40} />
+                  <Avatar src={person.avatar_url} name={name} size={32} />
                   <div className="staff-who">
                     <strong>
                       {person.full_name || "Unnamed"}

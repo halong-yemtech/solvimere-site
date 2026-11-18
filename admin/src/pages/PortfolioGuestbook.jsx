@@ -111,7 +111,7 @@ export default function PortfolioGuestbook() {
             <ul className="msg-list">
               {shown.map((c) => (
                 <li key={c.id} className={`msg-card${c.approved ? "" : " is-hidden"}`}>
-                  <Avatar name={c.name} size={40} />
+                  <Avatar name={c.name} size={32} />
                   <div className="msg-body">
                     <header>
                       <strong>{c.name}</strong>

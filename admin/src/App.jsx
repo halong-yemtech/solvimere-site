@@ -14,6 +14,7 @@ import PortfolioWorkspace from "./pages/PortfolioWorkspace";
 import PortfolioMedia from "./pages/PortfolioMedia";
 import PortfolioGuestbook from "./pages/PortfolioGuestbook";
 import PortfolioSettings from "./pages/PortfolioSettings";
+import PortfolioViews from "./pages/PortfolioViews";
 import Account from "./pages/Account";
 import { Spinner } from "./components/Spinner";
 
@@ -93,6 +94,14 @@ export default function App() {
         element={
           <Guard>
             <PortfolioMedia />
+          </Guard>
+        }
+      />
+      <Route
+        path="/portfolio/views"
+        element={
+          <Guard>
+            <PortfolioViews />
           </Guard>
         }
       />

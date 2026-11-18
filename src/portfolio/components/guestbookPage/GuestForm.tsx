@@ -3,6 +3,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { FiSend } from "react-icons/fi";
 import { createGuestbookComment } from "@/lib/actions";
+import { track } from "@/lib/tracker";
 import type { GuestbookComment } from "@/lib/siteTypes";
 
 const GUEST_NAME_KEY = "portfolio_guestName";
@@ -47,9 +48,11 @@ export default function GuestForm({ onCreated }: Props) {
     startTransition(async () => {
       const res = await createGuestbookComment(data);
       if (!res.ok) {
+        track("form_error", { label: "guest book" });
         toast.error(res.error);
         return;
       }
+      track("form_submit", { label: "guest book" });
       onCreated(res.data);
       toast.success("Thanks for your comment!", { duration: 5000 });
       reset({ comment: "", name: res.data.name });
@@ -64,7 +67,8 @@ export default function GuestForm({ onCreated }: Props) {
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      data-track-form="guest book"
+      onSubmit={handleSubmit(onSubmit, () => track("form_error", { label: "guest book" }))}
       className="pf-card p-7 sm:p-8 grid gap-5 xl:sticky xl:top-[9rem]"
       noValidate
     >
@@ -112,7 +116,7 @@ export default function GuestForm({ onCreated }: Props) {
         />
         Remember my name on this device
       </label>
-      <button type="submit" disabled={loading} className="pf-btn justify-self-start">
+      <button type="submit" data-track-ignore disabled={loading} className="pf-btn justify-self-start">
         {loading ? "Posting…" : "Post comment"}
         <span className="pf-btn-ico">
           <FiSend aria-hidden />

@@ -29,6 +29,26 @@ export async function sendContactMessage(input: {
   return error ? { ok: false, error: "Server error. Try again later" } : { ok: true, data: { fullName } };
 }
 
+/**
+ * Counts this visit (Admin -> Portfolio -> Views). The database works out the visitor's
+ * address and skips bots and repeat visits. Never affects the page if it fails.
+ */
+export async function recordPortfolioView(slug: string): Promise<void> {
+  if (!client) return;
+  let referrer = "";
+  try {
+    const from = new URL(document.referrer);
+    if (from.host !== window.location.host) referrer = from.origin;
+  } catch {
+    // no referrer
+  }
+  try {
+    await client.rpc("record_portfolio_view", { p_slug: slug, p_referrer: referrer });
+  } catch {
+    // tracking must never affect the page
+  }
+}
+
 type Row = { id: number; name: string; comment: string; created_at: string };
 const toComment = (r: Row): GuestbookComment => ({
   id: r.id,

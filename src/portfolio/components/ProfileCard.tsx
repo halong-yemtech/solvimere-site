@@ -97,6 +97,8 @@ export default function ProfileCard() {
             {profile.cvUrl && (
               <a
                 href={profile.cvUrl}
+                data-track-channel="cv"
+                data-track-label="Download CV"
                 target="_blank"
                 rel="noreferrer"
                 className={`pf-btn w-full !justify-between ${profile.hireLink ? "pf-btn-ghost" : ""}`}

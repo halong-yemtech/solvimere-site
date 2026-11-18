@@ -37,7 +37,7 @@ export default function BlogPostCard({
   const firstName = author.split(" ")[0] || author;
 
   return (
-    <article className="pf-card relative overflow-hidden">
+    <article className="pf-card relative overflow-hidden" data-track-area={`${p.name} post`}>
       {/* Brand stripe + soft glow, so each platform reads at a glance. */}
       <div className="h-1" style={{ background: p.color }} />
       <div

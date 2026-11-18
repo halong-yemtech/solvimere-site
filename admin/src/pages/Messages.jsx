@@ -154,7 +154,7 @@ export default function Messages() {
             const unread = row.status === "new";
             return (
               <li key={row.id} className={`msg-card${unread ? " is-unread" : ""}`}>
-                <Avatar name={row.name} size={40} />
+                <Avatar name={row.name} size={32} />
                 <div className="msg-body">
                   <header>
                     <strong>{row.name}</strong>

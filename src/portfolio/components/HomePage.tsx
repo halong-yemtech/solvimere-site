@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Toaster } from "react-hot-toast";
 import { FiArrowLeft } from "react-icons/fi";
 import { currentMenu, currentWork, useReactiveVar } from "@/lib/state";
+import { startTracking, trackSection } from "@/lib/tracker";
 import { useMenus } from "@/lib/useMenus";
 import type { SectionKey } from "@/lib/settingsDefaults";
 import ProfileCard from "@/components/ProfileCard";
@@ -17,6 +18,10 @@ export default function HomePage() {
   const workId = useReactiveVar(currentWork);
   const contentTop = useRef<HTMLDivElement>(null);
   const tabRefs = useRef(new Map<string, HTMLButtonElement>());
+
+  // This page only renders for a published portfolio, so a visit counts from here.
+  useEffect(() => startTracking(profile.slug), [profile.slug]);
+  useEffect(() => trackSection(activeKey), [activeKey]);
 
   // Open the section named in the address (#resume), and follow back/forward.
   useEffect(() => {
@@ -53,7 +58,7 @@ export default function HomePage() {
       <div className="pf-glow" aria-hidden />
 
       <div className="pf-wrap">
-        <header className="pf-topbar">
+        <header className="pf-topbar" data-track-area="Top bar">
           <Link to="/" className="pf-topbar-logo shrink-0" aria-label="Solvimere home">
             <img src="/images/logo-white.png" alt="Solvimere" />
           </Link>
@@ -69,14 +74,17 @@ export default function HomePage() {
         </header>
 
         <div className="mt-8 grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[36rem_minmax(0,1fr)] lg:gap-12 items-start">
-          <aside className="min-w-0 lg:sticky lg:top-8 [@media(max-height:760px)]:lg:static">
+          <aside
+            data-track-area="Profile card"
+            className="min-w-0 lg:sticky lg:top-8 [@media(max-height:760px)]:lg:static"
+          >
             <ProfileCard />
           </aside>
 
           <div className="min-w-0">
             <div ref={contentTop} aria-hidden />
             {menus.length > 1 && (
-              <nav className="pf-nav" aria-label={`${profile.name}'s portfolio`}>
+              <nav data-track-ignore className="pf-nav" aria-label={`${profile.name}'s portfolio`}>
                 <div className="pf-nav-list">
                   {menus.map((m) => (
                     <button
@@ -98,7 +106,7 @@ export default function HomePage() {
               </nav>
             )}
 
-            <main className="pt-4 lg:pt-2 min-h-[60vh]">
+            <main data-track-area="Content" className="pt-4 lg:pt-2 min-h-[60vh]">
               <AnimatePresence mode="wait" initial={false}>
                 {menus.map(
                   (m) =>
@@ -120,9 +128,18 @@ export default function HomePage() {
           </div>
         </div>
 
-        <footer className="mt-20 flex flex-wrap items-center justify-between gap-4 border-t border-white/[0.08] pt-8 text-[1.3rem] text-gray-500">
+        <footer
+          data-track-area="Footer"
+          className="mt-20 flex flex-wrap items-center justify-between gap-4 border-t border-white/[0.08] pt-8 text-[1.3rem] text-gray-500"
+        >
           <p>{profile.copyright || `© ${year} ${profile.name}`}</p>
           <p>
+            <Link to="/terms#privacy" className="hover:text-white">
+              Privacy
+            </Link>
+            <span className="mx-3" aria-hidden>
+              ·
+            </span>
             Part of the{" "}
             <Link to="/team" className="text-gray-300 hover:text-white">
               Solvimere team

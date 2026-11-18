@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   BookOpen,
   BriefcaseBusiness,
+  Eye,
   CalendarDays,
   ChevronRight,
   CircleUserRound,
@@ -47,6 +48,7 @@ const NAV = [
     icon: BriefcaseBusiness,
     items: [
       { to: "/portfolio", end: true, label: "Profiles", icon: IdCard, match: /^\/portfolio(\/\d+)?$/ },
+      { to: "/portfolio/views", label: "Views", icon: Eye },
       { to: "/portfolio/media", label: "Media", icon: Images },
       { to: "/portfolio/guestbook", label: "Guest book", icon: BookOpen },
       { to: "/portfolio/settings", label: "Settings", icon: Settings2 },

@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { FiArrowUpRight, FiGrid, FiImage } from "react-icons/fi";
 import Img from "@/components/Img";
 import { currentWork, currentWorkTab, useReactiveVar } from "@/lib/state";
+import { track } from "@/lib/tracker";
 import { useSite } from "../SiteProvider";
 
 /** Works: filter by category, open a project for details. */
@@ -28,7 +29,11 @@ export default function Works() {
               type="button"
               className="pf-filter"
               aria-pressed={tab === t}
-              onClick={() => currentWorkTab(t)}
+              data-track-ignore
+              onClick={() => {
+                currentWorkTab(t);
+                track("work_filter", { label: t });
+              }}
             >
               {t}
               <span className="ml-1.5 text-gray-500">
@@ -60,6 +65,7 @@ export default function Works() {
                 >
                   <button
                     type="button"
+                    data-track-ignore
                     onClick={() => currentWork(w.id)}
                     className="group pf-card pf-card-hover block w-full overflow-hidden text-left"
                   >

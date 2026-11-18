@@ -87,7 +87,7 @@ export default function Account() {
         <div className="ui-cover" aria-hidden="true" />
         <div className="ui-hero-body">
           <div className="ui-photo">
-            <Avatar src={person.avatar_url} name={displayName} size={96} />
+            <Avatar src={person.avatar_url} name={displayName} size={76} />
             <label className={`ui-photo-btn${uploading ? " is-busy" : ""}`} title="Change photo">
               {uploading ? <Loader2 className="spin" /> : <Camera />}
               <span className="sr-only">{person.avatar_url ? "Replace photo" : "Upload photo"}</span>

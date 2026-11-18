@@ -3,6 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import toast from "react-hot-toast";
 import { FiSend } from "react-icons/fi";
 import { sendContactMessage } from "@/lib/actions";
+import { track } from "@/lib/tracker";
 
 interface Inputs {
   fullName: string;
@@ -26,16 +27,23 @@ export default function ContactForm({ name }: { name: string }) {
     startTransition(async () => {
       const res = await sendContactMessage(data);
       if (!res.ok) {
+        track("form_error", { label: "contact" });
         toast.error(res.error);
         return;
       }
+      track("form_submit", { label: "contact" });
       toast.success(`Thanks, ${res.data.fullName}! ${firstName} will get back to you soon.`, { duration: 6000 });
       reset({ fullName: "", email: "", message: "" });
     });
   };
 
   return (
-    <form className="pf-card p-7 sm:p-10 grid gap-5" onSubmit={handleSubmit(onSubmit)} noValidate>
+    <form
+      className="pf-card p-7 sm:p-10 grid gap-5"
+      data-track-form="contact"
+      onSubmit={handleSubmit(onSubmit, () => track("form_error", { label: "contact" }))}
+      noValidate
+    >
       <div>
         <h3 className="text-[2rem] font-semibold text-white">Send {firstName} a message</h3>
         <p className="mt-1 text-[1.45rem] text-gray-400">Share a few details about your project or question.</p>
@@ -79,7 +87,7 @@ export default function ContactForm({ name }: { name: string }) {
         />
         {errors.message && <span className="text-[1.25rem] text-red-400">{errors.message.message}</span>}
       </label>
-      <button type="submit" disabled={loading} className="pf-btn justify-self-start">
+      <button type="submit" data-track-ignore disabled={loading} className="pf-btn justify-self-start">
         {loading ? "Sending…" : "Send message"}
         <span className="pf-btn-ico">
           <FiSend aria-hidden />

@@ -139,7 +139,7 @@ function Field({ field, values, onChange }) {
     return (
       <div className="sf-row">
         {field.fields.map((f, i) => (
-          <div key={f.name ?? i} style={{ flex: f.width ? `1 1 calc(${f.width} - 16px)` : "1 1 0" }}>
+          <div key={f.name ?? i} style={{ flex: f.width ? `1 1 calc(${f.width} - 12px)` : "1 1 0" }}>
             <Field field={f} values={values} onChange={onChange} />
           </div>
         ))}

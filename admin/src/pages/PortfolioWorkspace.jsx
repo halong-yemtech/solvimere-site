@@ -106,7 +106,7 @@ export default function PortfolioWorkspace() {
   return (
     <div className="ui-page">
       <section className="ui-card pw-hero">
-        <Avatar src={summary.avatarUrl} name={summary.name} size={64} />
+        <Avatar src={summary.avatarUrl} name={summary.name} size={48} />
         <div className="pw-hero-text">
           <h1>{summary.name}</h1>
           <p>

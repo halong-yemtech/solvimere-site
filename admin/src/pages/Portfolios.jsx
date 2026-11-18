@@ -130,7 +130,7 @@ export default function Portfolios() {
                 return (
                   <article key={p.id} className="pf-card">
                     <Link to={`/portfolio/${p.id}`} className="pf-card-hit">
-                      <Avatar src={p.avatarUrl} name={p.name} size={52} />
+                      <Avatar src={p.avatarUrl} name={p.name} size={40} />
                       <span className="pf-card-text">
                         <strong>{p.name}</strong>
                         <span>{p.role || "No job title"}</span>

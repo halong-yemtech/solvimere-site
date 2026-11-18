@@ -122,7 +122,7 @@ function UserMenu({ profile, onSignOut }) {
         aria-controls={menuId}
         onClick={() => setOpen((o) => !o)}
       >
-        <UserAvatar profile={profile} size={30} />
+        <UserAvatar profile={profile} size={28} />
         <span className="user-text">
           <strong>{name}</strong>
           <span>{profile?.role}</span>
