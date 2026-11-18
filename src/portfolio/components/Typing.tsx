@@ -1,31 +1,40 @@
-import Typewriter from "typewriter-effect";
+import { useEffect, useState } from "react";
 
-const span = (text: string) =>
-  `<span style="color: rgb(var(--accent)); font-size: 14px; font-weight: 400;">${text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")}</span>`;
+const TYPE_MS = 45;
+const DELETE_MS = 22;
+const HOLD_MS = 2600;
 
-export default function Typing({ titles }: { titles: string[] }) {
-  if (titles.length === 0) return <div className="h-8" />;
+/** Types each title, holds it, deletes it, and moves on. With one title (or reduced motion) it just shows it. */
+export default function Typing({ titles, className = "" }: { titles: string[]; className?: string }) {
+  const [index, setIndex] = useState(0);
+  const [length, setLength] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+  const still =
+    titles.length < 2 ||
+    (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
+
+  const title = titles[index % Math.max(titles.length, 1)] ?? "";
+
+  useEffect(() => {
+    if (still) return undefined;
+    let delay = deleting ? DELETE_MS : TYPE_MS;
+    if (!deleting && length === title.length) delay = HOLD_MS;
+    const t = window.setTimeout(() => {
+      if (!deleting && length === title.length) setDeleting(true);
+      else if (deleting && length === 0) {
+        setDeleting(false);
+        setIndex((i) => (i + 1) % titles.length);
+      } else setLength((l) => l + (deleting ? -1 : 1));
+    }, delay);
+    return () => window.clearTimeout(t);
+  }, [still, deleting, length, title, titles.length]);
+
+  if (titles.length === 0) return null;
 
   return (
-    <div className="text-center h-8">
-      <Typewriter
-        // Restart the animation if the titles change.
-        key={titles.join("|")}
-        onInit={(typewriter) => {
-          for (const title of titles) {
-            typewriter.typeString(span(title)).pauseFor(3500).deleteAll(17);
-          }
-          typewriter.start();
-        }}
-        options={{
-          autoStart: true,
-          loop: true,
-          cursor: "",
-          delay: 17,
-        }}
-      />
-    </div>
+    <p className={className} aria-label={titles.join(", ")}>
+      <span aria-hidden>{still ? titles[0] : title.slice(0, length)}</span>
+      {!still && <span className="pf-caret" aria-hidden />}
+    </p>
   );
 }

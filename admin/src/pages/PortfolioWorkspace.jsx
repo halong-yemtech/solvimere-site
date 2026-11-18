@@ -1,11 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
 import {
+  BadgeDollarSign,
+  BriefcaseBusiness,
+  Building2,
+  ChartColumn,
+  GraduationCap,
+  Lightbulb,
+  MessageSquareQuote,
+  Newspaper,
+  Tags,
+  Wrench,
   ArrowDown,
   ArrowLeft,
   ArrowUp,
   ExternalLink,
   FileText,
   Inbox,
+  Layers,
   LayoutList,
   Plus,
   SearchX,
@@ -15,9 +26,24 @@ import {
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { DocEditor, DocEditorModal } from "../components/DocEditor";
 import { Spinner } from "../components/Spinner";
+import { useCrumb } from "../components/Topbar";
 import { Empty } from "../components/Empty";
+import { Avatar } from "../components/Avatar";
 import { toast } from "../components/Toast";
 import { SITE_URL, deleteItem, deleteProfile, listItems, listProfiles, reorderItems } from "../portfolio/api";
+
+const KIND_ICONS = {
+  services: Wrench,
+  "pricing-plans": BadgeDollarSign,
+  clients: Building2,
+  testimonials: MessageSquareQuote,
+  facts: Lightbulb,
+  statistics: ChartColumn,
+  "resume-entries": GraduationCap,
+  works: BriefcaseBusiness,
+  "work-categories": Tags,
+  "blog-posts": Newspaper,
+};
 
 const TABS = [
   { key: "profile", label: "Profile", icon: UserRound },
@@ -32,6 +58,7 @@ export default function PortfolioWorkspace() {
   const [params, setParams] = useSearchParams();
   const tab = TABS.some((t) => t.key === params.get("tab")) ? params.get("tab") : "profile";
   const [summary, setSummary] = useState(null);
+  useCrumb(summary?.name);
   const [error, setError] = useState("");
 
   const refresh = useCallback(() => {
@@ -77,52 +104,63 @@ export default function PortfolioWorkspace() {
   }
 
   return (
-    <>
-      <header className="top row">
-        <div>
-          <p className="eyebrow">
-            <Link to="/portfolio">Portfolio</Link> / {summary ? `/team/${summary.slug}` : "…"}
+    <div className="ui-page">
+      <section className="ui-card pw-hero">
+        <Avatar src={summary.avatarUrl} name={summary.name} size={64} />
+        <div className="pw-hero-text">
+          <h1>{summary.name}</h1>
+          <p>
+            {summary.role ? <span>{summary.role}</span> : null}
+            <code>/team/{summary.slug}</code>
           </p>
-          <h1>{summary?.name || "Profile"}</h1>
         </div>
-        {summary ? (
-          <div className="actions">
-            <em className={`pill is-${summary.visibility}`}>{live ? "Public" : "Private"}</em>
-            {live ? (
-              <>
-                <a className="ghost" href={`${SITE_URL}/team/${summary.slug}`} target="_blank" rel="noreferrer">
-                  <ExternalLink />
-                  View live
-                </a>
-                <a className="ghost" href={`${SITE_URL}/team/${summary.slug}/cv`} target="_blank" rel="noreferrer">
-                  <FileText />
-                  CV
-                </a>
-              </>
-            ) : null}
-            <button type="button" className="danger" onClick={remove}>
-              <Trash2 />
-              Delete
-            </button>
-          </div>
-        ) : null}
-      </header>
+        <div className="pw-hero-meta">
+          <span className={`ui-badge ${live ? "is-green" : "is-gray"}`}>{live ? "Public" : "Private"}</span>
+          <span className="ui-muted">
+            <Layers className="pf-card-meta-icon" /> {summary.items} items
+          </span>
+        </div>
+        <div className="pw-hero-actions">
+          {live ? (
+            <>
+              <a className="ghost" href={`${SITE_URL}/team/${summary.slug}`} target="_blank" rel="noreferrer">
+                <ExternalLink />
+                View live
+              </a>
+              <a className="ghost" href={`${SITE_URL}/team/${summary.slug}/cv`} target="_blank" rel="noreferrer">
+                <FileText />
+                CV
+              </a>
+            </>
+          ) : null}
+          <button
+            type="button"
+            className="danger icon-btn"
+            onClick={remove}
+            title="Delete profile"
+            aria-label="Delete profile"
+          >
+            <Trash2 />
+          </button>
+        </div>
+      </section>
       {error ? <p className="error">{error}</p> : null}
 
-      <nav className="doc-tabs pf-tabs" aria-label="Profile sections">
+      <div className="ui-tabs pw-tabs" role="tablist" aria-label="Profile sections">
         {TABS.map((t) => (
           <button
             key={t.key}
             type="button"
+            role="tab"
+            aria-selected={t.key === tab}
             className={t.key === tab ? "is-on" : ""}
-            aria-current={t.key === tab ? "page" : undefined}
             onClick={() => setParams({ tab: t.key })}
           >
             <t.icon />
             {t.label}
           </button>
         ))}
-      </nav>
+      </div>
 
       {tab === "profile" ? (
         <DocEditor
@@ -135,7 +173,7 @@ export default function PortfolioWorkspace() {
         />
       ) : null}
       {tab === "content" ? <ProfileContent profileId={id} /> : null}
-    </>
+    </div>
   );
 }
 
@@ -184,80 +222,88 @@ function ProfileContent({ profileId }) {
 
   return (
     <div className="pf-content">
-      {groups.map((group) => (
-        <section key={group.kind} className="panel">
-          <header className="pf-group-head">
-            <h2>
-              {group.label} <span>{group.items.length}</span>
-            </h2>
-            <button
-              type="button"
-              className="ghost"
-              onClick={() =>
-                setEditing({
-                  target: { kind: "item", itemKind: group.kind, profileId },
-                  title: `New ${group.singular.toLowerCase()}`,
-                })
-              }
-            >
-              <Plus />
-              Add
-            </button>
-          </header>
-          {group.items.length === 0 ? (
-            <Empty compact icon={Inbox} title="Empty">
-              No {group.label.toLowerCase()} yet. Use Add to create one.
-            </Empty>
-          ) : null}
-          <ul className="pf-items">
-            {group.items.map((item, i) => (
-              <li key={item.id}>
-                <button
-                  type="button"
-                  className="pf-item-hit"
-                  onClick={() =>
-                    setEditing({
-                      target: { kind: "item", itemKind: group.kind, profileId, id: item.id },
-                      title: item.label,
-                    })
-                  }
-                >
-                  {item.label}
-                </button>
-                <span className="pf-item-tools">
-                  <button
-                    type="button"
-                    disabled={i === 0}
-                    onClick={() => move(group, i, -1)}
-                    aria-label={`Move ${item.label} up`}
-                    title="Move up"
-                  >
-                    <ArrowUp />
-                  </button>
-                  <button
-                    type="button"
-                    disabled={i === group.items.length - 1}
-                    onClick={() => move(group, i, 1)}
-                    aria-label={`Move ${item.label} down`}
-                    title="Move down"
-                  >
-                    <ArrowDown />
-                  </button>
-                  <button
-                    type="button"
-                    className="is-danger"
-                    onClick={() => remove(item)}
-                    aria-label={`Delete ${item.label}`}
-                    title="Delete"
-                  >
-                    <Trash2 />
-                  </button>
+      {groups.map((group) => {
+        const GroupIcon = KIND_ICONS[group.kind] || LayoutList;
+        return (
+          <section key={group.kind} className="ui-card pf-group">
+            <header className="pf-group-head">
+              <h2>
+                <span className="pf-group-icon">
+                  <GroupIcon />
                 </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+                {group.label} <em>{group.items.length}</em>
+              </h2>
+              <button
+                type="button"
+                className="ghost icon-btn"
+                title={`Add ${group.singular.toLowerCase()}`}
+                aria-label={`Add ${group.singular.toLowerCase()}`}
+                onClick={() =>
+                  setEditing({
+                    target: { kind: "item", itemKind: group.kind, profileId },
+                    title: `New ${group.singular.toLowerCase()}`,
+                  })
+                }
+              >
+                <Plus />
+              </button>
+            </header>
+            {group.items.length === 0 ? (
+              <Empty compact icon={Inbox} title="Empty">
+                No {group.label.toLowerCase()} yet. Use + to add one.
+              </Empty>
+            ) : null}
+            <ul className="pf-items">
+              {group.items.map((item, i) => (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    className="pf-item-hit"
+                    title={item.label}
+                    onClick={() =>
+                      setEditing({
+                        target: { kind: "item", itemKind: group.kind, profileId, id: item.id },
+                        title: item.label,
+                      })
+                    }
+                  >
+                    {item.label}
+                  </button>
+                  <span className="pf-item-tools">
+                    <button
+                      type="button"
+                      disabled={i === 0}
+                      onClick={() => move(group, i, -1)}
+                      aria-label={`Move ${item.label} up`}
+                      title="Move up"
+                    >
+                      <ArrowUp />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={i === group.items.length - 1}
+                      onClick={() => move(group, i, 1)}
+                      aria-label={`Move ${item.label} down`}
+                      title="Move down"
+                    >
+                      <ArrowDown />
+                    </button>
+                    <button
+                      type="button"
+                      className="is-danger"
+                      onClick={() => remove(item)}
+                      aria-label={`Delete ${item.label}`}
+                      title="Delete"
+                    >
+                      <Trash2 />
+                    </button>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })}
       {editing ? (
         <DocEditorModal
           title={editing.title}

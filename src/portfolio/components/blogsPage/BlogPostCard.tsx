@@ -6,6 +6,7 @@ import { FiArrowUpRight, FiMapPin } from "react-icons/fi";
 import { SiUpwork } from "react-icons/si";
 import type { BlogPlatform, BlogPostData } from "@/lib/siteTypes";
 import GithubCalendar from "./GithubCalendar";
+import UpworkBadges from "./UpworkBadges";
 
 const PLATFORMS: Record<
   BlogPlatform,
@@ -36,9 +37,9 @@ export default function BlogPostCard({
   const firstName = author.split(" ")[0] || author;
 
   return (
-    <article className="relative overflow-hidden rounded-2xl border border-gray-700/60 bg-gray-800/30 shadow-lg">
+    <article className="pf-card relative overflow-hidden">
       {/* Brand stripe + soft glow, so each platform reads at a glance. */}
-      <div className="h-1.5" style={{ background: p.color }} />
+      <div className="h-1" style={{ background: p.color }} />
       <div
         aria-hidden
         className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full opacity-[0.07] blur-2xl"
@@ -76,9 +77,10 @@ export default function BlogPostCard({
           )}
         </header>
 
-        <h3 className="mt-7 text-[2.2rem] leading-snug font-semibold text-gray-200">{post.title}</h3>
+        <h3 className="mt-7 text-[2.2rem] leading-snug font-bold tracking-[-0.02em] text-white">{post.title}</h3>
 
-        {post.badges.length > 0 && (
+        {post.badges.length > 0 && post.platform === "upwork" && <UpworkBadges badges={post.badges} />}
+        {post.badges.length > 0 && post.platform !== "upwork" && (
           <ul className="mt-4 flex flex-wrap gap-2">
             {post.badges.map((b) => (
               <li
@@ -100,7 +102,7 @@ export default function BlogPostCard({
             className={`mt-7 grid ${post.stats.length === 1 ? "grid-cols-1" : "grid-cols-2"} ${STAT_COLS[Math.min(post.stats.length, 4)]} max-sm:[&>*:last-child:nth-child(odd)]:col-span-2 gap-px overflow-hidden rounded-xl border border-gray-700/60 bg-gray-700/60`}
           >
             {post.stats.map((s) => (
-              <div key={`${s.value}-${s.label}`} className="bg-gray-900/90 px-5 py-4">
+              <div key={`${s.value}-${s.label}`} className="bg-[#0f0f13] px-5 py-4">
                 <dt className="sr-only">{s.label}</dt>
                 <dd>
                   <span className="block text-[2.4rem] leading-none font-semibold text-gray-100">{s.value}</span>
@@ -131,14 +133,14 @@ export default function BlogPostCard({
           </figure>
         )}
 
-        <div className="prose max-w-none mt-7 prose-p:text-2xl prose-p:leading-[1.7] prose-li:text-2xl prose-strong:text-main-orange prose-strong:font-semibold prose-em:text-gray-300">
+        <div className="prose max-w-none mt-7 prose-p:text-[1.55rem] prose-p:leading-[1.75] prose-p:text-gray-300 prose-li:text-[1.5rem] prose-strong:text-main-orange prose-strong:font-semibold prose-em:text-gray-300">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.body}</ReactMarkdown>
         </div>
 
         {post.tags.length > 0 && (
           <div className="mt-7 flex flex-wrap items-center gap-2">
             {tags.map((t) => (
-              <span key={t} className="rounded-md bg-gray-700/50 px-3 py-1 text-lg text-gray-300">
+              <span key={t} className="pf-chip !text-[1.2rem] !py-0.5">
                 {t}
               </span>
             ))}
@@ -155,14 +157,11 @@ export default function BlogPostCard({
         )}
 
         {post.url && (
-          <a
-            href={post.url}
-            target="_blank"
-            rel="noreferrer"
-            className="group mt-9 inline-flex items-center gap-2 rounded-full border-2 border-gray-300 px-7 py-2.5 text-xl font-semibold uppercase text-gray-300 transition-all duration-200 hover:border-main-orange hover:text-main-orange"
-          >
+          <a href={post.url} target="_blank" rel="noreferrer" className="pf-btn pf-btn-ghost mt-9">
             {post.buttonLabel}
-            <FiArrowUpRight className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            <span className="pf-btn-ico">
+              <FiArrowUpRight aria-hidden />
+            </span>
           </a>
         )}
       </div>

@@ -5,16 +5,21 @@ interface Props {
   socialLinks: SocialLinkData[];
 }
 
+/** The profile's accounts as a row of icon buttons. */
 export default function MediaIcons({ socialLinks }: Props) {
   return (
-    <div className="flex gap-5 items-center justify-center mt-7">
+    <div className="flex flex-wrap items-center justify-center gap-2.5 mt-6">
       {socialLinks.map(({ id, icon, label, url }) => (
-        <a rel="noreferrer" href={url} target="_blank" key={id} aria-label={label}>
-          <MyIcon
-            Icon={icon}
-            wrapperClassName=""
-            iconClassName="text-gray-300 text-3xl transition-all duration-300 hover:text-main-orange cursor-pointer"
-          />
+        <a
+          rel="noreferrer"
+          href={url}
+          target="_blank"
+          key={id}
+          aria-label={label}
+          data-tip={label}
+          className="pf-icon-btn tooltip"
+        >
+          <MyIcon Icon={icon} wrapperClassName="" iconClassName="text-[1.8rem]" />
         </a>
       ))}
     </div>

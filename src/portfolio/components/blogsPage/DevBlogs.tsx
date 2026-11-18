@@ -1,45 +1,39 @@
-import { Fragment } from "react";
-
-import Title from "../Title";
+import { FiArrowUpRight, FiEdit3 } from "react-icons/fi";
 import { useSite } from "../SiteProvider";
 import BlogPostCard from "./BlogPostCard";
 
+/** Blog: posts and highlights from the profile's accounts (Upwork, GitHub, LinkedIn…). */
 export default function DevBlogs() {
   const { profile, blogPosts } = useSite();
   const { blog } = profile;
   const hasPosts = blogPosts.length > 0;
 
   return (
-    <section className="h-full overflow-y-scroll myScroll">
-      <Title name="blogs" />
+    <section>
+      {blog.intro && hasPosts && (
+        <p className="mb-6 max-w-[76rem] text-[1.55rem] leading-[1.7] text-gray-400">{blog.intro}</p>
+      )}
 
-      <>
-        <div className={hasPosts ? "px-12 pt-10 pb-2" : "px-12 py-16 text-center"}>
-          {blog.intro && (
-            <p className={`text-2xl text-gray-400 leading-relaxed ${hasPosts ? "" : "max-w-3xl mx-auto"}`}>
-              {blog.intro}
-            </p>
-          )}
-          {blog.buttonUrl && !hasPosts && (
-            <a
-              href={blog.buttonUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-block mt-8 text-xl uppercase font-semibold text-gray-300 border-2 border-gray-300 rounded-full px-8 py-3 hover:text-main-orange hover:border-main-orange transition-all duration-200"
-            >
-              {blog.buttonLabel}
+      {hasPosts ? (
+        <div className="flex flex-col gap-6">
+          {blogPosts.map((post) => (
+            <BlogPostCard key={post.id} post={post} author={profile.name} avatar={profile.avatar?.url ?? null} />
+          ))}
+        </div>
+      ) : (
+        <div className="pf-card p-12 text-center">
+          <FiEdit3 className="mx-auto mb-4 text-[3rem] text-gray-500" aria-hidden />
+          <p className="mx-auto max-w-[56rem] text-[1.6rem] leading-relaxed text-gray-400">
+            {blog.intro || "Posts will be shown here soon."}
+          </p>
+          {blog.buttonUrl && (
+            <a href={blog.buttonUrl} target="_blank" rel="noreferrer" className="pf-btn pf-btn-ghost mt-8">
+              {blog.buttonLabel || "Read more"}
+              <span className="pf-btn-ico">
+                <FiArrowUpRight aria-hidden />
+              </span>
             </a>
           )}
-        </div>
-      </>
-
-      {hasPosts && (
-        <div className="px-6 sm:px-12 py-8 flex flex-col gap-10">
-          {blogPosts.map((post) => (
-            <Fragment key={post.id}>
-              <BlogPostCard post={post} author={profile.name} avatar={profile.avatar?.url ?? null} />
-            </Fragment>
-          ))}
         </div>
       )}
     </section>

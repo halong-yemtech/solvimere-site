@@ -1,67 +1,154 @@
-import { useEffect, useState } from "react";
-import { CalendarClock, History, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  CalendarCheck,
+  CalendarClock,
+  CalendarDays,
+  CalendarPlus,
+  CalendarX,
+  Check,
+  Clock,
+  Globe,
+  History,
+  Mail,
+  RotateCcw,
+  Trash2,
+  X,
+} from "lucide-react";
 import { supabase } from "../lib/supabase";
-import { Spinner } from "../components/Spinner";
+import { Avatar } from "../components/Avatar";
 import { Empty } from "../components/Empty";
+import { Spinner } from "../components/Spinner";
 import { toast } from "../components/Toast";
+import { PageHead, SearchBox, Stat, Tabs, Toolbar, matches } from "../components/ui";
 
-const STATUSES = ["pending", "confirmed", "cancelled"];
 const BUSINESS_TZ = "America/New_York";
+const STATUS = {
+  pending: { label: "Pending", tone: "amber" },
+  confirmed: { label: "Confirmed", tone: "green" },
+  cancelled: { label: "Cancelled", tone: "red" },
+};
 
-const fmt = (iso, timeZone) =>
-  new Date(iso).toLocaleString(undefined, {
-    timeZone,
-    weekday: "short",
+const time = (iso, timeZone) =>
+  new Date(iso).toLocaleTimeString(undefined, { timeZone, hour: "numeric", minute: "2-digit", timeZoneName: "short" });
+
+function dayLabel(iso) {
+  const d = new Date(iso);
+  const today = new Date();
+  const start = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diff = Math.round((start(d) - start(today)) / 86400000);
+  if (diff === 0) return "Today";
+  if (diff === 1) return "Tomorrow";
+  if (diff === -1) return "Yesterday";
+  return d.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
+}
+
+/** A calendar file for the meeting, so it can be added to any calendar app. */
+function downloadIcs(row) {
+  const fmt = (d) =>
+    d
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace(/\.\d{3}/, "");
+  const start = new Date(row.starts_at);
+  const end = new Date(start.getTime() + (row.duration_minutes || 30) * 60000);
+  const esc = (s) =>
+    String(s || "")
+      .replace(/[\\,;]/g, (c) => `\\${c}`)
+      .replace(/\n/g, "\\n");
+  const ics = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Solvimere//Admin//EN",
+    "BEGIN:VEVENT",
+    `UID:${row.id}@solvimere`,
+    `DTSTAMP:${fmt(new Date())}`,
+    `DTSTART:${fmt(start)}`,
+    `DTEND:${fmt(end)}`,
+    `SUMMARY:${esc(`Solvimere meeting with ${row.name}`)}`,
+    `DESCRIPTION:${esc([row.topic, row.email, row.company].filter(Boolean).join("\n"))}`,
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\r\n");
+  const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+  const a = Object.assign(document.createElement("a"), { href: url, download: `meeting-${row.name}.ics` });
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function mailtoFor(row) {
+  const when = `${new Date(row.starts_at).toLocaleString(undefined, {
+    timeZone: row.visitor_timezone || BUSINESS_TZ,
+    weekday: "long",
     day: "numeric",
-    month: "short",
+    month: "long",
     hour: "numeric",
     minute: "2-digit",
     timeZoneName: "short",
-  });
+  })}`;
+  const body = `Hi ${row.name},\n\nThanks for booking a call with Solvimere. Your meeting is on ${when} (${row.duration_minutes || 30} minutes).\n\nMeeting link: \n\nSee you then,\nSolvimere`;
+  return `mailto:${row.email}?subject=${encodeURIComponent("Your meeting with Solvimere")}&body=${encodeURIComponent(body)}`;
+}
 
 /** Meetings booked by visitors from the site's assistant ("Book a meeting"). */
 export default function Appointments() {
-  const [rows, setRows] = useState([]);
-  const [view, setView] = useState("upcoming");
+  const [rows, setRows] = useState(null);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  function load() {
-    setLoading(true);
-    const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    let query = supabase.from("appointments").select("*");
-    query =
-      view === "upcoming"
-        ? query.gte("starts_at", since).order("starts_at", { ascending: true })
-        : query.lt("starts_at", since).order("starts_at", { ascending: false }).limit(200);
-    query.then(({ data, error: queryError }) => {
-      setLoading(false);
-      if (queryError) {
-        setError(
-          /appointments/.test(queryError.message) && /exist|schema cache/.test(queryError.message)
-            ? "The appointments table isn't set up yet. Apply supabase/migrations/20261117140000_appointments.sql."
-            : queryError.message,
-        );
-        return;
-      }
-      setError("");
-      setRows(data || []);
-    });
-  }
+  const [view, setView] = useState("upcoming");
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view]);
+    supabase
+      .from("appointments")
+      .select("*")
+      .order("starts_at", { ascending: true })
+      .limit(1000)
+      .then(({ data, error: queryError }) => {
+        if (queryError) {
+          setError(
+            /appointments/.test(queryError.message) && /exist|schema cache/.test(queryError.message)
+              ? "The appointments table isn't set up yet. Apply supabase/migrations/20261117140000_appointments.sql."
+              : queryError.message,
+          );
+        }
+        setRows(data || []);
+      });
+  }, []);
+
+  const groups = useMemo(() => {
+    const since = Date.now() - 60 * 60 * 1000; // a meeting stays "upcoming" until an hour after it starts
+    const all = rows || [];
+    const upcoming = all.filter((r) => r.status !== "cancelled" && new Date(r.starts_at).getTime() >= since);
+    const past = all.filter((r) => r.status !== "cancelled" && new Date(r.starts_at).getTime() < since).reverse();
+    const cancelled = all.filter((r) => r.status === "cancelled").reverse();
+    return { upcoming, past, cancelled };
+  }, [rows]);
+
+  const shown = useMemo(
+    () => groups[view].filter((r) => matches(query, r.name, r.email, r.company, r.topic)),
+    [groups, view, query],
+  );
+
+  // Upcoming meetings are grouped by day.
+  const byDay = useMemo(() => {
+    const map = new Map();
+    shown.forEach((r) => {
+      const key = dayLabel(r.starts_at);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(r);
+    });
+    return [...map.entries()];
+  }, [shown]);
 
   async function setStatus(row, status) {
+    const before = row.status;
+    setRows((all) => all.map((r) => (r.id === row.id ? { ...r, status } : r)));
     const { error: saveError } = await supabase.from("appointments").update({ status }).eq("id", row.id);
     if (saveError) {
+      setRows((all) => all.map((r) => (r.id === row.id ? { ...r, status: before } : r)));
       toast.error(saveError.code === "23505" ? "Another active booking already holds that time." : saveError);
       return;
     }
-    setRows((current) => current.map((r) => (r.id === row.id ? { ...r, status } : r)));
-    toast.success(`Booking from ${row.name} marked ${status}.`);
+    toast.success(`Booking from ${row.name} ${status === "pending" ? "restored" : status}.`);
   }
 
   async function remove(row) {
@@ -71,88 +158,173 @@ export default function Appointments() {
       toast.error(deleteError);
       return;
     }
-    setRows((current) => current.filter((r) => r.id !== row.id));
+    setRows((all) => all.filter((r) => r.id !== row.id));
     toast.success(`Booking from ${row.name} deleted.`);
   }
 
-  if (loading) return <Spinner label="Loading bookings…" />;
+  if (!rows) return <Spinner label="Loading bookings…" />;
+
+  const pending = groups.upcoming.filter((r) => r.status === "pending").length;
 
   return (
-    <>
-      <header className="top row">
-        <div>
-          <p className="eyebrow">Public site</p>
-          <h1>Appointments</h1>
-          <p>Meetings visitors booked from the site&apos;s assistant. Confirm them and email the meeting link.</p>
-        </div>
-        <div className="appt-tabs">
-          <button
-            type="button"
-            className={`ghost ${view === "upcoming" ? "is-on" : ""}`}
-            onClick={() => setView("upcoming")}
-          >
-            <CalendarClock />
-            Upcoming
-          </button>
-          <button type="button" className={`ghost ${view === "past" ? "is-on" : ""}`} onClick={() => setView("past")}>
-            <History />
-            Past
-          </button>
-        </div>
-      </header>
+    <div className="ui-page">
+      <PageHead
+        icon={CalendarDays}
+        title="Appointments"
+        description="Meetings visitors booked from the site's assistant. Confirm them and email the meeting link. Times are New York time."
+        stats={
+          <>
+            <Stat icon={CalendarClock} value={groups.upcoming.length} label="upcoming" />
+            <Stat icon={Clock} value={pending} label="to confirm" tone={pending ? "warn" : undefined} />
+          </>
+        }
+      />
       {error ? <p className="error">{error}</p> : null}
-      {!error && rows.length === 0 ? (
+
+      <Toolbar>
+        <SearchBox value={query} onChange={setQuery} placeholder="Search name, email, company or topic" />
+        <Tabs
+          value={view}
+          onChange={setView}
+          label="Bookings"
+          options={[
+            { value: "upcoming", label: "Upcoming", icon: CalendarClock, count: groups.upcoming.length },
+            { value: "past", label: "Past", icon: History, count: groups.past.length },
+            { value: "cancelled", label: "Cancelled", icon: CalendarX, count: groups.cancelled.length },
+          ]}
+        />
+      </Toolbar>
+
+      {!error && shown.length === 0 ? (
         <Empty
-          icon={view === "upcoming" ? CalendarClock : History}
-          title={view === "upcoming" ? "No upcoming bookings" : "No past bookings"}
+          icon={view === "upcoming" ? CalendarClock : view === "past" ? History : CalendarX}
+          title={
+            query
+              ? "No matching bookings"
+              : view === "upcoming"
+                ? "No upcoming bookings"
+                : view === "past"
+                  ? "No past bookings"
+                  : "No cancelled bookings"
+          }
         >
-          {view === "upcoming"
-            ? "Meetings visitors book from the site's assistant will appear here."
-            : "Bookings move here once their time has passed."}
+          {query
+            ? `Nothing matches “${query}”.`
+            : view === "upcoming"
+              ? "Meetings visitors book from the site's assistant will appear here."
+              : "Bookings move here once their time has passed or they're cancelled."}
         </Empty>
+      ) : (
+        byDay.map(([day, list]) => (
+          <section key={day} className="appt-day">
+            <h2>
+              {day}
+              <em>{list.length}</em>
+            </h2>
+            <ul className="appt-cards">
+              {list.map((row) => {
+                const status = STATUS[row.status] || STATUS.pending;
+                return (
+                  <li key={row.id} className={`appt-card is-${row.status}`}>
+                    <div className="appt-time">
+                      <strong>{time(row.starts_at, BUSINESS_TZ)}</strong>
+                      <span>{row.duration_minutes || 30} min</span>
+                    </div>
+                    <div className="appt-person">
+                      <Avatar name={row.name} size={36} />
+                      <div className="ui-row-main">
+                        <strong>
+                          {row.name}
+                          {row.company ? <span className="appt-company"> · {row.company}</span> : null}
+                        </strong>
+                        <a href={`mailto:${row.email}`}>{row.email}</a>
+                      </div>
+                    </div>
+                    <div className="appt-detail">
+                      {row.topic ? <p>{row.topic}</p> : <p className="ui-muted">No topic given</p>}
+                      {row.visitor_timezone && row.visitor_timezone !== BUSINESS_TZ ? (
+                        <span className="ui-muted">
+                          <Globe /> Their time: {time(row.starts_at, row.visitor_timezone)}
+                        </span>
+                      ) : null}
+                    </div>
+                    <span className={`ui-badge is-${status.tone}`}>{status.label}</span>
+                    <div className="appt-buttons">
+                      {row.status === "pending" ? (
+                        <button
+                          type="button"
+                          className="primary icon-btn"
+                          title="Confirm"
+                          aria-label={`Confirm the booking from ${row.name}`}
+                          onClick={() => setStatus(row, "confirmed")}
+                        >
+                          <Check />
+                        </button>
+                      ) : null}
+                      <a
+                        className="ghost icon-btn"
+                        href={mailtoFor(row)}
+                        title="Email the meeting details"
+                        aria-label={`Email ${row.name}`}
+                      >
+                        <Mail />
+                      </a>
+                      {row.status !== "cancelled" ? (
+                        <button
+                          type="button"
+                          className="ghost icon-btn"
+                          title="Add to calendar (.ics)"
+                          aria-label="Add to calendar"
+                          onClick={() => downloadIcs(row)}
+                        >
+                          <CalendarPlus />
+                        </button>
+                      ) : null}
+                      {row.status === "cancelled" ? (
+                        <button
+                          type="button"
+                          className="ghost icon-btn"
+                          title="Restore booking"
+                          aria-label="Restore booking"
+                          onClick={() => setStatus(row, "pending")}
+                        >
+                          <RotateCcw />
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="ghost icon-btn"
+                          title="Cancel booking"
+                          aria-label={`Cancel the booking from ${row.name}`}
+                          onClick={() =>
+                            window.confirm(`Cancel the booking from ${row.name}?`) && setStatus(row, "cancelled")
+                          }
+                        >
+                          <X />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className="danger icon-btn"
+                        title="Delete"
+                        aria-label={`Delete the booking from ${row.name}`}
+                        onClick={() => remove(row)}
+                      >
+                        <Trash2 />
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ))
+      )}
+      {view === "upcoming" && groups.upcoming.some((r) => r.status === "confirmed") ? (
+        <p className="ui-muted appt-foot">
+          <CalendarCheck /> Confirmed meetings stay here until an hour after they start.
+        </p>
       ) : null}
-      <div className="appt-list">
-        {rows.map((row) => (
-          <article key={row.id} className={`panel appt is-${row.status}`}>
-            <div className="appt-when">
-              <strong>{fmt(row.starts_at, BUSINESS_TZ)}</strong>
-              <span>
-                {row.duration_minutes} min
-                {row.visitor_timezone ? ` · visitor: ${fmt(row.starts_at, row.visitor_timezone)}` : ""}
-              </span>
-            </div>
-            <div className="appt-who">
-              <strong>{row.name}</strong>
-              <a href={`mailto:${row.email}?subject=${encodeURIComponent("Your meeting with Solvimere")}`}>
-                {row.email}
-              </a>
-              {row.company ? <span>{row.company}</span> : null}
-            </div>
-            {row.topic ? <p className="appt-topic">{row.topic}</p> : null}
-            <div className="appt-actions">
-              <label>
-                <span className="sr-only">Status</span>
-                <select value={row.status} onChange={(event) => setStatus(row, event.target.value)}>
-                  {STATUSES.map((status) => (
-                    <option key={status} value={status}>
-                      {status[0].toUpperCase() + status.slice(1)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button
-                type="button"
-                className="danger icon-btn"
-                onClick={() => remove(row)}
-                aria-label={`Delete the booking from ${row.name}`}
-                title="Delete"
-              >
-                <Trash2 />
-              </button>
-            </div>
-          </article>
-        ))}
-      </div>
-    </>
+    </div>
   );
 }

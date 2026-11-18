@@ -1,7 +1,22 @@
-import { useEffect, useRef, useState } from "react";
-import { ExternalLink, Images, Loader2, Save, Trash2, Upload } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Check,
+  ExternalLink,
+  FileText,
+  FileType,
+  Image as ImageIcon,
+  Images,
+  Link2,
+  Loader2,
+  MousePointerClick,
+  Save,
+  Trash2,
+  Upload,
+  UploadCloud,
+} from "lucide-react";
 import { Spinner } from "../components/Spinner";
 import { Empty } from "../components/Empty";
+import { PageHead, SearchBox, Stat, Tabs, Toolbar, matches } from "../components/ui";
 import { toast } from "../components/Toast";
 import { deleteMedia, isImage, listAllMedia, mediaUsage, updateMediaAlt, uploadMedia } from "../portfolio/api";
 
@@ -17,6 +32,11 @@ export default function PortfolioMedia() {
   const [usage, setUsage] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [query, setQuery] = useState("");
+  const [kind, setKind] = useState("all");
+  const [dragging, setDragging] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const dragDepth = useRef(0);
 
   function load() {
     listAllMedia()
@@ -85,107 +105,228 @@ export default function PortfolioMedia() {
 
   if (!items) return <Spinner label="Loading media…" />;
 
+  const images = items.filter(isImage).length;
+  const shown = items.filter(
+    (m) => (kind === "all" || (kind === "images" ? isImage(m) : !isImage(m))) && matches(query, m.filename, m.alt),
+  );
+  const total = items.reduce((sum, m) => sum + (m.filesize || 0), 0);
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(selected.url);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+      toast.success("Link copied.");
+    } catch {
+      toast.error("Couldn't copy the link.");
+    }
+  }
+
+  const uploadButton = (
+    <button type="button" className="primary" disabled={busy} onClick={() => fileRef.current?.click()}>
+      {busy ? <Loader2 className="spin" /> : <Upload />}
+      {busy ? "Uploading…" : "Upload"}
+    </button>
+  );
+
   return (
     <div
+      className="ui-page media-page"
+      onDragEnter={(e) => {
+        if (![...e.dataTransfer.types].includes("Files")) return;
+        dragDepth.current += 1;
+        setDragging(true);
+      }}
+      onDragLeave={() => {
+        dragDepth.current = Math.max(0, dragDepth.current - 1);
+        if (!dragDepth.current) setDragging(false);
+      }}
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         e.preventDefault();
+        dragDepth.current = 0;
+        setDragging(false);
         onFiles(e.dataTransfer.files);
       }}
     >
-      <header className="top row">
-        <div>
-          <p className="eyebrow">Portfolio</p>
-          <h1>Media library</h1>
-          <p>Images and PDFs used in portfolios. Drop files anywhere here to upload.</p>
-        </div>
-        <button type="button" className="primary" disabled={busy} onClick={() => fileRef.current?.click()}>
-          {busy ? <Loader2 className="spin" /> : <Upload />}
-          {busy ? "Uploading…" : "Upload"}
-        </button>
-        <input
-          ref={fileRef}
-          type="file"
-          hidden
-          multiple
-          accept="image/*,application/pdf"
-          onChange={(e) => onFiles(e.target.files)}
-        />
-      </header>
+      <PageHead
+        icon={Images}
+        title="Media library"
+        description="Images and PDFs used in portfolios. Drop files anywhere on this page to upload."
+        stats={
+          <>
+            <Stat icon={ImageIcon} value={images} label={images === 1 ? "image" : "images"} />
+            <Stat icon={FileText} value={items.length - images} label={items.length - images === 1 ? "PDF" : "PDFs"} />
+            <Stat icon={UploadCloud} value={size(total)} label="total" />
+          </>
+        }
+        actions={uploadButton}
+      />
+      <input
+        ref={fileRef}
+        type="file"
+        hidden
+        multiple
+        accept="image/*,application/pdf"
+        onChange={(e) => onFiles(e.target.files)}
+      />
       {error ? <p className="error">{error}</p> : null}
+
       {items.length === 0 && !error ? (
-        <Empty
-          icon={Images}
-          title="No media yet"
-          action={
-            <button type="button" className="primary" disabled={busy} onClick={() => fileRef.current?.click()}>
-              {busy ? <Loader2 className="spin" /> : <Upload />}
-              {busy ? "Uploading…" : "Upload files"}
-            </button>
-          }
-        >
+        <Empty icon={Images} title="No media yet" action={uploadButton}>
           Upload images and PDFs for the portfolios, or drop files anywhere on this page.
         </Empty>
-      ) : null}
-      <div className="split pf-media-split" hidden={items.length === 0}>
-        <div className="pf-media-grid">
-          {items.map((m) => (
-            <button
-              key={m.id}
-              type="button"
-              className={selected?.id === m.id ? "is-on" : ""}
-              onClick={() => pick(m)}
-              title={m.filename}
-            >
-              {isImage(m) ? (
-                <img src={m.url} alt={m.alt} loading="lazy" />
-              ) : (
-                <span className="sf-thumb is-file">{m.filename}</span>
-              )}
-            </button>
-          ))}
-        </div>
-        {selected ? (
-          <form className="panel editor" onSubmit={saveAlt}>
-            <h2>{selected.filename}</h2>
-            {isImage(selected) ? <img className="pf-media-preview" src={selected.url} alt={selected.alt} /> : null}
-            <p>
-              {selected.mimeType} · {size(selected.filesize)}
-              {selected.width ? ` · ${selected.width}×${selected.height}` : ""}
-            </p>
-            <label className="field">
-              <span>Description (alt text)</span>
-              <input value={alt} maxLength={300} onChange={(e) => setAlt(e.target.value)} />
-            </label>
-            <p>
-              {usage === null
-                ? "Checking where it's used…"
-                : usage.length
-                  ? `Used by: ${usage.join(", ")}`
-                  : "Not used anywhere."}
-            </p>
-            <div className="actions">
-              <button type="submit" className="primary" disabled={alt === selected.alt}>
-                <Save />
-                Save description
-              </button>
-              <a className="ghost" href={selected.url} target="_blank" rel="noreferrer">
-                <ExternalLink />
-                Open
-              </a>
-              <button type="button" className="danger" onClick={remove}>
-                <Trash2 />
-                Delete
-              </button>
+      ) : (
+        <>
+          <Toolbar>
+            <SearchBox value={query} onChange={setQuery} placeholder="Search file name or description" />
+            <Tabs
+              value={kind}
+              onChange={setKind}
+              label="File type"
+              options={[
+                { value: "all", label: "All", count: items.length },
+                { value: "images", label: "Images", icon: ImageIcon, count: images },
+                { value: "files", label: "PDFs", icon: FileType, count: items.length - images },
+              ]}
+            />
+          </Toolbar>
+          <div className="media-layout">
+            <div className="media-grid">
+              {shown.length === 0 ? (
+                <Empty compact icon={Images} title="No matching files">
+                  Try another search or filter.
+                </Empty>
+              ) : null}
+              {shown.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  className={`media-tile${selected?.id === m.id ? " is-on" : ""}`}
+                  onClick={() => pick(m)}
+                  title={m.filename}
+                >
+                  {isImage(m) ? (
+                    <img src={m.url} alt={m.alt} loading="lazy" />
+                  ) : (
+                    <span className="media-file">
+                      <FileText />
+                      PDF
+                    </span>
+                  )}
+                  <span className="media-name">{m.filename}</span>
+                  {!m.alt ? <span className="media-flag" title="No description" /> : null}
+                </button>
+              ))}
             </div>
-          </form>
-        ) : (
-          <section className="panel editor empty-editor">
-            <h2>File details</h2>
-            <p>Select a file to edit its description, see where it&apos;s used, or delete it.</p>
-          </section>
-        )}
-      </div>
+
+            {selected ? (
+              <form className="ui-card media-detail" onSubmit={saveAlt}>
+                <div className="media-preview">
+                  {isImage(selected) ? (
+                    <img src={selected.url} alt={selected.alt} />
+                  ) : (
+                    <span className="media-file is-lg">
+                      <FileText />
+                      PDF
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <h2 className="media-title">{selected.filename}</h2>
+                  <dl className="media-facts">
+                    <div>
+                      <dt>Type</dt>
+                      <dd>{selected.mimeType}</dd>
+                    </div>
+                    <div>
+                      <dt>Size</dt>
+                      <dd>{size(selected.filesize)}</dd>
+                    </div>
+                    {selected.width ? (
+                      <div>
+                        <dt>Dimensions</dt>
+                        <dd>
+                          {selected.width} × {selected.height}
+                        </dd>
+                      </div>
+                    ) : null}
+                    <div>
+                      <dt>Used by</dt>
+                      <dd>
+                        {usage === null ? (
+                          <span className="ui-muted">Checking…</span>
+                        ) : usage.length ? (
+                          usage.join(", ")
+                        ) : (
+                          <span className="ui-muted">Not used anywhere</span>
+                        )}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+                <label className="field">
+                  <span>Description (alt text)</span>
+                  <textarea
+                    rows="2"
+                    value={alt}
+                    maxLength={300}
+                    placeholder="Describe the image for screen readers and search engines"
+                    onChange={(e) => setAlt(e.target.value)}
+                  />
+                </label>
+                <div className="ui-actions">
+                  <button
+                    type="button"
+                    className="danger icon-btn media-delete"
+                    onClick={remove}
+                    title="Delete file"
+                    aria-label="Delete file"
+                  >
+                    <Trash2 />
+                  </button>
+                  <button
+                    type="button"
+                    className="ghost icon-btn"
+                    onClick={copyLink}
+                    title="Copy link"
+                    aria-label="Copy link"
+                  >
+                    {copied ? <Check /> : <Link2 />}
+                  </button>
+                  <a
+                    className="ghost icon-btn"
+                    href={selected.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    title="Open in a new tab"
+                    aria-label="Open in a new tab"
+                  >
+                    <ExternalLink />
+                  </a>
+                  <button type="submit" className="primary" disabled={alt === selected.alt}>
+                    <Save />
+                    Save
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <section className="ui-card media-detail">
+                <Empty icon={MousePointerClick} title="Select a file">
+                  See its details, edit its description, copy its link or delete it.
+                </Empty>
+              </section>
+            )}
+          </div>
+        </>
+      )}
+      {dragging ? (
+        <div className="media-drop" aria-hidden="true">
+          <UploadCloud />
+          <strong>Drop to upload</strong>
+          <span>Images and PDFs</span>
+        </div>
+      ) : null}
     </div>
   );
 }

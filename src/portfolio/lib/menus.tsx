@@ -1,7 +1,5 @@
 import { lazy, Suspense, type ComponentType } from "react";
-import { FaRegUser, FaRegListAlt, FaEye, FaRegNewspaper } from "react-icons/fa";
-import { FiSend } from "react-icons/fi";
-import { MdComputer, MdDashboard } from "react-icons/md";
+import { FiBarChart2, FiBookOpen, FiEdit3, FiFileText, FiGrid, FiSend, FiUser } from "react-icons/fi";
 import type { IconType } from "react-icons";
 import type { SectionKey } from "@/lib/settingsDefaults";
 import type { MenuData } from "./types";
@@ -11,7 +9,7 @@ function section(load: () => Promise<{ default: ComponentType }>): ComponentType
   const Lazy = lazy(load);
   return function Section() {
     return (
-      <Suspense fallback={null}>
+      <Suspense fallback={<div className="min-h-[40rem]" aria-busy="true" />}>
         <Lazy />
       </Suspense>
     );
@@ -28,13 +26,13 @@ const Stats = section(() => import("@/components/statisticsPage/Stats"));
 
 /** Icon and component for each section. Labels, order and visibility come from Site settings. */
 export const sectionRegistry: Record<SectionKey, { Icon: IconType; Component: ComponentType }> = {
-  about: { Icon: FaRegUser, Component: About },
-  resume: { Icon: FaRegListAlt, Component: Resume },
-  works: { Icon: FaEye, Component: Works },
-  blog: { Icon: FaRegNewspaper, Component: DevBlogs },
-  stats: { Icon: MdDashboard, Component: Stats },
+  about: { Icon: FiUser, Component: About },
+  resume: { Icon: FiFileText, Component: Resume },
+  works: { Icon: FiGrid, Component: Works },
+  blog: { Icon: FiEdit3, Component: DevBlogs },
+  stats: { Icon: FiBarChart2, Component: Stats },
   contact: { Icon: FiSend, Component: Contact },
-  guestbook: { Icon: MdComputer, Component: GuestBook },
+  guestbook: { Icon: FiBookOpen, Component: GuestBook },
 };
 
 export function buildMenus(sections: { key: SectionKey; label: string }[]): MenuData[] {

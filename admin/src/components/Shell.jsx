@@ -12,7 +12,6 @@ import {
   IdCard,
   Images,
   LayoutDashboard,
-  LogOut,
   Mail,
   Menu,
   PanelLeftClose,
@@ -26,6 +25,7 @@ import {
 import { useAuth } from "../auth";
 import { supabase } from "../lib/supabase";
 import { toast } from "./Toast";
+import { Breadcrumbs, CrumbContext, Topbar, crumbsFor } from "./Topbar";
 
 /** The menu tree: groups → items → (optional) child items loaded at run time. */
 const NAV = [
@@ -46,7 +46,7 @@ const NAV = [
     label: "Portfolio",
     icon: BriefcaseBusiness,
     items: [
-      { to: "/portfolio", end: true, label: "Profiles", icon: IdCard },
+      { to: "/portfolio", end: true, label: "Profiles", icon: IdCard, match: /^\/portfolio(\/\d+)?$/ },
       { to: "/portfolio/media", label: "Media", icon: Images },
       { to: "/portfolio/guestbook", label: "Guest book", icon: BookOpen },
       { to: "/portfolio/settings", label: "Settings", icon: Settings2 },
@@ -125,6 +125,7 @@ export function Shell({ children }) {
   const [openNodes, setOpenNodes] = usePref("sidebar.nodes", {});
   const [mobileOpen, setMobileOpen] = useState(false);
   const [tip, setTip] = useState(null);
+  const [crumb, setCrumb] = useState(null); // last breadcrumb, set by the page (e.g. a profile's name)
   const [flyout, setFlyout] = useState(null); // { id, top, left } of the group shown next to the rail
   const closeTimer = useRef(0);
   const navigate = useNavigate();
@@ -181,9 +182,11 @@ export function Shell({ children }) {
     items: group.items.filter((item) => !item.admin || isAdmin),
   })).filter((group) => group.items.length);
   const inSection = (item) =>
-    item.end
-      ? location.pathname === item.to
-      : location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
+    item.match
+      ? item.match.test(location.pathname)
+      : item.end
+        ? location.pathname === item.to
+        : location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
 
   // In the icon rail (desktop only), labels appear as a floating tooltip next to the hovered item.
   const rail = collapsed && desktop;
@@ -295,7 +298,14 @@ export function Shell({ children }) {
                       return (
                         <li key={item.to} className={nodeOpen ? "is-open" : ""}>
                           <div className="tree-row">
-                            <NavLink to={item.to} end={item.end} className="tree-link" {...tipProps(item.label)}>
+                            <NavLink
+                              to={item.to}
+                              end={item.end}
+                              className={({ isActive }) =>
+                                `tree-link${isActive || item.match?.test(location.pathname) ? " active" : ""}`
+                              }
+                              {...tipProps(item.label)}
+                            >
                               <Icon className="tree-icon" />
                               <span>{item.label}</span>
                             </NavLink>
@@ -332,24 +342,6 @@ export function Shell({ children }) {
             );
           })}
         </nav>
-
-        <div className="aside-foot">
-          <Link className="who" to="/account" {...tipProps(profile?.full_name || profile?.email || "My profile")}>
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="" />
-            ) : (
-              <span className="ph">{(profile?.full_name || profile?.email || "?").slice(0, 1)}</span>
-            )}
-            <div>
-              <strong>{profile?.full_name || profile?.email}</strong>
-              <span>{profile?.role}</span>
-            </div>
-          </Link>
-          <button className="ghost sign-out" type="button" onClick={onSignOut} {...tipProps("Sign out")}>
-            <LogOut />
-            <span>Sign out</span>
-          </button>
-        </div>
       </aside>
       {rail && flyout
         ? (() => {
@@ -398,7 +390,14 @@ export function Shell({ children }) {
           {tip.label}
         </div>
       ) : null}
-      <div className="canvas">{children}</div>
+      <div className="canvas">
+        <Topbar profile={profile} onSignOut={onSignOut}>
+          <Breadcrumbs crumbs={crumbsFor(location.pathname, visibleGroups, childLists, crumb)} />
+        </Topbar>
+        <CrumbContext.Provider value={setCrumb}>
+          <main className="page">{children}</main>
+        </CrumbContext.Provider>
+      </div>
     </div>
   );
 }

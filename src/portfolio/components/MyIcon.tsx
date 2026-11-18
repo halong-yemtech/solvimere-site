@@ -30,12 +30,8 @@ export default function MyIcon({ Icon, size, iconClassName, style, wrapperClassN
   }
 
   return (
-    <div
-      className={`icon ${
-        size ? size : "w-24 h-24"
-      } rounded-full border-2 border-main-orange border-solid flex items-center justify-center`}
-    >
-      <IconComponent className={iconClassName || "text-5xl text-main-orange"} style={style} />
+    <div className={`pf-icon-tile ${size ?? ""}`}>
+      <IconComponent className={iconClassName} style={style} aria-hidden />
     </div>
   );
 }

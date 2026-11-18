@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
-import { Archive, Inbox, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Archive, ArchiveRestore, Inbox, Mail, MailOpen, Reply, Trash2 } from "lucide-react";
 import { supabase } from "../lib/supabase";
-import { Spinner } from "../components/Spinner";
+import { Avatar } from "../components/Avatar";
 import { Empty } from "../components/Empty";
+import { Spinner } from "../components/Spinner";
 import { toast } from "../components/Toast";
+import { PageHead, SearchBox, Stat, Tabs, Toolbar, matches, timeAgo } from "../components/ui";
 
-const STATUSES = ["new", "read", "archived"];
-const fmt = (iso) =>
+const fullDate = (iso) =>
   new Date(iso).toLocaleString(undefined, {
+    weekday: "short",
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -15,40 +17,60 @@ const fmt = (iso) =>
     minute: "2-digit",
   });
 
-/** Messages visitors sent from the site's corner widget ("Send us a message"). */
+/** Messages visitors sent from the site's and the portfolios' contact forms. */
 export default function Messages() {
-  const [rows, setRows] = useState([]);
-  const [view, setView] = useState("inbox"); // inbox = new + read, archived
+  const [rows, setRows] = useState(null);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  function load() {
-    setLoading(true);
-    let query = supabase.from("contact_messages").select("*").order("created_at", { ascending: false }).limit(300);
-    query = view === "inbox" ? query.in("status", ["new", "read"]) : query.eq("status", "archived");
-    query.then(({ data, error: queryError }) => {
-      setLoading(false);
-      if (queryError) {
-        setError(
-          /contact_messages/.test(queryError.message) && /exist|schema cache/.test(queryError.message)
-            ? "The messages table isn't set up yet. Apply supabase/migrations/20261117160000_contact_messages.sql."
-            : queryError.message,
-        );
-        return;
-      }
-      setError("");
-      setRows(data || []);
-    });
-  }
+  const [view, setView] = useState("inbox"); // inbox (new + read) | unread | archived
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view]);
+    supabase
+      .from("contact_messages")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(500)
+      .then(({ data, error: queryError }) => {
+        if (queryError) {
+          setError(
+            /contact_messages/.test(queryError.message) && /exist|schema cache/.test(queryError.message)
+              ? "The messages table isn't set up yet. Apply supabase/migrations/20261117160000_contact_messages.sql."
+              : queryError.message,
+          );
+        }
+        setRows(data || []);
+      });
+  }, []);
 
-  async function setStatus(row, status, { quiet = false } = {}) {
+  const counts = useMemo(() => {
+    const all = rows || [];
+    return {
+      inbox: all.filter((r) => r.status !== "archived").length,
+      unread: all.filter((r) => r.status === "new").length,
+      archived: all.filter((r) => r.status === "archived").length,
+    };
+  }, [rows]);
+
+  const shown = useMemo(
+    () =>
+      (rows || []).filter((r) => {
+        const inView =
+          view === "archived"
+            ? r.status === "archived"
+            : view === "unread"
+              ? r.status === "new"
+              : r.status !== "archived";
+        return inView && matches(query, r.name, r.email, r.message, r.page);
+      }),
+    [rows, view, query],
+  );
+
+  async function setStatus(row, status, quiet = false) {
+    const before = row.status;
+    setRows((all) => all.map((r) => (r.id === row.id ? { ...r, status } : r)));
     const { error: saveError } = await supabase.from("contact_messages").update({ status }).eq("id", row.id);
     if (saveError) {
+      setRows((all) => all.map((r) => (r.id === row.id ? { ...r, status: before } : r)));
       toast.error(saveError);
       return;
     }
@@ -57,18 +79,12 @@ export default function Messages() {
         status === "archived"
           ? `Message from ${row.name} archived.`
           : status === "new"
-            ? `Message from ${row.name} marked unread.`
-            : row.status === "archived"
+            ? `Marked as unread.`
+            : before === "archived"
               ? `Message from ${row.name} moved to the inbox.`
-              : `Message from ${row.name} marked read.`,
+              : `Marked as read.`,
       );
     }
-    const leavesView = (view === "inbox") !== (status !== "archived");
-    setRows((current) =>
-      leavesView
-        ? current.filter((r) => r.id !== row.id)
-        : current.map((r) => (r.id === row.id ? { ...r, status } : r)),
-    );
   }
 
   async function remove(row) {
@@ -78,95 +94,128 @@ export default function Messages() {
       toast.error(deleteError);
       return;
     }
-    setRows((current) => current.filter((r) => r.id !== row.id));
+    setRows((all) => all.filter((r) => r.id !== row.id));
     toast.success(`Message from ${row.name} deleted.`);
   }
 
-  if (loading) return <Spinner label="Loading messages…" />;
-
-  const unread = rows.filter((r) => r.status === "new").length;
+  if (!rows) return <Spinner label="Loading messages…" />;
 
   return (
-    <>
-      <header className="top row">
-        <div>
-          <p className="eyebrow">Public site</p>
-          <h1>Messages</h1>
-          <p>
-            Sent from the site&apos;s “Send us a message” widget.
-            {view === "inbox" && unread ? ` ${unread} unread.` : ""}
-          </p>
-        </div>
-        <div className="appt-tabs">
-          <button type="button" className={`ghost ${view === "inbox" ? "is-on" : ""}`} onClick={() => setView("inbox")}>
-            <Inbox />
-            Inbox
-          </button>
-          <button
-            type="button"
-            className={`ghost ${view === "archived" ? "is-on" : ""}`}
-            onClick={() => setView("archived")}
-          >
-            <Archive />
-            Archived
-          </button>
-        </div>
-      </header>
+    <div className="ui-page">
+      <PageHead
+        icon={Mail}
+        title="Messages"
+        description="Sent from the site's “Send us a message” widget and the portfolio contact forms."
+        stats={
+          <>
+            <Stat icon={Inbox} value={counts.inbox} label="in inbox" />
+            <Stat icon={Mail} value={counts.unread} label="unread" tone={counts.unread ? "warn" : undefined} />
+          </>
+        }
+      />
       {error ? <p className="error">{error}</p> : null}
-      {!error && rows.length === 0 ? (
-        <Empty
-          icon={view === "inbox" ? Inbox : Archive}
-          title={view === "inbox" ? "Inbox is empty" : "No archived messages"}
-        >
-          {view === "inbox"
-            ? "Messages visitors send from the site and the portfolios will appear here."
-            : "Messages you archive are kept here."}
-        </Empty>
-      ) : null}
-      <div className="appt-list">
-        {rows.map((row) => (
-          <article key={row.id} className={`panel appt msg is-${row.status}`}>
-            <div className="appt-who">
-              <strong>
-                {row.status === "new" ? <span className="msg-dot" aria-label="Unread" /> : null}
-                {row.name}
-              </strong>
-              <a
-                href={`mailto:${row.email}?subject=${encodeURIComponent("Re: your message to Solvimere")}`}
-                onClick={() => row.status === "new" && setStatus(row, "read", { quiet: true })}
-              >
-                {row.email}
-              </a>
-            </div>
-            <div className="appt-when">
-              <span>{fmt(row.created_at)}</span>
-              {row.page ? <span>from {row.page}</span> : null}
-            </div>
-            <p className="appt-topic">{row.message}</p>
-            <div className="appt-actions">
-              <label>
-                <span className="sr-only">Status</span>
-                <select value={row.status} onChange={(event) => setStatus(row, event.target.value)}>
-                  {STATUSES.map((status) => (
-                    <option key={status} value={status}>
-                      {status[0].toUpperCase() + status.slice(1)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button
-                type="button"
-                className="danger icon-btn"
-                onClick={() => remove(row)}
-                aria-label={`Delete the message from ${row.name}`}
-                title="Delete"
-              >
-                <Trash2 />
-              </button>
-            </div>
-          </article>
-        ))}
-      </div>
-    </>
+
+      <Toolbar>
+        <SearchBox value={query} onChange={setQuery} placeholder="Search name, email or text" />
+        <Tabs
+          value={view}
+          onChange={setView}
+          label="Folder"
+          options={[
+            { value: "inbox", label: "Inbox", icon: Inbox, count: counts.inbox },
+            { value: "unread", label: "Unread", icon: Mail, count: counts.unread },
+            { value: "archived", label: "Archived", icon: Archive, count: counts.archived },
+          ]}
+        />
+      </Toolbar>
+
+      {!error && shown.length === 0 ? (
+        query ? (
+          <Empty compact icon={Mail} title="No matching messages">
+            Nothing matches “{query}”.
+          </Empty>
+        ) : (
+          <Empty
+            icon={view === "archived" ? Archive : Inbox}
+            title={
+              view === "archived" ? "No archived messages" : view === "unread" ? "All caught up" : "Inbox is empty"
+            }
+          >
+            {view === "archived"
+              ? "Messages you archive are kept here."
+              : view === "unread"
+                ? "Every message has been read."
+                : "Messages visitors send from the site and the portfolios will appear here."}
+          </Empty>
+        )
+      ) : (
+        <ul className="msg-list">
+          {shown.map((row) => {
+            const unread = row.status === "new";
+            return (
+              <li key={row.id} className={`msg-card${unread ? " is-unread" : ""}`}>
+                <Avatar name={row.name} size={40} />
+                <div className="msg-body">
+                  <header>
+                    <strong>{row.name}</strong>
+                    <a href={`mailto:${row.email}`} className="msg-email">
+                      {row.email}
+                    </a>
+                    {unread ? <span className="ui-badge is-blue">New</span> : null}
+                    <time dateTime={row.created_at} title={fullDate(row.created_at)}>
+                      {timeAgo(row.created_at)}
+                    </time>
+                  </header>
+                  <p>{row.message}</p>
+                  {row.page ? (
+                    <span className="ui-muted">Sent from {row.page === "/" ? "the home page" : row.page}</span>
+                  ) : null}
+                </div>
+                <div className="msg-actions">
+                  <a
+                    className="primary icon-btn"
+                    href={`mailto:${row.email}?subject=${encodeURIComponent("Re: your message to Solvimere")}`}
+                    title="Reply by email"
+                    aria-label={`Reply to ${row.name}`}
+                    onClick={() => unread && setStatus(row, "read", true)}
+                  >
+                    <Reply />
+                  </a>
+                  {row.status !== "archived" ? (
+                    <button
+                      type="button"
+                      className="ghost icon-btn"
+                      title={unread ? "Mark as read" : "Mark as unread"}
+                      aria-label={unread ? "Mark as read" : "Mark as unread"}
+                      onClick={() => setStatus(row, unread ? "read" : "new")}
+                    >
+                      {unread ? <MailOpen /> : <Mail />}
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    className="ghost icon-btn"
+                    title={row.status === "archived" ? "Move to inbox" : "Archive"}
+                    aria-label={row.status === "archived" ? "Move to inbox" : "Archive"}
+                    onClick={() => setStatus(row, row.status === "archived" ? "read" : "archived")}
+                  >
+                    {row.status === "archived" ? <ArchiveRestore /> : <Archive />}
+                  </button>
+                  <button
+                    type="button"
+                    className="danger icon-btn"
+                    title="Delete"
+                    aria-label={`Delete the message from ${row.name}`}
+                    onClick={() => remove(row)}
+                  >
+                    <Trash2 />
+                  </button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
   );
 }

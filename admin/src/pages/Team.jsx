@@ -1,10 +1,28 @@
-import { useEffect, useState } from "react";
-import { ChevronDown, ChevronUp, ImageUp, Loader2, Pencil, Save, Trash2, UserPlus, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  AtSign,
+  BriefcaseBusiness,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+  ImageUp,
+  Loader2,
+  MousePointerClick,
+  Pencil,
+  Quote,
+  Save,
+  Trash2,
+  User,
+  UserPlus,
+  Users,
+  X,
+} from "lucide-react";
 import { ImageEditor } from "../components/ImageEditor";
 import { Spinner } from "../components/Spinner";
 import { Empty } from "../components/Empty";
-import { Users } from "lucide-react";
 import { toast } from "../components/Toast";
+import { PageHead, SearchBox, Stat, matches } from "../components/ui";
+import { SITE_URL } from "../portfolio/api";
 import { supabase, uploadImage } from "../lib/supabase";
 import { portfolioSlug } from "../../../src/lib/slug.js";
 
@@ -42,6 +60,8 @@ export default function Team() {
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const [editor, setEditor] = useState(null);
+  const [query, setQuery] = useState("");
+  const shown = useMemo(() => (members || []).filter((p) => matches(query, p.name, p.role, p.email)), [members, query]);
 
   function load(selectId) {
     supabase
@@ -185,200 +205,256 @@ export default function Team() {
 
   if (!members) return <Spinner label="Loading team…" />;
 
+  const withPhoto = members.filter((m) => m.avatar_url).length;
+  const slug = draft ? portfolioSlug(draft.name) : "";
+
   return (
-    <>
-      <header className="top row">
-        <div>
-          <p className="eyebrow">Public site</p>
-          <h1>Team</h1>
-          <p>Add, edit, and reorder the people shown on the team page.</p>
-        </div>
-        <button
-          className="primary"
-          type="button"
-          onClick={() => {
-            setDraft({ ...emptyMember });
-          }}
-        >
-          <UserPlus />
-          Add member
-        </button>
-      </header>
+    <div className="ui-page">
+      <PageHead
+        icon={Users}
+        title="Team"
+        description="The people on the team and home pages. Reorder with the arrows; the order saves at once."
+        stats={
+          <>
+            <Stat icon={Users} value={members.length} label="members" />
+            <Stat icon={ImageUp} value={withPhoto} label="with photos" />
+          </>
+        }
+        actions={
+          <button className="primary" type="button" onClick={() => setDraft({ ...emptyMember })}>
+            <UserPlus />
+            Add member
+          </button>
+        }
+      />
       {error ? <p className="error">{error}</p> : null}
-      <div className="split">
-        <section className="roster">
+
+      <div className="team-layout">
+        <section className="ui-card team-roster" aria-label="Team members">
+          <SearchBox value={query} onChange={setQuery} placeholder="Search name, role or email" />
           {members.length === 0 && !error ? (
             <Empty icon={Users} title="No team members yet">
               Add the people who should appear on the site&apos;s team page.
             </Empty>
           ) : null}
-          {members.map((person, index) => (
-            <article key={person.id} className={draft?.id === person.id ? "is-selected" : ""}>
-              <button
-                type="button"
-                className="roster-hit"
-                onClick={() => {
-                  setDraft(person);
-                }}
-              >
-                {person.avatar_url ? (
-                  <span className="avatar-frame" style={{ "--avatar-scale": person.avatar_scale || 1 }}>
-                    <img src={person.avatar_url} alt="" />
+          {members.length > 0 && shown.length === 0 ? (
+            <Empty compact icon={Users} title="No matches">
+              Nobody matches “{query}”.
+            </Empty>
+          ) : null}
+          <ul className="team-rows">
+            {shown.map((person) => {
+              const index = members.indexOf(person);
+              const selected = draft?.id === person.id;
+              return (
+                <li key={person.id} className={selected ? "is-selected" : ""}>
+                  <button type="button" className="team-hit" onClick={() => setDraft(person)}>
+                    {person.avatar_url ? (
+                      <span className="avatar-frame" style={{ "--avatar-scale": person.avatar_scale || 1 }}>
+                        <img src={person.avatar_url} alt="" />
+                      </span>
+                    ) : (
+                      <span className="team-ph">
+                        <User />
+                      </span>
+                    )}
+                    <span className="ui-row-main">
+                      <strong>{person.name}</strong>
+                      <span>{person.role}</span>
+                    </span>
+                  </button>
+                  {!query ? (
+                    <span className="team-order">
+                      <button
+                        type="button"
+                        aria-label={`Move ${person.name} up`}
+                        disabled={index === 0}
+                        onClick={() => move(index, -1)}
+                        title="Move up"
+                      >
+                        <ChevronUp />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`Move ${person.name} down`}
+                        disabled={index === members.length - 1}
+                        onClick={() => move(index, 1)}
+                        title="Move down"
+                      >
+                        <ChevronDown />
+                      </button>
+                    </span>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+
+        {draft ? (
+          <form className="ui-card team-editor" onSubmit={save}>
+            <div className="ui-card-head">
+              <span className="ui-card-icon">{draft.id ? <Pencil /> : <UserPlus />}</span>
+              <div>
+                <h2>{draft.id ? draft.name || "Edit member" : "New member"}</h2>
+                <p>{draft.id ? "Changes show on the site when you save." : "Fill in the details and create."}</p>
+              </div>
+              {draft.id && slug && SITE_URL ? (
+                <a
+                  className="ghost icon-btn team-portfolio"
+                  href={`${SITE_URL}/team/${slug}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  title="Open portfolio"
+                  aria-label="Open portfolio"
+                >
+                  <ExternalLink />
+                </a>
+              ) : null}
+            </div>
+
+            <fieldset className="team-section">
+              <legend>Photo</legend>
+              <div className="avatar-row">
+                {draft.avatar_url ? (
+                  <span className="avatar-frame" style={{ "--avatar-scale": clampScale(draft.avatar_scale) }}>
+                    <img src={draft.avatar_url} alt="" />
                   </span>
                 ) : (
-                  <span className="ph" />
+                  <span className="team-ph is-lg">
+                    <User />
+                  </span>
                 )}
-                <span>
-                  <strong>{person.name}</strong>
-                  <span>{person.role}</span>
-                  <span>{person.email || "No email"}</span>
-                </span>
-              </button>
-              <div className="reorder">
-                <button
-                  type="button"
-                  aria-label={`Move ${person.name} up`}
-                  disabled={index === 0}
-                  onClick={() => move(index, -1)}
-                  title="Move up"
-                >
-                  <ChevronUp />
-                </button>
-                <button
-                  type="button"
-                  aria-label={`Move ${person.name} down`}
-                  disabled={index === members.length - 1}
-                  onClick={() => move(index, 1)}
-                  title="Move down"
-                >
-                  <ChevronDown />
-                </button>
-              </div>
-            </article>
-          ))}
-        </section>
-        {draft ? (
-          <form className="panel editor" onSubmit={save}>
-            <h2>{draft.id ? "Edit member" : "New member"}</h2>
-            <div className="avatar-row">
-              {draft.avatar_url ? (
-                <span className="avatar-frame" style={{ "--avatar-scale": clampScale(draft.avatar_scale) }}>
-                  <img src={draft.avatar_url} alt="" />
-                </span>
-              ) : (
-                <span className="ph lg" />
-              )}
-              <div className="avatar-fields">
-                <span className="field-label">Avatar</span>
-                <div className="tool-row">
-                  <label className="ghost file-btn">
-                    <ImageUp />
-                    {draft.avatar_url ? "Replace photo" : "Upload photo"}
-                    <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onFile} />
-                  </label>
-                  {draft.avatar_url ? (
-                    <button
-                      className="ghost"
-                      type="button"
-                      onClick={() => setEditor({ src: draft.avatar_url, revoke: false })}
-                    >
-                      <Pencil />
-                      Edit image
-                    </button>
-                  ) : null}
+                <div className="avatar-fields">
+                  <div className="tool-row">
+                    <label className="ghost file-btn">
+                      <ImageUp />
+                      {draft.avatar_url ? "Replace photo" : "Upload photo"}
+                      <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onFile} />
+                    </label>
+                    {draft.avatar_url ? (
+                      <button
+                        className="ghost"
+                        type="button"
+                        onClick={() => setEditor({ src: draft.avatar_url, revoke: false })}
+                      >
+                        <Pencil />
+                        Edit image
+                      </button>
+                    ) : null}
+                  </div>
+                  <small>Crop, scale and adjust after choosing a photo.</small>
                 </div>
-                <small>Choose a photo to crop, scale, and adjust it.</small>
               </div>
-            </div>
-            <label className="field">
-              <span>Name</span>
-              <input value={draft.name} onChange={(event) => update("name", event.target.value)} required />
-              {portfolioSlug(draft.name) ? (
-                <small>
-                  Portfolio: /team/{portfolioSlug(draft.name)} (the portfolio app&apos;s profile slug must be &ldquo;
-                  {portfolioSlug(draft.name)}&rdquo;)
-                </small>
+            </fieldset>
+
+            <fieldset className="team-section">
+              <legend>Basics</legend>
+              <div className="form-grid">
+                <label className="ui-field">
+                  <span>Name</span>
+                  <span className="ui-input">
+                    <User aria-hidden="true" />
+                    <input value={draft.name} onChange={(event) => update("name", event.target.value)} required />
+                  </span>
+                  {slug ? <small>Portfolio address: /team/{slug}</small> : null}
+                </label>
+                <label className="ui-field">
+                  <span>Role</span>
+                  <span className="ui-input">
+                    <BriefcaseBusiness aria-hidden="true" />
+                    <input value={draft.role} onChange={(event) => update("role", event.target.value)} required />
+                  </span>
+                </label>
+              </div>
+              <label className="ui-field">
+                <span>Email</span>
+                <span className="ui-input">
+                  <AtSign aria-hidden="true" />
+                  <input
+                    type="email"
+                    value={draft.email}
+                    placeholder="name@solvimere.com"
+                    onChange={(event) => update("email", event.target.value)}
+                  />
+                </span>
+              </label>
+            </fieldset>
+
+            <fieldset className="team-section">
+              <legend>Team page text</legend>
+              <label className="field">
+                <span>Bio</span>
+                <textarea rows="3" value={draft.bio} onChange={(event) => update("bio", event.target.value)} />
+              </label>
+              <div className="form-grid">
+                <label className="field">
+                  <span>Highlight label</span>
+                  <input
+                    value={draft.highlight_label}
+                    placeholder="Highlights"
+                    onChange={(event) => update("highlight_label", event.target.value)}
+                  />
+                </label>
+                <label className="field">
+                  <span>Expertise label</span>
+                  <input
+                    value={draft.expertise_label}
+                    placeholder="Expertise"
+                    onChange={(event) => update("expertise_label", event.target.value)}
+                  />
+                </label>
+              </div>
+              <label className="field">
+                <span>Highlight</span>
+                <textarea
+                  rows="3"
+                  value={draft.highlight_text}
+                  onChange={(event) => update("highlight_text", event.target.value)}
+                />
+              </label>
+              <label className="field">
+                <span>Expertise</span>
+                <textarea
+                  rows="3"
+                  value={draft.expertise_text}
+                  onChange={(event) => update("expertise_text", event.target.value)}
+                />
+              </label>
+              <label className="field">
+                <span>
+                  <Quote className="team-quote-icon" aria-hidden="true" /> Personal quote
+                </span>
+                <textarea rows="2" value={draft.quote} onChange={(event) => update("quote", event.target.value)} />
+              </label>
+            </fieldset>
+
+            <div className="ui-actions">
+              {draft.id ? (
+                <button className="danger team-delete" type="button" disabled={pending} onClick={remove}>
+                  <Trash2 />
+                  Delete
+                </button>
               ) : null}
-            </label>
-            <label className="field">
-              <span>Role</span>
-              <input value={draft.role} onChange={(event) => update("role", event.target.value)} required />
-            </label>
-            <label className="field">
-              <span>Email</span>
-              <input
-                type="email"
-                value={draft.email}
-                placeholder="name@solvimere.com"
-                onChange={(event) => update("email", event.target.value)}
-              />
-            </label>
-            <label className="field">
-              <span>Bio</span>
-              <textarea rows="3" value={draft.bio} onChange={(event) => update("bio", event.target.value)} />
-            </label>
-            <div className="form-grid">
-              <label className="field">
-                <span>Highlight label</span>
-                <input
-                  value={draft.highlight_label}
-                  onChange={(event) => update("highlight_label", event.target.value)}
-                />
-              </label>
-              <label className="field">
-                <span>Expertise label</span>
-                <input
-                  value={draft.expertise_label}
-                  onChange={(event) => update("expertise_label", event.target.value)}
-                />
-              </label>
-            </div>
-            <label className="field">
-              <span>Highlight</span>
-              <textarea
-                rows="3"
-                value={draft.highlight_text}
-                onChange={(event) => update("highlight_text", event.target.value)}
-              />
-            </label>
-            <label className="field">
-              <span>Expertise</span>
-              <textarea
-                rows="3"
-                value={draft.expertise_text}
-                onChange={(event) => update("expertise_text", event.target.value)}
-              />
-            </label>
-            <label className="field">
-              <span>Personal quote</span>
-              <textarea rows="3" value={draft.quote} onChange={(event) => update("quote", event.target.value)} />
-            </label>
-            <div className="actions">
+              <button className="ghost" type="button" onClick={() => setDraft(null)}>
+                <X />
+                Close
+              </button>
               <button className="primary" type="submit" disabled={pending}>
                 {pending ? <Loader2 className="spin" /> : draft.id ? <Save /> : <UserPlus />}
                 {pending ? "Saving…" : draft.id ? "Save changes" : "Create member"}
               </button>
-              {draft.id ? (
-                <button className="danger" type="button" disabled={pending} onClick={remove}>
-                  <Trash2 />
-                  Delete
-                </button>
-              ) : (
-                <button className="ghost" type="button" onClick={() => setDraft(null)}>
-                  <X />
-                  Cancel
-                </button>
-              )}
             </div>
           </form>
         ) : (
-          <section className="panel editor empty-editor">
-            <h2>Member details</h2>
-            <p>Select a person to edit their avatar, email, role, and profile, or add someone new.</p>
+          <section className="ui-card team-editor">
+            <Empty icon={MousePointerClick} title="Select a team member">
+              Pick someone on the left to edit their photo, role and profile, or add someone new.
+            </Empty>
           </section>
         )}
       </div>
       {editor ? <ImageEditor src={editor.src} pending={pending} onCancel={closeEditor} onApply={applyImage} /> : null}
-    </>
+    </div>
   );
 }

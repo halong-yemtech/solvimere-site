@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import "react-loading-skeleton/dist/skeleton.css";
+import { FiArrowLeft } from "react-icons/fi";
 import "./portfolio.css";
 import HomePage from "./components/HomePage";
 import { SiteProvider } from "./components/SiteProvider";
@@ -67,43 +67,76 @@ export default function PortfolioPage() {
   );
 
   if (state.status === "loading") {
-    return <div className="pf-root min-h-screen bg-gray-900" style={themeStyle(null)} aria-busy="true" />;
+    return (
+      <main className="pf-loader" role="status" aria-live="polite">
+        <img src="/favicon.png" alt="" width="56" height="56" />
+        <span className="sr-only">Loading portfolio…</span>
+      </main>
+    );
   }
 
   if (!site) {
     return (
-      <main className="pf-root" style={themeStyle(null)}>
-        <div className="flex items-center justify-center min-h-screen p-10 text-center bg-gray-900">
-          <div className="max-w-2xl space-y-6 text-2xl text-gray-300">
-            <h1 className="text-4xl font-semibold text-main-orange">Portfolio coming soon</h1>
-            <p>This team member&apos;s portfolio isn&apos;t published yet.</p>
-            <Link to="/team" className="inline-block underline hover:text-main-orange">
-              Back to the team
-            </Link>
-          </div>
-        </div>
-      </main>
+      <Notice
+        site={null}
+        eyebrow="Team"
+        title={
+          <>
+            Portfolio <em>coming soon</em>
+          </>
+        }
+        text="This team member's portfolio isn't published yet."
+      />
     );
   }
 
   if (site.settings.maintenance.enabled) {
     return (
-      <main className="pf-root" style={themeStyle(site)}>
-        <div className="flex items-center justify-center min-h-screen p-10 text-center bg-gray-900">
-          <div className="max-w-2xl space-y-6 text-2xl text-gray-300">
-            <h1 className="text-4xl font-semibold text-main-orange">{site.profile.name}</h1>
-            <p className="whitespace-pre-line">{site.settings.maintenance.message}</p>
-          </div>
-        </div>
-      </main>
+      <Notice
+        site={site}
+        eyebrow="Back soon"
+        title={site.profile.name}
+        text={site.settings.maintenance.message || "This portfolio is being updated. Please check back shortly."}
+      />
     );
   }
 
   return (
     <div className="pf-root" style={themeStyle(site)}>
       <SiteProvider data={site}>
-        <HomePage />
+        {/* Remount when the slug changes so per-portfolio UI state starts fresh. */}
+        <HomePage key={site.profile.slug} />
       </SiteProvider>
     </div>
+  );
+}
+
+/** Full-page message (not published yet, or in maintenance), in the site's style. */
+function Notice({
+  site,
+  eyebrow,
+  title,
+  text,
+}: {
+  site: SiteData | null;
+  eyebrow: string;
+  title: React.ReactNode;
+  text: string;
+}) {
+  return (
+    <main className="pf-root grid place-items-center px-8 text-center" style={themeStyle(site)}>
+      <div className="pf-glow" aria-hidden />
+      <div className="max-w-[60rem]">
+        <span className="pf-eyebrow">{eyebrow}</span>
+        <h1 className="pf-heading !text-[clamp(3.6rem,6vw,6.4rem)]">{title}</h1>
+        <p className="mt-6 whitespace-pre-line text-[1.7rem] leading-relaxed text-gray-400">{text}</p>
+        <Link to="/team" className="pf-btn pf-btn-ghost mt-10 !pl-2 !pr-6">
+          <span className="pf-btn-ico">
+            <FiArrowLeft aria-hidden />
+          </span>
+          Back to the team
+        </Link>
+      </div>
+    </main>
   );
 }

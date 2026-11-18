@@ -1,39 +1,29 @@
-import { currentWorkTab } from "@/lib/state";
-import { useSite } from "./SiteProvider";
-
 interface Props {
+  /** Short label for a block inside a section ("Services", "Skills"…). */
   name: string;
-  currentMenu?: string;
-  /** Extra controls on the right (e.g. edit tools). */
+  /** Controls on the right (e.g. filters). */
   actions?: React.ReactNode;
 }
 
-export default function Title({ name, currentMenu, actions }: Props) {
-  const { workCategories } = useSite();
-  const workTabs = ["All", ...workCategories];
-
+/** Small divider heading between blocks of a section: label, hairline, optional controls. */
+export default function Title({ name, actions }: Props) {
   return (
-    <div className="customLine relative before:bottom-0 borderLeft z-20 py-10 flex flex-wrap gap-8 justify-center sm:justify-between items-center">
-      <span className="ml-12 customCircle relative tracking-wide capitalize text-3xl text-gray-300 font-medium">
-        {name}
-      </span>
+    <header className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-3">
+      <h2 className="pf-block-title">{name}</h2>
+      <span className="h-px min-w-[4rem] flex-1 bg-white/[0.08]" aria-hidden />
+      {actions}
+    </header>
+  );
+}
 
-      {currentMenu && (
-        <ul className="flex flex-wrap items-center gap-6 mr-12 ml-12">
-          {workTabs.map((tab) => (
-            <li
-              key={tab}
-              onClick={() => currentWorkTab(tab)}
-              className={`text-[1.4rem] cursor-pointer tracking-wide ${
-                currentMenu === tab ? "text-main-orange" : "text-gray-300"
-              }`}
-            >
-              {tab}
-            </li>
-          ))}
-        </ul>
-      )}
-      {actions && <div className="mr-12 ml-12 sm:ml-0">{actions}</div>}
-    </div>
+/** Heading inside a card (e.g. "Experience"), with an icon tile. */
+export function SubTitle({ title, Icon }: { title: string; Icon: React.ComponentType<{ "aria-hidden"?: boolean }> }) {
+  return (
+    <h3 className="pf-subheading">
+      <span className="pf-icon-tile !w-11 !h-11 !rounded-xl !text-[1.7rem]">
+        <Icon aria-hidden />
+      </span>
+      <span className="capitalize">{title}</span>
+    </h3>
   );
 }

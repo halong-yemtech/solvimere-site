@@ -1,14 +1,18 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Geist:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Rubik:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Geist:wght@300;400;500;600;700;800&display=swap");
 
 /*
  * Portfolio pages (/team/<slug>): Tailwind utilities scoped to .pf-root
  * (tailwind.config.js -> important: ".pf-root", preflight off), so nothing here
  * reaches the rest of the site. This is Tailwind's reset, scoped the same way.
+ *
+ * Sizes are in rem with 1rem = 8px on phones, 8.8px on tablets and 10px on desktops
+ * (html.pf-html below), so the whole portfolio scales with the screen.
  */
-.pf-root *,
-.pf-root ::before,
-.pf-root ::after {
-  border: 0 solid #e5e7eb;
+.pf-root :where(*, ::before, ::after) {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0 solid rgba(255, 255, 255, 0.08);
 }
 .pf-root {
   line-height: 1.5;
@@ -16,283 +20,528 @@
   tab-size: 4;
   font-feature-settings: normal;
 }
-.pf-root :is(h1, h2, h3, h4, h5, h6) {
+.pf-root,
+.pf-root :where(button, input, optgroup, select, textarea) {
+  font-family: var(--site-font, "Inter"), ui-sans-serif, system-ui, sans-serif;
+}
+.pf-root :where(h1, h2, h3, h4, h5, h6) {
   font-size: inherit;
   font-weight: inherit;
 }
-.pf-root a {
+.pf-root :where(a) {
   color: inherit;
+  text-decoration: none;
 }
-.pf-root :is(b, strong) {
-  font-weight: bolder;
+.pf-root :where(b, strong) {
+  font-weight: 600;
 }
-.pf-root :is(button, input, optgroup, select, textarea) {
-  font-family: inherit;
+.pf-root :where(button, input, optgroup, select, textarea) {
   font-size: 100%;
   font-weight: inherit;
   line-height: inherit;
   color: inherit;
   background: transparent;
 }
-.pf-root :is(button, [role="button"]) {
+.pf-root :where(button, [role="button"]) {
   cursor: pointer;
 }
-.pf-root :is(ol, ul, menu) {
+.pf-root :where(ol, ul, menu) {
   list-style: none;
 }
 .pf-root textarea {
   resize: vertical;
 }
-.pf-root :is(input, textarea)::placeholder {
-  color: #9ca3af;
+.pf-root :where(input, textarea)::placeholder {
+  color: #7c7c86;
   opacity: 1;
 }
-.pf-root :is(img, svg, video, canvas, audio, iframe, embed, object) {
+.pf-root :where(img, svg, video, canvas, audio, iframe, embed, object) {
   display: block;
   vertical-align: middle;
 }
-.pf-root :is(img, video) {
+.pf-root :where(img, video) {
   max-width: 100%;
   height: auto;
 }
 .pf-root [hidden] {
   display: none;
 }
+.pf-root :focus {
+  outline: none;
+}
+.pf-root :focus-visible {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 2px;
+}
 
+/* Only the --tw-* variable defaults (preflight is off), which gradients, rings, shadows and transforms need. */
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@layer components {
-  .pf-root .formStyle {
-    @apply w-full text-2xl bg-transparent border-0 border-b-2 border-gray-800 border-solid rounded-none resize-none placeholder:text-2xl placeholder:text-gray-400 text-main-orange focus:border-main-orange focus:placeholder:text-gray-300;
-  }
-}
-
-.pf-root {
-  --wa: 38 92% 50%;
-}
-
-.pf-root,
-.pf-root * {
-  font-family: var(--site-font, "Poppins"), sans-serif;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  outline: none;
-  border: none;
-  text-decoration: none;
-}
 
 html.pf-html {
   font-size: 50%;
   overflow-x: hidden;
+  background: #08080a;
   scroll-behavior: smooth;
-  scroll-padding-top: 6.5rem;
-  /* background-color: #f5b038; */
+  scroll-padding-top: 8rem;
+}
+@media (min-width: 991px) {
+  html.pf-html {
+    font-size: 55%;
+  }
+}
+@media (min-width: 1250px) {
+  html.pf-html {
+    font-size: 62.5%;
+  }
+}
+html.pf-html body {
+  background: #08080a;
 }
 
-/* width */
-.pf-root .myScroll::-webkit-scrollbar {
-  width: 6px;
-  background-color: transparent;
-}
+/* ---------- Page frame ---------- */
 
-.infinite-scroll-component::-webkit-scrollbar,
-.pf-root .noScroll::-webkit-scrollbar {
-  width: 0;
-  background-color: transparent;
+.pf-root {
+  position: relative;
+  min-height: 100vh;
+  background: #08080a;
+  color: #e4e4e7;
+  font-size: 1.6rem;
+  isolation: isolate;
 }
-
-/* Track */
-.myScroll::-webkit-scrollbar-track,
-.pf-root .infinite-scroll-component::-webkit-scrollbar-track {
-  -webkit-box-shadow: none;
-  background-color: transparent;
+.pf-glow {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(60rem 42rem at 8% -6%, rgb(var(--accent) / 0.22), transparent 70%),
+    radial-gradient(50rem 40rem at 100% 110%, rgb(var(--accent) / 0.1), transparent 70%);
 }
-
-/* Handle */
-.pf-root .myScroll::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.25);
-  border-radius: 0.6rem;
-}
-
-.pf-root,
-.pf-root *,
-.pf-root *:hover {
-  scrollbar-color: auto;
-}
-
-.pf-root .customLine::before {
+.pf-glow::after {
+  /* faint grid, like the site's hero */
   content: "";
   position: absolute;
-  width: 100%;
-  height: 0.1rem;
+  inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 6.4rem 6.4rem;
+  mask-image: radial-gradient(ellipse 80% 60% at 30% 0%, #000 20%, transparent 75%);
+}
+.pf-wrap {
+  width: min(128rem, calc(100% - 3.2rem));
+  margin: 0 auto;
+}
+@media (min-width: 640px) {
+  .pf-wrap {
+    width: min(128rem, calc(100% - 6.4rem));
+  }
 }
 
-.pf-root .customCircle::first-letter {
+/* Top bar: a slimmer version of the site header. */
+.pf-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+  margin-top: 1.6rem;
+  padding: 0.8rem 0.8rem 0.8rem 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(14, 14, 18, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.pf-topbar-logo img {
+  height: 3rem;
+  width: auto;
+}
+
+/* ---------- Buttons (the site's pill buttons) ---------- */
+
+.pf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  height: 4.6rem;
+  padding: 0 0.5rem 0 2rem;
+  border-radius: 999px;
+  background: rgb(var(--accent));
+  color: #fff;
+  font-size: 1.45rem;
+  font-weight: 650;
+  white-space: nowrap;
+  box-shadow: 0 1rem 3rem rgb(var(--accent) / 0.3);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+.pf-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 1.4rem 3.6rem rgb(var(--accent) / 0.42);
+}
+.pf-btn:disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+.pf-btn-ico {
+  display: grid;
+  place-items: center;
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: 50%;
+  background: #fff;
   color: rgb(var(--accent));
+  font-size: 1.6rem;
+  transition: transform 0.2s ease;
 }
-
-.pf-root .customCircle::before {
-  content: "";
-  position: absolute;
-  left: -1rem;
-  top: 0;
+.pf-btn:hover .pf-btn-ico {
+  transform: rotate(-12deg);
+}
+.pf-btn-ghost {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+}
+.pf-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+.pf-btn-ghost .pf-btn-ico {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+.pf-btn-sm {
+  height: 4rem;
+  font-size: 1.35rem;
+  padding-left: 1.6rem;
+}
+.pf-btn-sm .pf-btn-ico {
   width: 3rem;
   height: 3rem;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(246, 184, 70, 0.4) 0%, rgba(246, 184, 70, 0.01) 100%);
+  font-size: 1.4rem;
+}
+.pf-btn-plain {
+  padding: 0 2rem;
 }
 
-.pf-root .borderRight::before {
-  background: radial-gradient(ellipse at right, rgba(197, 202, 213, 0.15) 0, rgba(255, 255, 255, 0) 70%);
+.pf-icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: #d4d4d8;
+  font-size: 1.8rem;
+  transition:
+    color 0.2s,
+    border-color 0.2s,
+    background 0.2s,
+    transform 0.2s;
+}
+.pf-icon-btn:hover {
+  color: #fff;
+  border-color: rgb(var(--accent) / 0.5);
+  background: rgb(var(--accent) / 0.12);
+  transform: translateY(-1px);
 }
 
-.pf-root .lineLeft {
-  background: radial-gradient(ellipse at left, rgba(197, 202, 213, 0.15) 0, rgba(255, 255, 255, 0) 70%);
+/* ---------- Cards, headings, chips ---------- */
+
+.pf-card {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 2rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015)), #0f0f13;
+}
+.pf-card-hover {
+  transition:
+    border-color 0.25s ease,
+    transform 0.25s ease,
+    background 0.25s ease;
+}
+.pf-card-hover:hover {
+  border-color: rgb(var(--accent) / 0.4);
+  transform: translateY(-2px);
 }
 
-.pf-root .vCustomLine::before {
+.pf-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.6rem 1.4rem 0.6rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.pf-eyebrow::before {
+  content: "+";
+  color: rgb(var(--accent));
+  font-weight: 800;
+}
+.pf-heading {
+  margin-top: 1.4rem;
+  color: #fff;
+  font-size: clamp(2.8rem, 3.4vw, 4rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+.pf-heading em {
+  font-style: normal;
+  color: rgb(var(--accent));
+}
+.pf-block-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  color: #a1a1aa;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.pf-block-title::before {
   content: "";
-  position: absolute;
-  width: 0.2rem;
-  height: 100%;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: rgb(var(--accent));
+  box-shadow: 0 0 0 0.35rem rgb(var(--accent) / 0.18);
+}
+.pf-subheading {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.pf-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #d4d4d8;
+  font-size: 1.3rem;
+  line-height: 1.4;
+}
+.pf-chip-accent {
+  border-color: rgb(var(--accent) / 0.35);
+  background: rgb(var(--accent) / 0.12);
+  color: #fff;
+}
+
+.pf-icon-tile {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 4.8rem;
+  height: 4.8rem;
+  border-radius: 1.4rem;
+  background: rgb(var(--accent) / 0.12);
+  box-shadow: inset 0 0 0 1px rgb(var(--accent) / 0.25);
+  color: rgb(var(--accent));
+  font-size: 2.2rem;
+}
+
+/* ---------- Section navigation ---------- */
+
+.pf-nav {
+  position: sticky;
   top: 0;
-  background: radial-gradient(ellipse at top, rgba(197, 202, 213, 0.15) 0, rgba(255, 255, 255, 0) 70%);
+  z-index: 30;
+  margin: 0 -1.6rem;
+  padding: 1.2rem 1.6rem;
+  background: linear-gradient(#08080a 70%, rgba(8, 8, 10, 0));
 }
-
-.pf-root .borderLeft::before {
-  background: radial-gradient(ellipse at left, rgba(197, 202, 213, 0.15) 0, rgba(255, 255, 255, 0) 70%);
+@media (min-width: 1024px) {
+  .pf-nav {
+    top: 0;
+    margin: 0;
+    padding: 1.6rem 0 2rem;
+  }
 }
-
-.pf-root .profile::after {
-  content: "";
-  position: absolute;
-  left: -1.5rem;
-  top: -1.2rem;
+.pf-nav-list {
+  display: flex;
+  gap: 0.4rem;
   width: 100%;
-  height: 100%;
-  border-radius: 0.5rem;
-  z-index: -1;
-  background: linear-gradient(135deg, rgba(133, 87, 2, 0.4) 0%, rgba(246, 184, 70, 0.01) 100%);
+  padding: 0.5rem;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(18, 18, 22, 0.86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  scrollbar-width: none;
+}
+.pf-nav-list::-webkit-scrollbar {
+  display: none;
+}
+.pf-tab {
+  display: inline-flex;
+  flex: 1 0 auto;
+  justify-content: center;
+  align-items: center;
+  gap: 0.8rem;
+  height: 4rem;
+  padding: 0 1.6rem;
+  border-radius: 999px;
+  color: #a1a1aa;
+  font-size: 1.4rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-transform: capitalize;
+  transition:
+    color 0.2s,
+    background 0.2s;
+}
+.pf-tab svg {
+  font-size: 1.6rem;
+}
+.pf-tab:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+.pf-tab[aria-current="page"] {
+  color: #fff;
+  background: rgb(var(--accent));
+  box-shadow: 0 0.6rem 2rem rgb(var(--accent) / 0.35);
 }
 
-.pf-root .overlay {
-  background: linear-gradient(135deg, rgba(133, 87, 2, 0.4) 0%, rgba(246, 184, 70, 0.01) 100%);
+/* Small filter pills (works categories) */
+.pf-filter {
+  height: 3.4rem;
+  padding: 0 1.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  color: #a1a1aa;
+  font-size: 1.3rem;
+  font-weight: 600;
+  transition:
+    color 0.2s,
+    border-color 0.2s,
+    background 0.2s;
+}
+.pf-filter:hover {
+  color: #fff;
+}
+.pf-filter[aria-pressed="true"] {
+  color: #fff;
+  border-color: rgb(var(--accent) / 0.5);
+  background: rgb(var(--accent) / 0.16);
 }
 
-.pf-root .myShadow {
-  box-shadow: 3px 0 20px -2px rgba(0, 0, 0, 0.3);
-}
+/* ---------- Forms ---------- */
 
-.pf-root .swiper {
+.pf-field {
+  display: grid;
+  gap: 0.8rem;
+  align-content: start;
+}
+.pf-label {
+  color: #a1a1aa;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.pf-input {
   width: 100%;
-  height: 100%;
+  min-height: 5rem;
+  padding: 1.2rem 1.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.4rem;
+  background: rgba(255, 255, 255, 0.03);
+  color: #fff;
+  font-size: 1.5rem;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    box-shadow 0.2s;
 }
-
-.pf-root .swiper-pagination .swiper-pagination-bullet {
-  background: transparent !important;
-  border: 0.1rem solid rgb(var(--accent));
-  width: 0.9rem;
-  height: 0.9rem;
-  margin: 0 0.3rem !important;
+.pf-input:hover {
+  border-color: rgba(255, 255, 255, 0.18);
 }
-
-.pf-root .swiper-pagination .swiper-pagination-bullet-active {
-  background: rgb(var(--accent)) !important;
+.pf-input:focus {
+  border-color: rgb(var(--accent) / 0.7);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 4px rgb(var(--accent) / 0.15);
 }
-
-.pf-root .bgSlider .swiper-fade .swiper-slide img {
-  opacity: 0;
-  visibility: hidden;
-  transform: scale(1.1) translateY(2rem);
-  transition: 1400ms ease !important;
+.pf-input[aria-invalid="true"] {
+  border-color: rgba(248, 113, 113, 0.7);
 }
-
-.pf-root .bgSlider .swiper-fade .swiper-slide.swiper-slide-active img {
-  opacity: 1;
-  visibility: visible;
-  transform: scale(1) translateY(0);
-  transition: 1400ms ease !important;
+textarea.pf-input {
+  min-height: 14rem;
+  line-height: 1.6;
 }
-
-.pf-root .profilePic::before {
-  content: "";
-  position: absolute;
-  top: 10px;
-  left: -10px;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(246, 184, 70, 0.4) 0%, rgba(246, 184, 70, 0.01) 100%);
-}
-
-.quote::before,
-.pf-root .quote::after {
-  content: "";
-  position: absolute;
+.pf-root input[type="checkbox"].pf-check {
+  appearance: none;
+  -webkit-appearance: none;
+  display: grid;
+  place-items: center;
   width: 2rem;
   height: 2rem;
-  background-color: rgb(107 114 128);
-  -webkit-mask-size: contain;
-  mask-size: contain;
-  opacity: 0.65;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 0.6rem;
+  cursor: pointer;
 }
-
-.pf-root .quote::after {
-  bottom: 0;
-  right: 0;
-  -webkit-mask-image: url("/team/images/quoteRight.svg");
-  mask-image: url("/team/images/quoteRight.svg");
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
+.pf-root input[type="checkbox"].pf-check:checked {
+  border-color: rgb(var(--accent));
+  background: rgb(var(--accent));
 }
-
-.pf-root .quote::before {
-  top: 0;
-  left: 0;
-  -webkit-mask-image: url("/team/images/quoteLeft.svg");
-  mask-image: url("/team/images/quoteLeft.svg");
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-}
-
-.pf-root .work::before {
+.pf-root input[type="checkbox"].pf-check:checked::after {
   content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, rgba(246, 184, 70, 0.4) 0%, rgba(246, 184, 70, 0.01) 100%);
-  z-index: 2;
-  opacity: 0;
-  transition: all 0.3s ease;
+  width: 0.6rem;
+  height: 1.1rem;
+  margin-top: -0.2rem;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
-.pf-root .work-wrapper:hover .work::before {
-  opacity: 1;
-  /* color: #d1d5db; */
-}
+/* ---------- Loading ---------- */
 
-.tech-func ul li::before,
-.pf-root .prose ul li::before {
-  content: "\2022";
-  color: rgb(var(--accent));
-  font-weight: bold;
-  display: inline-block;
-  width: 1.8rem;
-  min-width: 1.8rem;
+.pf-loader {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  background: #08080a;
 }
-
+.pf-loader img {
+  width: 56px;
+  height: 56px;
+  animation: pf-spin 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes pf-spin {
+  50% {
+    transform: rotate(180deg) scale(0.86);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 .pf-root .loader span:first-child {
   animation: bubble 0.9s linear infinite alternate forwards;
 }
-
 .pf-root .loader span:last-child {
   animation: bubbleReverse 0.9s linear infinite alternate forwards;
 }
-
 @keyframes bubble {
   from {
     transform: scale(1);
@@ -301,7 +550,6 @@ html.pf-html {
     transform: scale(0);
   }
 }
-
 @keyframes bubbleReverse {
   from {
     transform: scale(0);
@@ -311,47 +559,114 @@ html.pf-html {
   }
 }
 
-@media (min-width: 991px) {
-  html.pf-html {
-    font-size: 55%;
-  }
-}
-
-@media (min-width: 1250px) {
-  html.pf-html {
-    font-size: 62.5%;
-  }
-}
-
-/* The three daisyUI pieces the portfolio used (daisyUI itself would restyle the whole site). */
-.pf-root .tooltip {
-  position: relative;
+.pf-caret {
   display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: rgb(var(--accent));
+  animation: pf-blink 1s steps(1) infinite;
 }
-.pf-root .tooltip[data-tip]::before {
-  content: attr(data-tip);
-  position: absolute;
-  z-index: 10;
-  left: 50%;
-  top: calc(100% + 0.6rem);
-  translate: -50% 0;
-  padding: 0.4rem 0.9rem;
-  border-radius: 0.6rem;
-  background: #111827;
-  color: #e5e7eb;
-  font-size: 1.3rem;
-  white-space: nowrap;
+@keyframes pf-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.pf-html {
+    scroll-behavior: auto;
+  }
+  .pf-loader img,
+  .pf-caret {
+    animation: none;
+  }
+}
+
+/* ---------- Pieces used by the sections ---------- */
+
+.pf-root .myScroll::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+  background-color: transparent;
+}
+.pf-root .myScroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+}
+.pf-root .noScroll {
+  scrollbar-width: none;
+}
+.pf-root .noScroll::-webkit-scrollbar {
+  width: 0;
+}
+
+/* Cover slideshow in the profile card */
+.pf-root .bgSlider .swiper {
+  width: 100%;
+  height: 100%;
+}
+.pf-root .bgSlider .swiper-fade .swiper-slide img {
   opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
+  transform: scale(1.08);
+  transition: 1400ms ease !important;
 }
-.pf-root .tooltip[data-tip]:hover::before {
+.pf-root .bgSlider .swiper-fade .swiper-slide.swiper-slide-active img {
   opacity: 1;
+  transform: scale(1);
 }
+
+/* Testimonials slider dots */
+.pf-root .swiper-pagination {
+  position: static;
+  margin-top: 2rem;
+}
+.pf-root .swiper-pagination .swiper-pagination-bullet {
+  width: 0.8rem;
+  height: 0.8rem;
+  margin: 0 0.4rem !important;
+  background: rgba(255, 255, 255, 0.25) !important;
+  opacity: 1;
+  transition: width 0.25s;
+}
+.pf-root .swiper-pagination .swiper-pagination-bullet-active {
+  width: 2.4rem;
+  border-radius: 999px;
+  background: rgb(var(--accent)) !important;
+}
+
+/* Markdown lists: one accent bullet per item (the browser's own marker is turned off). */
+.pf-root .prose ul {
+  padding-left: 0;
+  list-style: none;
+}
+.pf-root .prose ul > li {
+  position: relative;
+  padding-left: 1.8rem;
+}
+.pf-root .prose ul > li::marker {
+  content: none;
+}
+.pf-root .prose ul > li::before {
+  content: "";
+  position: absolute;
+  left: 0.2rem;
+  top: 0.72em;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: rgb(var(--accent));
+}
+.pf-root .prose ol {
+  padding-left: 1.8rem;
+}
+
+/* Skill rings and bars */
 .pf-root .radial-progress {
   --value: 0;
   --size: 5rem;
-  --thickness: calc(var(--size) / 10);
+  --thickness: calc(var(--size) / 12);
   position: relative;
   display: inline-grid;
   place-content: center;
@@ -377,23 +692,41 @@ html.pf-html {
     #000 calc(100% - var(--thickness) + 1px)
   );
 }
-.pf-root .progress {
-  position: relative;
-  width: 100%;
+.pf-bar {
   height: 0.6rem;
   overflow: hidden;
-  border-radius: 9999px;
-  appearance: none;
-  -webkit-appearance: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
 }
-.pf-root .progress::-webkit-progress-bar {
-  background: transparent;
+.pf-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgb(var(--accent) / 0.6), rgb(var(--accent)));
 }
-.pf-root .progress::-webkit-progress-value {
-  background: rgb(var(--accent));
-  border-radius: 9999px;
+
+/* Tooltip on icon links */
+.pf-root .tooltip {
+  position: relative;
 }
-.pf-root .progress::-moz-progress-bar {
-  background: rgb(var(--accent));
-  border-radius: 9999px;
+.pf-root .tooltip[data-tip]::before {
+  content: attr(data-tip);
+  position: absolute;
+  z-index: 10;
+  left: 50%;
+  top: calc(100% + 0.6rem);
+  translate: -50% 0;
+  padding: 0.4rem 0.9rem;
+  border-radius: 0.6rem;
+  background: #1c1c22;
+  color: #e4e4e7;
+  font-size: 1.2rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.pf-root .tooltip[data-tip]:hover::before,
+.pf-root .tooltip[data-tip]:focus-visible::before {
+  opacity: 1;
 }

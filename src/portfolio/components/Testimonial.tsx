@@ -1,28 +1,39 @@
+import { RiDoubleQuotesL } from "react-icons/ri";
 import Img from "@/components/Img";
 import type { TestimonialData } from "@/lib/siteTypes";
 
 interface Props {
   testimonial: TestimonialData;
+  className?: string;
 }
 
-export default function Testimonial({ testimonial }: Props) {
+/** A quote with the person's photo, name and role. */
+export default function Testimonial({ testimonial, className = "" }: Props) {
   return (
-    <div className="testimonial px-12 py-10 flex flex-col items-center">
-      <h3 className="text-2xl italic text-gray-500 text-center font-medium tracking-wide relative mb-8 quote">
-        <span className="inline-block mx-14">{testimonial.quote}</span>
-      </h3>
-      {testimonial.photo && (
-        <Img
-          src={testimonial.photo.url}
-          alt={testimonial.photo.alt || testimonial.name}
-          width={90}
-          height={90}
-          style={{ objectFit: "cover" }}
-          className="rounded-full w-[90px] h-[90px]"
-        />
-      )}
-      <h2 className="capitalize text-2xl font-semibold text-gray-300 mt-3 mb-1.5">{testimonial.name}</h2>
-      {testimonial.role && <p className="text-xl text-gray-500 text-center mb-6">{testimonial.role}</p>}
-    </div>
+    <figure className={`pf-card p-8 sm:p-10 ${className}`}>
+      <RiDoubleQuotesL className="text-[4rem] text-main-orange opacity-80" aria-hidden />
+      <blockquote className="mt-4 text-[1.8rem] leading-[1.6] text-gray-200 whitespace-pre-line">
+        {testimonial.quote}
+      </blockquote>
+      <figcaption className="mt-8 flex items-center gap-4">
+        {testimonial.photo ? (
+          <Img
+            src={testimonial.photo.url}
+            alt={testimonial.photo.alt || testimonial.name}
+            width={52}
+            height={52}
+            className="w-[5.2rem] h-[5.2rem] rounded-full object-cover ring-2 ring-white/10"
+          />
+        ) : (
+          <span className="grid w-[5.2rem] h-[5.2rem] place-items-center rounded-full bg-main-orange/15 text-[2rem] font-bold text-main-orange">
+            {testimonial.name.charAt(0)}
+          </span>
+        )}
+        <span>
+          <span className="block text-[1.6rem] font-semibold text-white">{testimonial.name}</span>
+          {testimonial.role && <span className="block text-[1.35rem] text-gray-400">{testimonial.role}</span>}
+        </span>
+      </figcaption>
+    </figure>
   );
 }

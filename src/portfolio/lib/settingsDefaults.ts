@@ -13,7 +13,8 @@ export const DEFAULT_SECTIONS: { key: SectionKey; label: string; visible: boolea
   { key: "guestbook", label: "guest book", visible: true },
 ];
 
-export const DEFAULT_ACCENT = "#f59e0b";
+/** The main site's blue, so a portfolio matches solvimere.com unless Portfolio settings pick another colour. */
+export const DEFAULT_ACCENT = "#1578e6";
 
 export const FONT_OPTIONS = [
   { value: "poppins", label: "Poppins", css: '"Poppins"' },
@@ -21,10 +22,10 @@ export const FONT_OPTIONS = [
   { value: "geist", label: "Geist", css: '"Geist"' },
   { value: "inter", label: "Inter", css: '"Inter"' },
 ] as const;
-export const DEFAULT_FONT: FontKey = "poppins";
+export const DEFAULT_FONT: FontKey = "inter";
 export type FontKey = (typeof FONT_OPTIONS)[number]["value"];
 
-/** "#f59e0b" -> "245 158 11" (space-separated, for rgb(var(--accent) / α)). */
+/** "#1578e6" -> "21 120 230" (space-separated, for rgb(var(--accent) / α)). */
 export function hexToRgbChannels(hex: string): string {
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
   const n = parseInt(m ? m[1] : DEFAULT_ACCENT.slice(1), 16);

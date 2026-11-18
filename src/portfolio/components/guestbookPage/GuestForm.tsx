@@ -1,11 +1,12 @@
 import { useEffect, useState, useTransition } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { AiOutlineSwapRight } from "react-icons/ai";
+import { FiSend } from "react-icons/fi";
 import { createGuestbookComment } from "@/lib/actions";
 import type { GuestbookComment } from "@/lib/siteTypes";
 
 const GUEST_NAME_KEY = "portfolio_guestName";
+const MAX_COMMENT = 2000;
 
 interface Inputs {
   name: string;
@@ -17,15 +18,26 @@ interface Props {
 }
 
 export default function GuestForm({ onCreated }: Props) {
-  const { register, handleSubmit, reset, setValue } = useForm<Inputs>();
-  const [isChecked, setIsChecked] = useState<boolean>(false);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<Inputs>();
+  const [remember, setRemember] = useState(false);
   const [loading, startTransition] = useTransition();
+  const length = (watch("comment") || "").length;
 
   // localStorage only exists in the browser, so read the saved name after mount.
   useEffect(() => {
     try {
       const saved = localStorage.getItem(GUEST_NAME_KEY);
-      if (saved) setValue("name", saved);
+      if (saved) {
+        setValue("name", saved);
+        setRemember(true);
+      }
     } catch {
       // storage unavailable (private mode etc.) - just start empty
     }
@@ -39,63 +51,73 @@ export default function GuestForm({ onCreated }: Props) {
         return;
       }
       onCreated(res.data);
-      toast.success("Thanks for your comment", { duration: 5000 });
+      toast.success("Thanks for your comment!", { duration: 5000 });
       reset({ comment: "", name: res.data.name });
-      if (isChecked) {
-        try {
-          localStorage.setItem(GUEST_NAME_KEY, res.data.name);
-        } catch {
-          // ignore storage errors
-        }
+      try {
+        if (remember) localStorage.setItem(GUEST_NAME_KEY, res.data.name);
+        else localStorage.removeItem(GUEST_NAME_KEY);
+      } catch {
+        // ignore storage errors
       }
-      setIsChecked(false);
     });
   };
 
-  const onInvalid = () => toast.error("Please enter both a comment and your name.");
-
   return (
-    <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
-      <textarea
-        {...register("comment", { required: true, maxLength: 2000 })}
-        placeholder="Comment"
-        className="h-32 mb-4 formStyle"
-      ></textarea>
-      <input
-        {...register("name", { required: true, maxLength: 80 })}
-        type="text"
-        placeholder="Name"
-        className="h-20 formStyle"
-      />
-      <fieldset className="flex items-center gap-4 mt-6 mb-8">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="pf-card p-7 sm:p-8 grid gap-5 xl:sticky xl:top-[9rem]"
+      noValidate
+    >
+      <div>
+        <h3 className="text-[1.8rem] font-semibold text-white">Leave a note</h3>
+        <p className="mt-1 text-[1.4rem] text-gray-400">Your comment shows up here right away.</p>
+      </div>
+      <label className="pf-field">
+        <span className="pf-label">Your name</span>
         <input
-          disabled={loading}
-          id="reminder"
+          {...register("name", { required: "Please enter your name.", maxLength: 80 })}
+          type="text"
+          autoComplete="name"
+          placeholder="Jane Doe"
+          aria-invalid={errors.name ? "true" : undefined}
+          className="pf-input"
+        />
+        {errors.name && <span className="text-[1.25rem] text-red-400">{errors.name.message}</span>}
+      </label>
+      <label className="pf-field">
+        <span className="flex justify-between">
+          <span className="pf-label">Comment</span>
+          <span className={`text-[1.2rem] ${length > MAX_COMMENT ? "text-red-400" : "text-gray-500"}`}>
+            {length}/{MAX_COMMENT}
+          </span>
+        </span>
+        <textarea
+          {...register("comment", {
+            required: "Please write a comment.",
+            maxLength: { value: MAX_COMMENT, message: "That's a bit long — please shorten it." },
+          })}
+          placeholder="Great work! I especially liked…"
+          aria-invalid={errors.comment ? "true" : undefined}
+          className="pf-input"
+        />
+        {errors.comment && <span className="text-[1.25rem] text-red-400">{errors.comment.message}</span>}
+      </label>
+      <label className="flex items-center gap-3 text-[1.35rem] text-gray-400 cursor-pointer">
+        <input
           type="checkbox"
-          checked={isChecked}
-          onChange={() => setIsChecked((prev) => !prev)}
-        />
-        <label htmlFor="reminder" className="text-xl font-medium text-gray-600">
-          Save my name for the next time I come.
-        </label>
-      </fieldset>
-      <fieldset className="w-[22rem] h-20 bg-[#0e1422d9] flex justify-center items-center gap-3 text-gray-300 group mt-6 rounded-lg cursor-pointer">
-        <button
-          type="submit"
+          className="pf-check"
           disabled={loading}
-          className={`${
-            loading ? "pointer-events-none" : "group-hover:text-main-orange"
-          } uppercase text-2xl font-semibold group-hover:mx-2 transition-all duration-300`}
-        >
-          {loading ? "submitting..." : "submit"}
-        </button>
-
-        <AiOutlineSwapRight
-          className={`text-4xl group-hover:text-main-orange transition-all duration-300 ${
-            loading ? "hidden" : "block"
-          }`}
+          checked={remember}
+          onChange={() => setRemember((prev) => !prev)}
         />
-      </fieldset>
+        Remember my name on this device
+      </label>
+      <button type="submit" disabled={loading} className="pf-btn justify-self-start">
+        {loading ? "Posting…" : "Post comment"}
+        <span className="pf-btn-ico">
+          <FiSend aria-hidden />
+        </span>
+      </button>
     </form>
   );
 }

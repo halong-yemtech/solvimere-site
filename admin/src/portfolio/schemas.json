@@ -2994,14 +2994,14 @@
                         "label": "Accent",
                         "description": "Highlight color used across the site.",
                         "width": "50%",
-                        "defaultValue": "#f59e0b",
+                        "defaultValue": "#1578e6",
                         "type": "color"
                       },
                       {
                         "name": "font",
                         "label": "Font",
                         "width": "50%",
-                        "defaultValue": "poppins",
+                        "defaultValue": "inter",
                         "type": "select",
                         "options": [
                           {
